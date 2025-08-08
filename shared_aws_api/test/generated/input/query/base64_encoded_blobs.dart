@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'base64_encoded_blobs.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Base64 encoded Blobs
 class Base64EncodedBlobs {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   Base64EncodedBlobs({
     required String region,
@@ -31,7 +30,7 @@ class Base64EncodedBlobs {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'Base64EncodedBlobs',
@@ -40,9 +39,7 @@ class Base64EncodedBlobs {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -56,8 +53,9 @@ class Base64EncodedBlobs {
   Future<void> operationName0({
     Uint8List? blobArg,
   }) async {
-    final $request = <String, dynamic>{};
-    blobArg?.also((arg) => $request['BlobArg'] = arg);
+    final $request = <String, String>{
+      if (blobArg != null) 'BlobArg': base64Encode(blobArg),
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -65,8 +63,6 @@ class Base64EncodedBlobs {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }

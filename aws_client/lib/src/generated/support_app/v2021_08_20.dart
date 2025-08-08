@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -161,7 +162,7 @@ class SupportApp {
     final $payload = <String, dynamic>{
       'channelId': channelId,
       'channelRoleArn': channelRoleArn,
-      'notifyOnCaseSeverity': notifyOnCaseSeverity.toValue(),
+      'notifyOnCaseSeverity': notifyOnCaseSeverity.value,
       'teamId': teamId,
       if (channelName != null) 'channelName': channelName,
       if (notifyOnAddCorrespondenceToCase != null)
@@ -510,7 +511,7 @@ class SupportApp {
       if (notifyOnAddCorrespondenceToCase != null)
         'notifyOnAddCorrespondenceToCase': notifyOnAddCorrespondenceToCase,
       if (notifyOnCaseSeverity != null)
-        'notifyOnCaseSeverity': notifyOnCaseSeverity.toValue(),
+        'notifyOnCaseSeverity': notifyOnCaseSeverity.value,
       if (notifyOnCreateOrReopenCase != null)
         'notifyOnCreateOrReopenCase': notifyOnCreateOrReopenCase,
       if (notifyOnResolveCase != null)
@@ -527,31 +528,17 @@ class SupportApp {
 }
 
 enum AccountType {
-  management,
-  member,
-}
+  management('management'),
+  member('member'),
+  ;
 
-extension AccountTypeValueExtension on AccountType {
-  String toValue() {
-    switch (this) {
-      case AccountType.management:
-        return 'management';
-      case AccountType.member:
-        return 'member';
-    }
-  }
-}
+  final String value;
 
-extension AccountTypeFromString on String {
-  AccountType toAccountType() {
-    switch (this) {
-      case 'management':
-        return AccountType.management;
-      case 'member':
-        return AccountType.member;
-    }
-    throw Exception('$this is not known in enum AccountType');
-  }
+  const AccountType(this.value);
+
+  static AccountType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum AccountType'));
 }
 
 class CreateSlackChannelConfigurationResult {
@@ -644,7 +631,7 @@ class ListSlackChannelConfigurationsResult {
       Map<String, dynamic> json) {
     return ListSlackChannelConfigurationsResult(
       slackChannelConfigurations: (json['slackChannelConfigurations'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               SlackChannelConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -681,7 +668,7 @@ class ListSlackWorkspaceConfigurationsResult {
       nextToken: json['nextToken'] as String?,
       slackWorkspaceConfigurations: (json['slackWorkspaceConfigurations']
               as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               SlackWorkspaceConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -700,36 +687,19 @@ class ListSlackWorkspaceConfigurationsResult {
 }
 
 enum NotificationSeverityLevel {
-  none,
-  all,
-  high,
-}
+  none('none'),
+  all('all'),
+  high('high'),
+  ;
 
-extension NotificationSeverityLevelValueExtension on NotificationSeverityLevel {
-  String toValue() {
-    switch (this) {
-      case NotificationSeverityLevel.none:
-        return 'none';
-      case NotificationSeverityLevel.all:
-        return 'all';
-      case NotificationSeverityLevel.high:
-        return 'high';
-    }
-  }
-}
+  final String value;
 
-extension NotificationSeverityLevelFromString on String {
-  NotificationSeverityLevel toNotificationSeverityLevel() {
-    switch (this) {
-      case 'none':
-        return NotificationSeverityLevel.none;
-      case 'all':
-        return NotificationSeverityLevel.all;
-      case 'high':
-        return NotificationSeverityLevel.high;
-    }
-    throw Exception('$this is not known in enum NotificationSeverityLevel');
-  }
+  const NotificationSeverityLevel(this.value);
+
+  static NotificationSeverityLevel fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum NotificationSeverityLevel'));
 }
 
 class PutAccountAliasResult {
@@ -765,7 +735,8 @@ class RegisterSlackWorkspaceForOrganizationResult {
   factory RegisterSlackWorkspaceForOrganizationResult.fromJson(
       Map<String, dynamic> json) {
     return RegisterSlackWorkspaceForOrganizationResult(
-      accountType: (json['accountType'] as String?)?.toAccountType(),
+      accountType:
+          (json['accountType'] as String?)?.let(AccountType.fromString),
       teamId: json['teamId'] as String?,
       teamName: json['teamName'] as String?,
     );
@@ -776,7 +747,7 @@ class RegisterSlackWorkspaceForOrganizationResult {
     final teamId = this.teamId;
     final teamName = this.teamName;
     return {
-      if (accountType != null) 'accountType': accountType.toValue(),
+      if (accountType != null) 'accountType': accountType.value,
       if (teamId != null) 'teamId': teamId,
       if (teamName != null) 'teamName': teamName,
     };
@@ -838,7 +809,7 @@ class SlackChannelConfiguration {
       notifyOnAddCorrespondenceToCase:
           json['notifyOnAddCorrespondenceToCase'] as bool?,
       notifyOnCaseSeverity: (json['notifyOnCaseSeverity'] as String?)
-          ?.toNotificationSeverityLevel(),
+          ?.let(NotificationSeverityLevel.fromString),
       notifyOnCreateOrReopenCase: json['notifyOnCreateOrReopenCase'] as bool?,
       notifyOnResolveCase: json['notifyOnResolveCase'] as bool?,
     );
@@ -862,7 +833,7 @@ class SlackChannelConfiguration {
       if (notifyOnAddCorrespondenceToCase != null)
         'notifyOnAddCorrespondenceToCase': notifyOnAddCorrespondenceToCase,
       if (notifyOnCaseSeverity != null)
-        'notifyOnCaseSeverity': notifyOnCaseSeverity.toValue(),
+        'notifyOnCaseSeverity': notifyOnCaseSeverity.value,
       if (notifyOnCreateOrReopenCase != null)
         'notifyOnCreateOrReopenCase': notifyOnCreateOrReopenCase,
       if (notifyOnResolveCase != null)
@@ -966,7 +937,7 @@ class UpdateSlackChannelConfigurationResult {
       notifyOnAddCorrespondenceToCase:
           json['notifyOnAddCorrespondenceToCase'] as bool?,
       notifyOnCaseSeverity: (json['notifyOnCaseSeverity'] as String?)
-          ?.toNotificationSeverityLevel(),
+          ?.let(NotificationSeverityLevel.fromString),
       notifyOnCreateOrReopenCase: json['notifyOnCreateOrReopenCase'] as bool?,
       notifyOnResolveCase: json['notifyOnResolveCase'] as bool?,
       teamId: json['teamId'] as String?,
@@ -990,7 +961,7 @@ class UpdateSlackChannelConfigurationResult {
       if (notifyOnAddCorrespondenceToCase != null)
         'notifyOnAddCorrespondenceToCase': notifyOnAddCorrespondenceToCase,
       if (notifyOnCaseSeverity != null)
-        'notifyOnCaseSeverity': notifyOnCaseSeverity.toValue(),
+        'notifyOnCaseSeverity': notifyOnCaseSeverity.value,
       if (notifyOnCreateOrReopenCase != null)
         'notifyOnCreateOrReopenCase': notifyOnCreateOrReopenCase,
       if (notifyOnResolveCase != null)

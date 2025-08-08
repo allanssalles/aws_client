@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'list_types.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// List types
 class ListTypes {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   ListTypes({
     required String region,
@@ -31,7 +30,7 @@ class ListTypes {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'ListTypes',
@@ -40,9 +39,7 @@ class ListTypes {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -56,8 +53,14 @@ class ListTypes {
   Future<void> operationName0({
     List<String>? listArg,
   }) async {
-    final $request = <String, dynamic>{};
-    listArg?.also((arg) => $request['ListArg'] = arg);
+    final $request = <String, String>{
+      if (listArg != null)
+        if (listArg.isEmpty)
+          'ListArg': ''
+        else
+          for (var i1 = 0; i1 < listArg.length; i1++)
+            'ListArg.member.${i1 + 1}': listArg[i1],
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -65,16 +68,20 @@ class ListTypes {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 
   Future<void> operationName1({
     List<String>? listArg,
   }) async {
-    final $request = <String, dynamic>{};
-    listArg?.also((arg) => $request['ListArg'] = arg);
+    final $request = <String, String>{
+      if (listArg != null)
+        if (listArg.isEmpty)
+          'ListArg': ''
+        else
+          for (var i1 = 0; i1 < listArg.length; i1++)
+            'ListArg.member.${i1 + 1}': listArg[i1],
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -82,8 +89,6 @@ class ListTypes {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }

@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -141,7 +142,7 @@ class ApiGatewayV2 {
   }) async {
     final $payload = <String, dynamic>{
       'name': name,
-      'protocolType': protocolType.toValue(),
+      'protocolType': protocolType.value,
       if (apiKeySelectionExpression != null)
         'apiKeySelectionExpression': apiKeySelectionExpression,
       if (corsConfiguration != null) 'corsConfiguration': corsConfiguration,
@@ -317,7 +318,7 @@ class ApiGatewayV2 {
       3600,
     );
     final $payload = <String, dynamic>{
-      'authorizerType': authorizerType.toValue(),
+      'authorizerType': authorizerType.value,
       'identitySource': identitySource,
       'name': name,
       if (authorizerCredentialsArn != null)
@@ -624,18 +625,18 @@ class ApiGatewayV2 {
       30000,
     );
     final $payload = <String, dynamic>{
-      'integrationType': integrationType.toValue(),
+      'integrationType': integrationType.value,
       if (connectionId != null) 'connectionId': connectionId,
-      if (connectionType != null) 'connectionType': connectionType.toValue(),
+      if (connectionType != null) 'connectionType': connectionType.value,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (credentialsArn != null) 'credentialsArn': credentialsArn,
       if (description != null) 'description': description,
       if (integrationMethod != null) 'integrationMethod': integrationMethod,
       if (integrationSubtype != null) 'integrationSubtype': integrationSubtype,
       if (integrationUri != null) 'integrationUri': integrationUri,
       if (passthroughBehavior != null)
-        'passthroughBehavior': passthroughBehavior.toValue(),
+        'passthroughBehavior': passthroughBehavior.value,
       if (payloadFormatVersion != null)
         'payloadFormatVersion': payloadFormatVersion,
       if (requestParameters != null) 'requestParameters': requestParameters,
@@ -720,7 +721,7 @@ class ApiGatewayV2 {
     final $payload = <String, dynamic>{
       'integrationResponseKey': integrationResponseKey,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (responseParameters != null) 'responseParameters': responseParameters,
       if (responseTemplates != null) 'responseTemplates': responseTemplates,
       if (templateSelectionExpression != null)
@@ -851,7 +852,7 @@ class ApiGatewayV2 {
       if (authorizationScopes != null)
         'authorizationScopes': authorizationScopes,
       if (authorizationType != null)
-        'authorizationType': authorizationType.toValue(),
+        'authorizationType': authorizationType.value,
       if (authorizerId != null) 'authorizerId': authorizerId,
       if (modelSelectionExpression != null)
         'modelSelectionExpression': modelSelectionExpression,
@@ -1283,7 +1284,7 @@ class ApiGatewayV2 {
     );
   }
 
-  /// Deletes a route request parameter.
+  /// Deletes a route request parameter. Supported only for WebSocket APIs.
   ///
   /// May throw [NotFoundException].
   /// May throw [TooManyRequestsException].
@@ -2642,7 +2643,7 @@ class ApiGatewayV2 {
         'authorizerPayloadFormatVersion': authorizerPayloadFormatVersion,
       if (authorizerResultTtlInSeconds != null)
         'authorizerResultTtlInSeconds': authorizerResultTtlInSeconds,
-      if (authorizerType != null) 'authorizerType': authorizerType.toValue(),
+      if (authorizerType != null) 'authorizerType': authorizerType.value,
       if (authorizerUri != null) 'authorizerUri': authorizerUri,
       if (enableSimpleResponses != null)
         'enableSimpleResponses': enableSimpleResponses,
@@ -2879,7 +2880,7 @@ class ApiGatewayV2 {
   /// action can be append, overwrite or remove. For values, you can provide
   /// static values, or map request data, stage variables, or context variables
   /// that are evaluated at runtime. To learn more, see <a
-  /// href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-parameter-mapping.">Transforming
+  /// href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-parameter-mapping.html">Transforming
   /// API requests and responses</a>.
   ///
   /// Parameter [requestTemplates] :
@@ -2942,17 +2943,17 @@ class ApiGatewayV2 {
     );
     final $payload = <String, dynamic>{
       if (connectionId != null) 'connectionId': connectionId,
-      if (connectionType != null) 'connectionType': connectionType.toValue(),
+      if (connectionType != null) 'connectionType': connectionType.value,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (credentialsArn != null) 'credentialsArn': credentialsArn,
       if (description != null) 'description': description,
       if (integrationMethod != null) 'integrationMethod': integrationMethod,
       if (integrationSubtype != null) 'integrationSubtype': integrationSubtype,
-      if (integrationType != null) 'integrationType': integrationType.toValue(),
+      if (integrationType != null) 'integrationType': integrationType.value,
       if (integrationUri != null) 'integrationUri': integrationUri,
       if (passthroughBehavior != null)
-        'passthroughBehavior': passthroughBehavior.toValue(),
+        'passthroughBehavior': passthroughBehavior.value,
       if (payloadFormatVersion != null)
         'payloadFormatVersion': payloadFormatVersion,
       if (requestParameters != null) 'requestParameters': requestParameters,
@@ -3045,7 +3046,7 @@ class ApiGatewayV2 {
   }) async {
     final $payload = <String, dynamic>{
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (integrationResponseKey != null)
         'integrationResponseKey': integrationResponseKey,
       if (responseParameters != null) 'responseParameters': responseParameters,
@@ -3186,7 +3187,7 @@ class ApiGatewayV2 {
       if (authorizationScopes != null)
         'authorizationScopes': authorizationScopes,
       if (authorizationType != null)
-        'authorizationType': authorizationType.toValue(),
+        'authorizationType': authorizationType.value,
       if (authorizerId != null) 'authorizerId': authorizerId,
       if (modelSelectionExpression != null)
         'modelSelectionExpression': modelSelectionExpression,
@@ -3486,7 +3487,7 @@ class Api {
   factory Api.fromJson(Map<String, dynamic> json) {
     return Api(
       name: json['name'] as String,
-      protocolType: (json['protocolType'] as String).toProtocolType(),
+      protocolType: ProtocolType.fromString((json['protocolType'] as String)),
       routeSelectionExpression: json['routeSelectionExpression'] as String,
       apiEndpoint: json['apiEndpoint'] as String?,
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
@@ -3500,14 +3501,14 @@ class Api {
       disableExecuteApiEndpoint: json['disableExecuteApiEndpoint'] as bool?,
       disableSchemaValidation: json['disableSchemaValidation'] as bool?,
       importInfo: (json['importInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       version: json['version'] as String?,
       warnings: (json['warnings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -3532,7 +3533,7 @@ class Api {
     final warnings = this.warnings;
     return {
       'name': name,
-      'protocolType': protocolType.toValue(),
+      'protocolType': protocolType.value,
       'routeSelectionExpression': routeSelectionExpression,
       if (apiEndpoint != null) 'apiEndpoint': apiEndpoint,
       if (apiGatewayManaged != null) 'apiGatewayManaged': apiGatewayManaged,
@@ -3604,41 +3605,20 @@ class ApiMapping {
 /// using JSON Web Tokens, AWS_IAM for using AWS IAM permissions, and CUSTOM for
 /// using a Lambda authorizer.
 enum AuthorizationType {
-  none,
-  awsIam,
-  custom,
-  jwt,
-}
+  none('NONE'),
+  awsIam('AWS_IAM'),
+  custom('CUSTOM'),
+  jwt('JWT'),
+  ;
 
-extension AuthorizationTypeValueExtension on AuthorizationType {
-  String toValue() {
-    switch (this) {
-      case AuthorizationType.none:
-        return 'NONE';
-      case AuthorizationType.awsIam:
-        return 'AWS_IAM';
-      case AuthorizationType.custom:
-        return 'CUSTOM';
-      case AuthorizationType.jwt:
-        return 'JWT';
-    }
-  }
-}
+  final String value;
 
-extension AuthorizationTypeFromString on String {
-  AuthorizationType toAuthorizationType() {
-    switch (this) {
-      case 'NONE':
-        return AuthorizationType.none;
-      case 'AWS_IAM':
-        return AuthorizationType.awsIam;
-      case 'CUSTOM':
-        return AuthorizationType.custom;
-      case 'JWT':
-        return AuthorizationType.jwt;
-    }
-    throw Exception('$this is not known in enum AuthorizationType');
-  }
+  const AuthorizationType(this.value);
+
+  static AuthorizationType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum AuthorizationType'));
 }
 
 /// Represents an authorizer.
@@ -3750,11 +3730,12 @@ class Authorizer {
           json['authorizerPayloadFormatVersion'] as String?,
       authorizerResultTtlInSeconds:
           json['authorizerResultTtlInSeconds'] as int?,
-      authorizerType: (json['authorizerType'] as String?)?.toAuthorizerType(),
+      authorizerType:
+          (json['authorizerType'] as String?)?.let(AuthorizerType.fromString),
       authorizerUri: json['authorizerUri'] as String?,
       enableSimpleResponses: json['enableSimpleResponses'] as bool?,
       identitySource: (json['identitySource'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       identityValidationExpression:
@@ -3787,7 +3768,7 @@ class Authorizer {
         'authorizerPayloadFormatVersion': authorizerPayloadFormatVersion,
       if (authorizerResultTtlInSeconds != null)
         'authorizerResultTtlInSeconds': authorizerResultTtlInSeconds,
-      if (authorizerType != null) 'authorizerType': authorizerType.toValue(),
+      if (authorizerType != null) 'authorizerType': authorizerType.value,
       if (authorizerUri != null) 'authorizerUri': authorizerUri,
       if (enableSimpleResponses != null)
         'enableSimpleResponses': enableSimpleResponses,
@@ -3803,90 +3784,51 @@ class Authorizer {
 /// request parameters. Specify JWT to use JSON Web Tokens (supported only for
 /// HTTP APIs).
 enum AuthorizerType {
-  request,
-  jwt,
-}
+  request('REQUEST'),
+  jwt('JWT'),
+  ;
 
-extension AuthorizerTypeValueExtension on AuthorizerType {
-  String toValue() {
-    switch (this) {
-      case AuthorizerType.request:
-        return 'REQUEST';
-      case AuthorizerType.jwt:
-        return 'JWT';
-    }
-  }
-}
+  final String value;
 
-extension AuthorizerTypeFromString on String {
-  AuthorizerType toAuthorizerType() {
-    switch (this) {
-      case 'REQUEST':
-        return AuthorizerType.request;
-      case 'JWT':
-        return AuthorizerType.jwt;
-    }
-    throw Exception('$this is not known in enum AuthorizerType');
-  }
+  const AuthorizerType(this.value);
+
+  static AuthorizerType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum AuthorizerType'));
 }
 
 /// Represents a connection type.
 enum ConnectionType {
-  internet,
-  vpcLink,
-}
+  internet('INTERNET'),
+  vpcLink('VPC_LINK'),
+  ;
 
-extension ConnectionTypeValueExtension on ConnectionType {
-  String toValue() {
-    switch (this) {
-      case ConnectionType.internet:
-        return 'INTERNET';
-      case ConnectionType.vpcLink:
-        return 'VPC_LINK';
-    }
-  }
-}
+  final String value;
 
-extension ConnectionTypeFromString on String {
-  ConnectionType toConnectionType() {
-    switch (this) {
-      case 'INTERNET':
-        return ConnectionType.internet;
-      case 'VPC_LINK':
-        return ConnectionType.vpcLink;
-    }
-    throw Exception('$this is not known in enum ConnectionType');
-  }
+  const ConnectionType(this.value);
+
+  static ConnectionType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ConnectionType'));
 }
 
 /// Specifies how to handle response payload content type conversions. Supported
 /// only for WebSocket APIs.
 enum ContentHandlingStrategy {
-  convertToBinary,
-  convertToText,
-}
+  convertToBinary('CONVERT_TO_BINARY'),
+  convertToText('CONVERT_TO_TEXT'),
+  ;
 
-extension ContentHandlingStrategyValueExtension on ContentHandlingStrategy {
-  String toValue() {
-    switch (this) {
-      case ContentHandlingStrategy.convertToBinary:
-        return 'CONVERT_TO_BINARY';
-      case ContentHandlingStrategy.convertToText:
-        return 'CONVERT_TO_TEXT';
-    }
-  }
-}
+  final String value;
 
-extension ContentHandlingStrategyFromString on String {
-  ContentHandlingStrategy toContentHandlingStrategy() {
-    switch (this) {
-      case 'CONVERT_TO_BINARY':
-        return ContentHandlingStrategy.convertToBinary;
-      case 'CONVERT_TO_TEXT':
-        return ContentHandlingStrategy.convertToText;
-    }
-    throw Exception('$this is not known in enum ContentHandlingStrategy');
-  }
+  const ContentHandlingStrategy(this.value);
+
+  static ContentHandlingStrategy fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ContentHandlingStrategy'));
 }
 
 /// Represents a CORS configuration. Supported only for HTTP APIs. See <a
@@ -3927,19 +3869,19 @@ class Cors {
     return Cors(
       allowCredentials: json['allowCredentials'] as bool?,
       allowHeaders: (json['allowHeaders'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       allowMethods: (json['allowMethods'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       allowOrigins: (json['allowOrigins'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       exposeHeaders: (json['exposeHeaders'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       maxAge: json['maxAge'] as int?,
@@ -4106,17 +4048,18 @@ class CreateApiResponse {
       disableExecuteApiEndpoint: json['disableExecuteApiEndpoint'] as bool?,
       disableSchemaValidation: json['disableSchemaValidation'] as bool?,
       importInfo: (json['importInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       name: json['name'] as String?,
-      protocolType: (json['protocolType'] as String?)?.toProtocolType(),
+      protocolType:
+          (json['protocolType'] as String?)?.let(ProtocolType.fromString),
       routeSelectionExpression: json['routeSelectionExpression'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       version: json['version'] as String?,
       warnings: (json['warnings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -4154,7 +4097,7 @@ class CreateApiResponse {
         'disableSchemaValidation': disableSchemaValidation,
       if (importInfo != null) 'importInfo': importInfo,
       if (name != null) 'name': name,
-      if (protocolType != null) 'protocolType': protocolType.toValue(),
+      if (protocolType != null) 'protocolType': protocolType.value,
       if (routeSelectionExpression != null)
         'routeSelectionExpression': routeSelectionExpression,
       if (tags != null) 'tags': tags,
@@ -4271,11 +4214,12 @@ class CreateAuthorizerResponse {
           json['authorizerPayloadFormatVersion'] as String?,
       authorizerResultTtlInSeconds:
           json['authorizerResultTtlInSeconds'] as int?,
-      authorizerType: (json['authorizerType'] as String?)?.toAuthorizerType(),
+      authorizerType:
+          (json['authorizerType'] as String?)?.let(AuthorizerType.fromString),
       authorizerUri: json['authorizerUri'] as String?,
       enableSimpleResponses: json['enableSimpleResponses'] as bool?,
       identitySource: (json['identitySource'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       identityValidationExpression:
@@ -4308,7 +4252,7 @@ class CreateAuthorizerResponse {
         'authorizerPayloadFormatVersion': authorizerPayloadFormatVersion,
       if (authorizerResultTtlInSeconds != null)
         'authorizerResultTtlInSeconds': authorizerResultTtlInSeconds,
-      if (authorizerType != null) 'authorizerType': authorizerType.toValue(),
+      if (authorizerType != null) 'authorizerType': authorizerType.value,
       if (authorizerUri != null) 'authorizerUri': authorizerUri,
       if (enableSimpleResponses != null)
         'enableSimpleResponses': enableSimpleResponses,
@@ -4354,8 +4298,8 @@ class CreateDeploymentResponse {
       autoDeployed: json['autoDeployed'] as bool?,
       createdDate: timeStampFromJson(json['createdDate']),
       deploymentId: json['deploymentId'] as String?,
-      deploymentStatus:
-          (json['deploymentStatus'] as String?)?.toDeploymentStatus(),
+      deploymentStatus: (json['deploymentStatus'] as String?)
+          ?.let(DeploymentStatus.fromString),
       deploymentStatusMessage: json['deploymentStatusMessage'] as String?,
       description: json['description'] as String?,
     );
@@ -4372,8 +4316,7 @@ class CreateDeploymentResponse {
       if (autoDeployed != null) 'autoDeployed': autoDeployed,
       if (createdDate != null) 'createdDate': iso8601ToJson(createdDate),
       if (deploymentId != null) 'deploymentId': deploymentId,
-      if (deploymentStatus != null)
-        'deploymentStatus': deploymentStatus.toValue(),
+      if (deploymentStatus != null) 'deploymentStatus': deploymentStatus.value,
       if (deploymentStatusMessage != null)
         'deploymentStatusMessage': deploymentStatusMessage,
       if (description != null) 'description': description,
@@ -4411,7 +4354,7 @@ class CreateDomainNameResponse {
           json['apiMappingSelectionExpression'] as String?,
       domainName: json['domainName'] as String?,
       domainNameConfigurations: (json['domainNameConfigurations'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               DomainNameConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -4585,7 +4528,7 @@ class CreateIntegrationResult {
   /// href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services.html">Working
   /// with AWS service integrations for HTTP APIs</a>.
   ///
-  /// For HTTP API itegrations, without a specified integrationSubtype request
+  /// For HTTP API integrations, without a specified integrationSubtype request
   /// parameters are a key-value map specifying how to transform HTTP requests
   /// before sending them to backend integrations. The key should follow the
   /// pattern &lt;action&gt;:&lt;header|querystring|path&gt;.&lt;location&gt;. The
@@ -4656,9 +4599,10 @@ class CreateIntegrationResult {
     return CreateIntegrationResult(
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       connectionId: json['connectionId'] as String?,
-      connectionType: (json['connectionType'] as String?)?.toConnectionType(),
+      connectionType:
+          (json['connectionType'] as String?)?.let(ConnectionType.fromString),
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       credentialsArn: json['credentialsArn'] as String?,
       description: json['description'] as String?,
       integrationId: json['integrationId'] as String?,
@@ -4667,10 +4611,10 @@ class CreateIntegrationResult {
           json['integrationResponseSelectionExpression'] as String?,
       integrationSubtype: json['integrationSubtype'] as String?,
       integrationType:
-          (json['integrationType'] as String?)?.toIntegrationType(),
+          (json['integrationType'] as String?)?.let(IntegrationType.fromString),
       integrationUri: json['integrationUri'] as String?,
-      passthroughBehavior:
-          (json['passthroughBehavior'] as String?)?.toPassthroughBehavior(),
+      passthroughBehavior: (json['passthroughBehavior'] as String?)
+          ?.let(PassthroughBehavior.fromString),
       payloadFormatVersion: json['payloadFormatVersion'] as String?,
       requestParameters: (json['requestParameters'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -4715,9 +4659,9 @@ class CreateIntegrationResult {
     return {
       if (apiGatewayManaged != null) 'apiGatewayManaged': apiGatewayManaged,
       if (connectionId != null) 'connectionId': connectionId,
-      if (connectionType != null) 'connectionType': connectionType.toValue(),
+      if (connectionType != null) 'connectionType': connectionType.value,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (credentialsArn != null) 'credentialsArn': credentialsArn,
       if (description != null) 'description': description,
       if (integrationId != null) 'integrationId': integrationId,
@@ -4726,10 +4670,10 @@ class CreateIntegrationResult {
         'integrationResponseSelectionExpression':
             integrationResponseSelectionExpression,
       if (integrationSubtype != null) 'integrationSubtype': integrationSubtype,
-      if (integrationType != null) 'integrationType': integrationType.toValue(),
+      if (integrationType != null) 'integrationType': integrationType.value,
       if (integrationUri != null) 'integrationUri': integrationUri,
       if (passthroughBehavior != null)
-        'passthroughBehavior': passthroughBehavior.toValue(),
+        'passthroughBehavior': passthroughBehavior.value,
       if (payloadFormatVersion != null)
         'payloadFormatVersion': payloadFormatVersion,
       if (requestParameters != null) 'requestParameters': requestParameters,
@@ -4800,7 +4744,7 @@ class CreateIntegrationResponseResponse {
       Map<String, dynamic> json) {
     return CreateIntegrationResponseResponse(
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       integrationResponseId: json['integrationResponseId'] as String?,
       integrationResponseKey: json['integrationResponseKey'] as String?,
       responseParameters: (json['responseParameters'] as Map<String, dynamic>?)
@@ -4821,7 +4765,7 @@ class CreateIntegrationResponseResponse {
     final templateSelectionExpression = this.templateSelectionExpression;
     return {
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (integrationResponseId != null)
         'integrationResponseId': integrationResponseId,
       if (integrationResponseKey != null)
@@ -4964,11 +4908,11 @@ class CreateRouteResult {
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       apiKeyRequired: json['apiKeyRequired'] as bool?,
       authorizationScopes: (json['authorizationScopes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
-      authorizationType:
-          (json['authorizationType'] as String?)?.toAuthorizationType(),
+      authorizationType: (json['authorizationType'] as String?)
+          ?.let(AuthorizationType.fromString),
       authorizerId: json['authorizerId'] as String?,
       modelSelectionExpression: json['modelSelectionExpression'] as String?,
       operationName: json['operationName'] as String?,
@@ -5006,7 +4950,7 @@ class CreateRouteResult {
       if (authorizationScopes != null)
         'authorizationScopes': authorizationScopes,
       if (authorizationType != null)
-        'authorizationType': authorizationType.toValue(),
+        'authorizationType': authorizationType.value,
       if (authorizerId != null) 'authorizerId': authorizerId,
       if (modelSelectionExpression != null)
         'modelSelectionExpression': modelSelectionExpression,
@@ -5259,19 +5203,21 @@ class CreateVpcLinkResponse {
       createdDate: timeStampFromJson(json['createdDate']),
       name: json['name'] as String?,
       securityGroupIds: (json['securityGroupIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       subnetIds: (json['subnetIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       vpcLinkId: json['vpcLinkId'] as String?,
-      vpcLinkStatus: (json['vpcLinkStatus'] as String?)?.toVpcLinkStatus(),
+      vpcLinkStatus:
+          (json['vpcLinkStatus'] as String?)?.let(VpcLinkStatus.fromString),
       vpcLinkStatusMessage: json['vpcLinkStatusMessage'] as String?,
-      vpcLinkVersion: (json['vpcLinkVersion'] as String?)?.toVpcLinkVersion(),
+      vpcLinkVersion:
+          (json['vpcLinkVersion'] as String?)?.let(VpcLinkVersion.fromString),
     );
   }
 
@@ -5292,10 +5238,10 @@ class CreateVpcLinkResponse {
       if (subnetIds != null) 'subnetIds': subnetIds,
       if (tags != null) 'tags': tags,
       if (vpcLinkId != null) 'vpcLinkId': vpcLinkId,
-      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.toValue(),
+      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.value,
       if (vpcLinkStatusMessage != null)
         'vpcLinkStatusMessage': vpcLinkStatusMessage,
-      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.toValue(),
+      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.value,
     };
   }
 }
@@ -5348,8 +5294,8 @@ class Deployment {
       autoDeployed: json['autoDeployed'] as bool?,
       createdDate: timeStampFromJson(json['createdDate']),
       deploymentId: json['deploymentId'] as String?,
-      deploymentStatus:
-          (json['deploymentStatus'] as String?)?.toDeploymentStatus(),
+      deploymentStatus: (json['deploymentStatus'] as String?)
+          ?.let(DeploymentStatus.fromString),
       deploymentStatusMessage: json['deploymentStatusMessage'] as String?,
       description: json['description'] as String?,
     );
@@ -5366,8 +5312,7 @@ class Deployment {
       if (autoDeployed != null) 'autoDeployed': autoDeployed,
       if (createdDate != null) 'createdDate': iso8601ToJson(createdDate),
       if (deploymentId != null) 'deploymentId': deploymentId,
-      if (deploymentStatus != null)
-        'deploymentStatus': deploymentStatus.toValue(),
+      if (deploymentStatus != null) 'deploymentStatus': deploymentStatus.value,
       if (deploymentStatusMessage != null)
         'deploymentStatusMessage': deploymentStatusMessage,
       if (description != null) 'description': description,
@@ -5377,36 +5322,19 @@ class Deployment {
 
 /// Represents a deployment status.
 enum DeploymentStatus {
-  pending,
-  failed,
-  deployed,
-}
+  pending('PENDING'),
+  failed('FAILED'),
+  deployed('DEPLOYED'),
+  ;
 
-extension DeploymentStatusValueExtension on DeploymentStatus {
-  String toValue() {
-    switch (this) {
-      case DeploymentStatus.pending:
-        return 'PENDING';
-      case DeploymentStatus.failed:
-        return 'FAILED';
-      case DeploymentStatus.deployed:
-        return 'DEPLOYED';
-    }
-  }
-}
+  final String value;
 
-extension DeploymentStatusFromString on String {
-  DeploymentStatus toDeploymentStatus() {
-    switch (this) {
-      case 'PENDING':
-        return DeploymentStatus.pending;
-      case 'FAILED':
-        return DeploymentStatus.failed;
-      case 'DEPLOYED':
-        return DeploymentStatus.deployed;
-    }
-    throw Exception('$this is not known in enum DeploymentStatus');
-  }
+  const DeploymentStatus(this.value);
+
+  static DeploymentStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum DeploymentStatus'));
 }
 
 /// Represents a domain name.
@@ -5440,7 +5368,7 @@ class DomainName {
       apiMappingSelectionExpression:
           json['apiMappingSelectionExpression'] as String?,
       domainNameConfigurations: (json['domainNameConfigurations'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               DomainNameConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -5534,14 +5462,16 @@ class DomainNameConfiguration {
       certificateArn: json['certificateArn'] as String?,
       certificateName: json['certificateName'] as String?,
       certificateUploadDate: timeStampFromJson(json['certificateUploadDate']),
-      domainNameStatus:
-          (json['domainNameStatus'] as String?)?.toDomainNameStatus(),
+      domainNameStatus: (json['domainNameStatus'] as String?)
+          ?.let(DomainNameStatus.fromString),
       domainNameStatusMessage: json['domainNameStatusMessage'] as String?,
-      endpointType: (json['endpointType'] as String?)?.toEndpointType(),
+      endpointType:
+          (json['endpointType'] as String?)?.let(EndpointType.fromString),
       hostedZoneId: json['hostedZoneId'] as String?,
       ownershipVerificationCertificateArn:
           json['ownershipVerificationCertificateArn'] as String?,
-      securityPolicy: (json['securityPolicy'] as String?)?.toSecurityPolicy(),
+      securityPolicy:
+          (json['securityPolicy'] as String?)?.let(SecurityPolicy.fromString),
     );
   }
 
@@ -5564,16 +5494,15 @@ class DomainNameConfiguration {
       if (certificateName != null) 'certificateName': certificateName,
       if (certificateUploadDate != null)
         'certificateUploadDate': iso8601ToJson(certificateUploadDate),
-      if (domainNameStatus != null)
-        'domainNameStatus': domainNameStatus.toValue(),
+      if (domainNameStatus != null) 'domainNameStatus': domainNameStatus.value,
       if (domainNameStatusMessage != null)
         'domainNameStatusMessage': domainNameStatusMessage,
-      if (endpointType != null) 'endpointType': endpointType.toValue(),
+      if (endpointType != null) 'endpointType': endpointType.value,
       if (hostedZoneId != null) 'hostedZoneId': hostedZoneId,
       if (ownershipVerificationCertificateArn != null)
         'ownershipVerificationCertificateArn':
             ownershipVerificationCertificateArn,
-      if (securityPolicy != null) 'securityPolicy': securityPolicy.toValue(),
+      if (securityPolicy != null) 'securityPolicy': securityPolicy.value,
     };
   }
 }
@@ -5584,70 +5513,36 @@ class DomainNameConfiguration {
 /// existing operation is complete. If it is AVAILABLE, the domain can be
 /// updated.
 enum DomainNameStatus {
-  available,
-  updating,
-  pendingCertificateReimport,
-  pendingOwnershipVerification,
-}
+  available('AVAILABLE'),
+  updating('UPDATING'),
+  pendingCertificateReimport('PENDING_CERTIFICATE_REIMPORT'),
+  pendingOwnershipVerification('PENDING_OWNERSHIP_VERIFICATION'),
+  ;
 
-extension DomainNameStatusValueExtension on DomainNameStatus {
-  String toValue() {
-    switch (this) {
-      case DomainNameStatus.available:
-        return 'AVAILABLE';
-      case DomainNameStatus.updating:
-        return 'UPDATING';
-      case DomainNameStatus.pendingCertificateReimport:
-        return 'PENDING_CERTIFICATE_REIMPORT';
-      case DomainNameStatus.pendingOwnershipVerification:
-        return 'PENDING_OWNERSHIP_VERIFICATION';
-    }
-  }
-}
+  final String value;
 
-extension DomainNameStatusFromString on String {
-  DomainNameStatus toDomainNameStatus() {
-    switch (this) {
-      case 'AVAILABLE':
-        return DomainNameStatus.available;
-      case 'UPDATING':
-        return DomainNameStatus.updating;
-      case 'PENDING_CERTIFICATE_REIMPORT':
-        return DomainNameStatus.pendingCertificateReimport;
-      case 'PENDING_OWNERSHIP_VERIFICATION':
-        return DomainNameStatus.pendingOwnershipVerification;
-    }
-    throw Exception('$this is not known in enum DomainNameStatus');
-  }
+  const DomainNameStatus(this.value);
+
+  static DomainNameStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum DomainNameStatus'));
 }
 
 /// Represents an endpoint type.
 enum EndpointType {
-  regional,
-  edge,
-}
+  regional('REGIONAL'),
+  edge('EDGE'),
+  ;
 
-extension EndpointTypeValueExtension on EndpointType {
-  String toValue() {
-    switch (this) {
-      case EndpointType.regional:
-        return 'REGIONAL';
-      case EndpointType.edge:
-        return 'EDGE';
-    }
-  }
-}
+  final String value;
 
-extension EndpointTypeFromString on String {
-  EndpointType toEndpointType() {
-    switch (this) {
-      case 'REGIONAL':
-        return EndpointType.regional;
-      case 'EDGE':
-        return EndpointType.edge;
-    }
-    throw Exception('$this is not known in enum EndpointType');
-  }
+  const EndpointType(this.value);
+
+  static EndpointType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum EndpointType'));
 }
 
 class ExportApiResponse {
@@ -5724,7 +5619,7 @@ class GetApiMappingsResponse {
   factory GetApiMappingsResponse.fromJson(Map<String, dynamic> json) {
     return GetApiMappingsResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ApiMapping.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -5840,17 +5735,18 @@ class GetApiResponse {
       disableExecuteApiEndpoint: json['disableExecuteApiEndpoint'] as bool?,
       disableSchemaValidation: json['disableSchemaValidation'] as bool?,
       importInfo: (json['importInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       name: json['name'] as String?,
-      protocolType: (json['protocolType'] as String?)?.toProtocolType(),
+      protocolType:
+          (json['protocolType'] as String?)?.let(ProtocolType.fromString),
       routeSelectionExpression: json['routeSelectionExpression'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       version: json['version'] as String?,
       warnings: (json['warnings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -5888,7 +5784,7 @@ class GetApiResponse {
         'disableSchemaValidation': disableSchemaValidation,
       if (importInfo != null) 'importInfo': importInfo,
       if (name != null) 'name': name,
-      if (protocolType != null) 'protocolType': protocolType.toValue(),
+      if (protocolType != null) 'protocolType': protocolType.value,
       if (routeSelectionExpression != null)
         'routeSelectionExpression': routeSelectionExpression,
       if (tags != null) 'tags': tags,
@@ -5914,7 +5810,7 @@ class GetApisResponse {
   factory GetApisResponse.fromJson(Map<String, dynamic> json) {
     return GetApisResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Api.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -6038,11 +5934,12 @@ class GetAuthorizerResponse {
           json['authorizerPayloadFormatVersion'] as String?,
       authorizerResultTtlInSeconds:
           json['authorizerResultTtlInSeconds'] as int?,
-      authorizerType: (json['authorizerType'] as String?)?.toAuthorizerType(),
+      authorizerType:
+          (json['authorizerType'] as String?)?.let(AuthorizerType.fromString),
       authorizerUri: json['authorizerUri'] as String?,
       enableSimpleResponses: json['enableSimpleResponses'] as bool?,
       identitySource: (json['identitySource'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       identityValidationExpression:
@@ -6075,7 +5972,7 @@ class GetAuthorizerResponse {
         'authorizerPayloadFormatVersion': authorizerPayloadFormatVersion,
       if (authorizerResultTtlInSeconds != null)
         'authorizerResultTtlInSeconds': authorizerResultTtlInSeconds,
-      if (authorizerType != null) 'authorizerType': authorizerType.toValue(),
+      if (authorizerType != null) 'authorizerType': authorizerType.value,
       if (authorizerUri != null) 'authorizerUri': authorizerUri,
       if (enableSimpleResponses != null)
         'enableSimpleResponses': enableSimpleResponses,
@@ -6104,7 +6001,7 @@ class GetAuthorizersResponse {
   factory GetAuthorizersResponse.fromJson(Map<String, dynamic> json) {
     return GetAuthorizersResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Authorizer.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -6154,8 +6051,8 @@ class GetDeploymentResponse {
       autoDeployed: json['autoDeployed'] as bool?,
       createdDate: timeStampFromJson(json['createdDate']),
       deploymentId: json['deploymentId'] as String?,
-      deploymentStatus:
-          (json['deploymentStatus'] as String?)?.toDeploymentStatus(),
+      deploymentStatus: (json['deploymentStatus'] as String?)
+          ?.let(DeploymentStatus.fromString),
       deploymentStatusMessage: json['deploymentStatusMessage'] as String?,
       description: json['description'] as String?,
     );
@@ -6172,8 +6069,7 @@ class GetDeploymentResponse {
       if (autoDeployed != null) 'autoDeployed': autoDeployed,
       if (createdDate != null) 'createdDate': iso8601ToJson(createdDate),
       if (deploymentId != null) 'deploymentId': deploymentId,
-      if (deploymentStatus != null)
-        'deploymentStatus': deploymentStatus.toValue(),
+      if (deploymentStatus != null) 'deploymentStatus': deploymentStatus.value,
       if (deploymentStatusMessage != null)
         'deploymentStatusMessage': deploymentStatusMessage,
       if (description != null) 'description': description,
@@ -6197,7 +6093,7 @@ class GetDeploymentsResponse {
   factory GetDeploymentsResponse.fromJson(Map<String, dynamic> json) {
     return GetDeploymentsResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Deployment.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -6244,7 +6140,7 @@ class GetDomainNameResponse {
           json['apiMappingSelectionExpression'] as String?,
       domainName: json['domainName'] as String?,
       domainNameConfigurations: (json['domainNameConfigurations'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               DomainNameConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -6292,7 +6188,7 @@ class GetDomainNamesResponse {
   factory GetDomainNamesResponse.fromJson(Map<String, dynamic> json) {
     return GetDomainNamesResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => DomainName.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -6451,7 +6347,7 @@ class GetIntegrationResult {
   /// href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services.html">Working
   /// with AWS service integrations for HTTP APIs</a>.
   ///
-  /// For HTTP API itegrations, without a specified integrationSubtype request
+  /// For HTTP API integrations, without a specified integrationSubtype request
   /// parameters are a key-value map specifying how to transform HTTP requests
   /// before sending them to backend integrations. The key should follow the
   /// pattern &lt;action&gt;:&lt;header|querystring|path&gt;.&lt;location&gt;. The
@@ -6522,9 +6418,10 @@ class GetIntegrationResult {
     return GetIntegrationResult(
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       connectionId: json['connectionId'] as String?,
-      connectionType: (json['connectionType'] as String?)?.toConnectionType(),
+      connectionType:
+          (json['connectionType'] as String?)?.let(ConnectionType.fromString),
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       credentialsArn: json['credentialsArn'] as String?,
       description: json['description'] as String?,
       integrationId: json['integrationId'] as String?,
@@ -6533,10 +6430,10 @@ class GetIntegrationResult {
           json['integrationResponseSelectionExpression'] as String?,
       integrationSubtype: json['integrationSubtype'] as String?,
       integrationType:
-          (json['integrationType'] as String?)?.toIntegrationType(),
+          (json['integrationType'] as String?)?.let(IntegrationType.fromString),
       integrationUri: json['integrationUri'] as String?,
-      passthroughBehavior:
-          (json['passthroughBehavior'] as String?)?.toPassthroughBehavior(),
+      passthroughBehavior: (json['passthroughBehavior'] as String?)
+          ?.let(PassthroughBehavior.fromString),
       payloadFormatVersion: json['payloadFormatVersion'] as String?,
       requestParameters: (json['requestParameters'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -6581,9 +6478,9 @@ class GetIntegrationResult {
     return {
       if (apiGatewayManaged != null) 'apiGatewayManaged': apiGatewayManaged,
       if (connectionId != null) 'connectionId': connectionId,
-      if (connectionType != null) 'connectionType': connectionType.toValue(),
+      if (connectionType != null) 'connectionType': connectionType.value,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (credentialsArn != null) 'credentialsArn': credentialsArn,
       if (description != null) 'description': description,
       if (integrationId != null) 'integrationId': integrationId,
@@ -6592,10 +6489,10 @@ class GetIntegrationResult {
         'integrationResponseSelectionExpression':
             integrationResponseSelectionExpression,
       if (integrationSubtype != null) 'integrationSubtype': integrationSubtype,
-      if (integrationType != null) 'integrationType': integrationType.toValue(),
+      if (integrationType != null) 'integrationType': integrationType.value,
       if (integrationUri != null) 'integrationUri': integrationUri,
       if (passthroughBehavior != null)
-        'passthroughBehavior': passthroughBehavior.toValue(),
+        'passthroughBehavior': passthroughBehavior.value,
       if (payloadFormatVersion != null)
         'payloadFormatVersion': payloadFormatVersion,
       if (requestParameters != null) 'requestParameters': requestParameters,
@@ -6665,7 +6562,7 @@ class GetIntegrationResponseResponse {
   factory GetIntegrationResponseResponse.fromJson(Map<String, dynamic> json) {
     return GetIntegrationResponseResponse(
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       integrationResponseId: json['integrationResponseId'] as String?,
       integrationResponseKey: json['integrationResponseKey'] as String?,
       responseParameters: (json['responseParameters'] as Map<String, dynamic>?)
@@ -6686,7 +6583,7 @@ class GetIntegrationResponseResponse {
     final templateSelectionExpression = this.templateSelectionExpression;
     return {
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (integrationResponseId != null)
         'integrationResponseId': integrationResponseId,
       if (integrationResponseKey != null)
@@ -6715,7 +6612,7 @@ class GetIntegrationResponsesResponse {
   factory GetIntegrationResponsesResponse.fromJson(Map<String, dynamic> json) {
     return GetIntegrationResponsesResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => IntegrationResponse.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -6748,7 +6645,7 @@ class GetIntegrationsResponse {
   factory GetIntegrationsResponse.fromJson(Map<String, dynamic> json) {
     return GetIntegrationsResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Integration.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -6854,7 +6751,7 @@ class GetModelsResponse {
   factory GetModelsResponse.fromJson(Map<String, dynamic> json) {
     return GetModelsResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Model.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -6950,11 +6847,11 @@ class GetRouteResult {
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       apiKeyRequired: json['apiKeyRequired'] as bool?,
       authorizationScopes: (json['authorizationScopes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
-      authorizationType:
-          (json['authorizationType'] as String?)?.toAuthorizationType(),
+      authorizationType: (json['authorizationType'] as String?)
+          ?.let(AuthorizationType.fromString),
       authorizerId: json['authorizerId'] as String?,
       modelSelectionExpression: json['modelSelectionExpression'] as String?,
       operationName: json['operationName'] as String?,
@@ -6992,7 +6889,7 @@ class GetRouteResult {
       if (authorizationScopes != null)
         'authorizationScopes': authorizationScopes,
       if (authorizationType != null)
-        'authorizationType': authorizationType.toValue(),
+        'authorizationType': authorizationType.value,
       if (authorizerId != null) 'authorizerId': authorizerId,
       if (modelSelectionExpression != null)
         'modelSelectionExpression': modelSelectionExpression,
@@ -7079,7 +6976,7 @@ class GetRouteResponsesResponse {
   factory GetRouteResponsesResponse.fromJson(Map<String, dynamic> json) {
     return GetRouteResponsesResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => RouteResponse.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -7112,7 +7009,7 @@ class GetRoutesResponse {
   factory GetRoutesResponse.fromJson(Map<String, dynamic> json) {
     return GetRoutesResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Route.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -7282,7 +7179,7 @@ class GetStagesResponse {
   factory GetStagesResponse.fromJson(Map<String, dynamic> json) {
     return GetStagesResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Stage.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -7366,19 +7263,21 @@ class GetVpcLinkResponse {
       createdDate: timeStampFromJson(json['createdDate']),
       name: json['name'] as String?,
       securityGroupIds: (json['securityGroupIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       subnetIds: (json['subnetIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       vpcLinkId: json['vpcLinkId'] as String?,
-      vpcLinkStatus: (json['vpcLinkStatus'] as String?)?.toVpcLinkStatus(),
+      vpcLinkStatus:
+          (json['vpcLinkStatus'] as String?)?.let(VpcLinkStatus.fromString),
       vpcLinkStatusMessage: json['vpcLinkStatusMessage'] as String?,
-      vpcLinkVersion: (json['vpcLinkVersion'] as String?)?.toVpcLinkVersion(),
+      vpcLinkVersion:
+          (json['vpcLinkVersion'] as String?)?.let(VpcLinkVersion.fromString),
     );
   }
 
@@ -7399,10 +7298,10 @@ class GetVpcLinkResponse {
       if (subnetIds != null) 'subnetIds': subnetIds,
       if (tags != null) 'tags': tags,
       if (vpcLinkId != null) 'vpcLinkId': vpcLinkId,
-      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.toValue(),
+      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.value,
       if (vpcLinkStatusMessage != null)
         'vpcLinkStatusMessage': vpcLinkStatusMessage,
-      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.toValue(),
+      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.value,
     };
   }
 }
@@ -7423,7 +7322,7 @@ class GetVpcLinksResponse {
   factory GetVpcLinksResponse.fromJson(Map<String, dynamic> json) {
     return GetVpcLinksResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => VpcLink.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -7539,17 +7438,18 @@ class ImportApiResponse {
       disableExecuteApiEndpoint: json['disableExecuteApiEndpoint'] as bool?,
       disableSchemaValidation: json['disableSchemaValidation'] as bool?,
       importInfo: (json['importInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       name: json['name'] as String?,
-      protocolType: (json['protocolType'] as String?)?.toProtocolType(),
+      protocolType:
+          (json['protocolType'] as String?)?.let(ProtocolType.fromString),
       routeSelectionExpression: json['routeSelectionExpression'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       version: json['version'] as String?,
       warnings: (json['warnings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -7587,7 +7487,7 @@ class ImportApiResponse {
         'disableSchemaValidation': disableSchemaValidation,
       if (importInfo != null) 'importInfo': importInfo,
       if (name != null) 'name': name,
-      if (protocolType != null) 'protocolType': protocolType.toValue(),
+      if (protocolType != null) 'protocolType': protocolType.value,
       if (routeSelectionExpression != null)
         'routeSelectionExpression': routeSelectionExpression,
       if (tags != null) 'tags': tags,
@@ -7740,7 +7640,7 @@ class Integration {
   /// href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services.html">Working
   /// with AWS service integrations for HTTP APIs</a>.
   ///
-  /// For HTTP API itegrations, without a specified integrationSubtype request
+  /// For HTTP API integrations, without a specified integrationSubtype request
   /// parameters are a key-value map specifying how to transform HTTP requests
   /// before sending them to backend integrations. The key should follow the
   /// pattern &lt;action&gt;:&lt;header|querystring|path&gt;.&lt;location&gt;. The
@@ -7811,9 +7711,10 @@ class Integration {
     return Integration(
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       connectionId: json['connectionId'] as String?,
-      connectionType: (json['connectionType'] as String?)?.toConnectionType(),
+      connectionType:
+          (json['connectionType'] as String?)?.let(ConnectionType.fromString),
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       credentialsArn: json['credentialsArn'] as String?,
       description: json['description'] as String?,
       integrationId: json['integrationId'] as String?,
@@ -7822,10 +7723,10 @@ class Integration {
           json['integrationResponseSelectionExpression'] as String?,
       integrationSubtype: json['integrationSubtype'] as String?,
       integrationType:
-          (json['integrationType'] as String?)?.toIntegrationType(),
+          (json['integrationType'] as String?)?.let(IntegrationType.fromString),
       integrationUri: json['integrationUri'] as String?,
-      passthroughBehavior:
-          (json['passthroughBehavior'] as String?)?.toPassthroughBehavior(),
+      passthroughBehavior: (json['passthroughBehavior'] as String?)
+          ?.let(PassthroughBehavior.fromString),
       payloadFormatVersion: json['payloadFormatVersion'] as String?,
       requestParameters: (json['requestParameters'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -7870,9 +7771,9 @@ class Integration {
     return {
       if (apiGatewayManaged != null) 'apiGatewayManaged': apiGatewayManaged,
       if (connectionId != null) 'connectionId': connectionId,
-      if (connectionType != null) 'connectionType': connectionType.toValue(),
+      if (connectionType != null) 'connectionType': connectionType.value,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (credentialsArn != null) 'credentialsArn': credentialsArn,
       if (description != null) 'description': description,
       if (integrationId != null) 'integrationId': integrationId,
@@ -7881,10 +7782,10 @@ class Integration {
         'integrationResponseSelectionExpression':
             integrationResponseSelectionExpression,
       if (integrationSubtype != null) 'integrationSubtype': integrationSubtype,
-      if (integrationType != null) 'integrationType': integrationType.toValue(),
+      if (integrationType != null) 'integrationType': integrationType.value,
       if (integrationUri != null) 'integrationUri': integrationUri,
       if (passthroughBehavior != null)
-        'passthroughBehavior': passthroughBehavior.toValue(),
+        'passthroughBehavior': passthroughBehavior.value,
       if (payloadFormatVersion != null)
         'payloadFormatVersion': payloadFormatVersion,
       if (requestParameters != null) 'requestParameters': requestParameters,
@@ -7956,7 +7857,7 @@ class IntegrationResponse {
     return IntegrationResponse(
       integrationResponseKey: json['integrationResponseKey'] as String,
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       integrationResponseId: json['integrationResponseId'] as String?,
       responseParameters: (json['responseParameters'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -7977,7 +7878,7 @@ class IntegrationResponse {
     return {
       'integrationResponseKey': integrationResponseKey,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (integrationResponseId != null)
         'integrationResponseId': integrationResponseId,
       if (responseParameters != null) 'responseParameters': responseParameters,
@@ -7990,46 +7891,21 @@ class IntegrationResponse {
 
 /// Represents an API method integration type.
 enum IntegrationType {
-  aws,
-  http,
-  mock,
-  httpProxy,
-  awsProxy,
-}
+  aws('AWS'),
+  http('HTTP'),
+  mock('MOCK'),
+  httpProxy('HTTP_PROXY'),
+  awsProxy('AWS_PROXY'),
+  ;
 
-extension IntegrationTypeValueExtension on IntegrationType {
-  String toValue() {
-    switch (this) {
-      case IntegrationType.aws:
-        return 'AWS';
-      case IntegrationType.http:
-        return 'HTTP';
-      case IntegrationType.mock:
-        return 'MOCK';
-      case IntegrationType.httpProxy:
-        return 'HTTP_PROXY';
-      case IntegrationType.awsProxy:
-        return 'AWS_PROXY';
-    }
-  }
-}
+  final String value;
 
-extension IntegrationTypeFromString on String {
-  IntegrationType toIntegrationType() {
-    switch (this) {
-      case 'AWS':
-        return IntegrationType.aws;
-      case 'HTTP':
-        return IntegrationType.http;
-      case 'MOCK':
-        return IntegrationType.mock;
-      case 'HTTP_PROXY':
-        return IntegrationType.httpProxy;
-      case 'AWS_PROXY':
-        return IntegrationType.awsProxy;
-    }
-    throw Exception('$this is not known in enum IntegrationType');
-  }
+  const IntegrationType(this.value);
+
+  static IntegrationType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum IntegrationType'));
 }
 
 /// Represents the configuration of a JWT authorizer. Required for the JWT
@@ -8055,7 +7931,7 @@ class JWTConfiguration {
   factory JWTConfiguration.fromJson(Map<String, dynamic> json) {
     return JWTConfiguration(
       audience: (json['audience'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       issuer: json['issuer'] as String?,
@@ -8074,36 +7950,19 @@ class JWTConfiguration {
 
 /// The logging level.
 enum LoggingLevel {
-  error,
-  info,
-  off,
-}
+  error('ERROR'),
+  info('INFO'),
+  off('OFF'),
+  ;
 
-extension LoggingLevelValueExtension on LoggingLevel {
-  String toValue() {
-    switch (this) {
-      case LoggingLevel.error:
-        return 'ERROR';
-      case LoggingLevel.info:
-        return 'INFO';
-      case LoggingLevel.off:
-        return 'OFF';
-    }
-  }
-}
+  final String value;
 
-extension LoggingLevelFromString on String {
-  LoggingLevel toLoggingLevel() {
-    switch (this) {
-      case 'ERROR':
-        return LoggingLevel.error;
-      case 'INFO':
-        return LoggingLevel.info;
-      case 'OFF':
-        return LoggingLevel.off;
-    }
-    throw Exception('$this is not known in enum LoggingLevel');
-  }
+  const LoggingLevel(this.value);
+
+  static LoggingLevel fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum LoggingLevel'));
 }
 
 /// Represents a data model for an API. Supported only for WebSocket APIs. See
@@ -8193,7 +8052,7 @@ class MutualTlsAuthentication {
       truststoreUri: json['truststoreUri'] as String?,
       truststoreVersion: json['truststoreVersion'] as String?,
       truststoreWarnings: (json['truststoreWarnings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -8267,65 +8126,35 @@ class ParameterConstraints {
 /// Represents passthrough behavior for an integration response. Supported only
 /// for WebSocket APIs.
 enum PassthroughBehavior {
-  whenNoMatch,
-  never,
-  whenNoTemplates,
-}
+  whenNoMatch('WHEN_NO_MATCH'),
+  never('NEVER'),
+  whenNoTemplates('WHEN_NO_TEMPLATES'),
+  ;
 
-extension PassthroughBehaviorValueExtension on PassthroughBehavior {
-  String toValue() {
-    switch (this) {
-      case PassthroughBehavior.whenNoMatch:
-        return 'WHEN_NO_MATCH';
-      case PassthroughBehavior.never:
-        return 'NEVER';
-      case PassthroughBehavior.whenNoTemplates:
-        return 'WHEN_NO_TEMPLATES';
-    }
-  }
-}
+  final String value;
 
-extension PassthroughBehaviorFromString on String {
-  PassthroughBehavior toPassthroughBehavior() {
-    switch (this) {
-      case 'WHEN_NO_MATCH':
-        return PassthroughBehavior.whenNoMatch;
-      case 'NEVER':
-        return PassthroughBehavior.never;
-      case 'WHEN_NO_TEMPLATES':
-        return PassthroughBehavior.whenNoTemplates;
-    }
-    throw Exception('$this is not known in enum PassthroughBehavior');
-  }
+  const PassthroughBehavior(this.value);
+
+  static PassthroughBehavior fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum PassthroughBehavior'));
 }
 
 /// Represents a protocol type.
 enum ProtocolType {
-  websocket,
-  http,
-}
+  websocket('WEBSOCKET'),
+  http('HTTP'),
+  ;
 
-extension ProtocolTypeValueExtension on ProtocolType {
-  String toValue() {
-    switch (this) {
-      case ProtocolType.websocket:
-        return 'WEBSOCKET';
-      case ProtocolType.http:
-        return 'HTTP';
-    }
-  }
-}
+  final String value;
 
-extension ProtocolTypeFromString on String {
-  ProtocolType toProtocolType() {
-    switch (this) {
-      case 'WEBSOCKET':
-        return ProtocolType.websocket;
-      case 'HTTP':
-        return ProtocolType.http;
-    }
-    throw Exception('$this is not known in enum ProtocolType');
-  }
+  const ProtocolType(this.value);
+
+  static ProtocolType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ProtocolType'));
 }
 
 class ReimportApiResponse {
@@ -8427,17 +8256,18 @@ class ReimportApiResponse {
       disableExecuteApiEndpoint: json['disableExecuteApiEndpoint'] as bool?,
       disableSchemaValidation: json['disableSchemaValidation'] as bool?,
       importInfo: (json['importInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       name: json['name'] as String?,
-      protocolType: (json['protocolType'] as String?)?.toProtocolType(),
+      protocolType:
+          (json['protocolType'] as String?)?.let(ProtocolType.fromString),
       routeSelectionExpression: json['routeSelectionExpression'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       version: json['version'] as String?,
       warnings: (json['warnings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -8475,7 +8305,7 @@ class ReimportApiResponse {
         'disableSchemaValidation': disableSchemaValidation,
       if (importInfo != null) 'importInfo': importInfo,
       if (name != null) 'name': name,
-      if (protocolType != null) 'protocolType': protocolType.toValue(),
+      if (protocolType != null) 'protocolType': protocolType.value,
       if (routeSelectionExpression != null)
         'routeSelectionExpression': routeSelectionExpression,
       if (tags != null) 'tags': tags,
@@ -8566,11 +8396,11 @@ class Route {
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       apiKeyRequired: json['apiKeyRequired'] as bool?,
       authorizationScopes: (json['authorizationScopes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
-      authorizationType:
-          (json['authorizationType'] as String?)?.toAuthorizationType(),
+      authorizationType: (json['authorizationType'] as String?)
+          ?.let(AuthorizationType.fromString),
       authorizerId: json['authorizerId'] as String?,
       modelSelectionExpression: json['modelSelectionExpression'] as String?,
       operationName: json['operationName'] as String?,
@@ -8608,7 +8438,7 @@ class Route {
       if (authorizationScopes != null)
         'authorizationScopes': authorizationScopes,
       if (authorizationType != null)
-        'authorizationType': authorizationType.toValue(),
+        'authorizationType': authorizationType.value,
       if (authorizerId != null) 'authorizerId': authorizerId,
       if (modelSelectionExpression != null)
         'modelSelectionExpression': modelSelectionExpression,
@@ -8712,7 +8542,8 @@ class RouteSettings {
     return RouteSettings(
       dataTraceEnabled: json['dataTraceEnabled'] as bool?,
       detailedMetricsEnabled: json['detailedMetricsEnabled'] as bool?,
-      loggingLevel: (json['loggingLevel'] as String?)?.toLoggingLevel(),
+      loggingLevel:
+          (json['loggingLevel'] as String?)?.let(LoggingLevel.fromString),
       throttlingBurstLimit: json['throttlingBurstLimit'] as int?,
       throttlingRateLimit: json['throttlingRateLimit'] as double?,
     );
@@ -8728,7 +8559,7 @@ class RouteSettings {
       if (dataTraceEnabled != null) 'dataTraceEnabled': dataTraceEnabled,
       if (detailedMetricsEnabled != null)
         'detailedMetricsEnabled': detailedMetricsEnabled,
-      if (loggingLevel != null) 'loggingLevel': loggingLevel.toValue(),
+      if (loggingLevel != null) 'loggingLevel': loggingLevel.value,
       if (throttlingBurstLimit != null)
         'throttlingBurstLimit': throttlingBurstLimit,
       if (throttlingRateLimit != null)
@@ -8740,31 +8571,18 @@ class RouteSettings {
 /// The Transport Layer Security (TLS) version of the security policy for this
 /// domain name. The valid values are TLS_1_0 and TLS_1_2.
 enum SecurityPolicy {
-  tls_1_0,
-  tls_1_2,
-}
+  tls_1_0('TLS_1_0'),
+  tls_1_2('TLS_1_2'),
+  ;
 
-extension SecurityPolicyValueExtension on SecurityPolicy {
-  String toValue() {
-    switch (this) {
-      case SecurityPolicy.tls_1_0:
-        return 'TLS_1_0';
-      case SecurityPolicy.tls_1_2:
-        return 'TLS_1_2';
-    }
-  }
-}
+  final String value;
 
-extension SecurityPolicyFromString on String {
-  SecurityPolicy toSecurityPolicy() {
-    switch (this) {
-      case 'TLS_1_0':
-        return SecurityPolicy.tls_1_0;
-      case 'TLS_1_2':
-        return SecurityPolicy.tls_1_2;
-    }
-    throw Exception('$this is not known in enum SecurityPolicy');
-  }
+  const SecurityPolicy(this.value);
+
+  static SecurityPolicy fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum SecurityPolicy'));
 }
 
 /// Represents an API stage.
@@ -9107,17 +8925,18 @@ class UpdateApiResponse {
       disableExecuteApiEndpoint: json['disableExecuteApiEndpoint'] as bool?,
       disableSchemaValidation: json['disableSchemaValidation'] as bool?,
       importInfo: (json['importInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       name: json['name'] as String?,
-      protocolType: (json['protocolType'] as String?)?.toProtocolType(),
+      protocolType:
+          (json['protocolType'] as String?)?.let(ProtocolType.fromString),
       routeSelectionExpression: json['routeSelectionExpression'] as String?,
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       version: json['version'] as String?,
       warnings: (json['warnings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -9155,7 +8974,7 @@ class UpdateApiResponse {
         'disableSchemaValidation': disableSchemaValidation,
       if (importInfo != null) 'importInfo': importInfo,
       if (name != null) 'name': name,
-      if (protocolType != null) 'protocolType': protocolType.toValue(),
+      if (protocolType != null) 'protocolType': protocolType.value,
       if (routeSelectionExpression != null)
         'routeSelectionExpression': routeSelectionExpression,
       if (tags != null) 'tags': tags,
@@ -9272,11 +9091,12 @@ class UpdateAuthorizerResponse {
           json['authorizerPayloadFormatVersion'] as String?,
       authorizerResultTtlInSeconds:
           json['authorizerResultTtlInSeconds'] as int?,
-      authorizerType: (json['authorizerType'] as String?)?.toAuthorizerType(),
+      authorizerType:
+          (json['authorizerType'] as String?)?.let(AuthorizerType.fromString),
       authorizerUri: json['authorizerUri'] as String?,
       enableSimpleResponses: json['enableSimpleResponses'] as bool?,
       identitySource: (json['identitySource'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       identityValidationExpression:
@@ -9309,7 +9129,7 @@ class UpdateAuthorizerResponse {
         'authorizerPayloadFormatVersion': authorizerPayloadFormatVersion,
       if (authorizerResultTtlInSeconds != null)
         'authorizerResultTtlInSeconds': authorizerResultTtlInSeconds,
-      if (authorizerType != null) 'authorizerType': authorizerType.toValue(),
+      if (authorizerType != null) 'authorizerType': authorizerType.value,
       if (authorizerUri != null) 'authorizerUri': authorizerUri,
       if (enableSimpleResponses != null)
         'enableSimpleResponses': enableSimpleResponses,
@@ -9355,8 +9175,8 @@ class UpdateDeploymentResponse {
       autoDeployed: json['autoDeployed'] as bool?,
       createdDate: timeStampFromJson(json['createdDate']),
       deploymentId: json['deploymentId'] as String?,
-      deploymentStatus:
-          (json['deploymentStatus'] as String?)?.toDeploymentStatus(),
+      deploymentStatus: (json['deploymentStatus'] as String?)
+          ?.let(DeploymentStatus.fromString),
       deploymentStatusMessage: json['deploymentStatusMessage'] as String?,
       description: json['description'] as String?,
     );
@@ -9373,8 +9193,7 @@ class UpdateDeploymentResponse {
       if (autoDeployed != null) 'autoDeployed': autoDeployed,
       if (createdDate != null) 'createdDate': iso8601ToJson(createdDate),
       if (deploymentId != null) 'deploymentId': deploymentId,
-      if (deploymentStatus != null)
-        'deploymentStatus': deploymentStatus.toValue(),
+      if (deploymentStatus != null) 'deploymentStatus': deploymentStatus.value,
       if (deploymentStatusMessage != null)
         'deploymentStatusMessage': deploymentStatusMessage,
       if (description != null) 'description': description,
@@ -9412,7 +9231,7 @@ class UpdateDomainNameResponse {
           json['apiMappingSelectionExpression'] as String?,
       domainName: json['domainName'] as String?,
       domainNameConfigurations: (json['domainNameConfigurations'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               DomainNameConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -9586,7 +9405,7 @@ class UpdateIntegrationResult {
   /// href="https://docs.aws.amazon.com/apigateway/latest/developerguide/http-api-develop-integrations-aws-services.html">Working
   /// with AWS service integrations for HTTP APIs</a>.
   ///
-  /// For HTTP API itegrations, without a specified integrationSubtype request
+  /// For HTTP API integrations, without a specified integrationSubtype request
   /// parameters are a key-value map specifying how to transform HTTP requests
   /// before sending them to backend integrations. The key should follow the
   /// pattern &lt;action&gt;:&lt;header|querystring|path&gt;.&lt;location&gt;. The
@@ -9657,9 +9476,10 @@ class UpdateIntegrationResult {
     return UpdateIntegrationResult(
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       connectionId: json['connectionId'] as String?,
-      connectionType: (json['connectionType'] as String?)?.toConnectionType(),
+      connectionType:
+          (json['connectionType'] as String?)?.let(ConnectionType.fromString),
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       credentialsArn: json['credentialsArn'] as String?,
       description: json['description'] as String?,
       integrationId: json['integrationId'] as String?,
@@ -9668,10 +9488,10 @@ class UpdateIntegrationResult {
           json['integrationResponseSelectionExpression'] as String?,
       integrationSubtype: json['integrationSubtype'] as String?,
       integrationType:
-          (json['integrationType'] as String?)?.toIntegrationType(),
+          (json['integrationType'] as String?)?.let(IntegrationType.fromString),
       integrationUri: json['integrationUri'] as String?,
-      passthroughBehavior:
-          (json['passthroughBehavior'] as String?)?.toPassthroughBehavior(),
+      passthroughBehavior: (json['passthroughBehavior'] as String?)
+          ?.let(PassthroughBehavior.fromString),
       payloadFormatVersion: json['payloadFormatVersion'] as String?,
       requestParameters: (json['requestParameters'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -9716,9 +9536,9 @@ class UpdateIntegrationResult {
     return {
       if (apiGatewayManaged != null) 'apiGatewayManaged': apiGatewayManaged,
       if (connectionId != null) 'connectionId': connectionId,
-      if (connectionType != null) 'connectionType': connectionType.toValue(),
+      if (connectionType != null) 'connectionType': connectionType.value,
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (credentialsArn != null) 'credentialsArn': credentialsArn,
       if (description != null) 'description': description,
       if (integrationId != null) 'integrationId': integrationId,
@@ -9727,10 +9547,10 @@ class UpdateIntegrationResult {
         'integrationResponseSelectionExpression':
             integrationResponseSelectionExpression,
       if (integrationSubtype != null) 'integrationSubtype': integrationSubtype,
-      if (integrationType != null) 'integrationType': integrationType.toValue(),
+      if (integrationType != null) 'integrationType': integrationType.value,
       if (integrationUri != null) 'integrationUri': integrationUri,
       if (passthroughBehavior != null)
-        'passthroughBehavior': passthroughBehavior.toValue(),
+        'passthroughBehavior': passthroughBehavior.value,
       if (payloadFormatVersion != null)
         'payloadFormatVersion': payloadFormatVersion,
       if (requestParameters != null) 'requestParameters': requestParameters,
@@ -9801,7 +9621,7 @@ class UpdateIntegrationResponseResponse {
       Map<String, dynamic> json) {
     return UpdateIntegrationResponseResponse(
       contentHandlingStrategy: (json['contentHandlingStrategy'] as String?)
-          ?.toContentHandlingStrategy(),
+          ?.let(ContentHandlingStrategy.fromString),
       integrationResponseId: json['integrationResponseId'] as String?,
       integrationResponseKey: json['integrationResponseKey'] as String?,
       responseParameters: (json['responseParameters'] as Map<String, dynamic>?)
@@ -9822,7 +9642,7 @@ class UpdateIntegrationResponseResponse {
     final templateSelectionExpression = this.templateSelectionExpression;
     return {
       if (contentHandlingStrategy != null)
-        'contentHandlingStrategy': contentHandlingStrategy.toValue(),
+        'contentHandlingStrategy': contentHandlingStrategy.value,
       if (integrationResponseId != null)
         'integrationResponseId': integrationResponseId,
       if (integrationResponseKey != null)
@@ -9965,11 +9785,11 @@ class UpdateRouteResult {
       apiGatewayManaged: json['apiGatewayManaged'] as bool?,
       apiKeyRequired: json['apiKeyRequired'] as bool?,
       authorizationScopes: (json['authorizationScopes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
-      authorizationType:
-          (json['authorizationType'] as String?)?.toAuthorizationType(),
+      authorizationType: (json['authorizationType'] as String?)
+          ?.let(AuthorizationType.fromString),
       authorizerId: json['authorizerId'] as String?,
       modelSelectionExpression: json['modelSelectionExpression'] as String?,
       operationName: json['operationName'] as String?,
@@ -10007,7 +9827,7 @@ class UpdateRouteResult {
       if (authorizationScopes != null)
         'authorizationScopes': authorizationScopes,
       if (authorizationType != null)
-        'authorizationType': authorizationType.toValue(),
+        'authorizationType': authorizationType.value,
       if (authorizerId != null) 'authorizerId': authorizerId,
       if (modelSelectionExpression != null)
         'modelSelectionExpression': modelSelectionExpression,
@@ -10260,19 +10080,21 @@ class UpdateVpcLinkResponse {
       createdDate: timeStampFromJson(json['createdDate']),
       name: json['name'] as String?,
       securityGroupIds: (json['securityGroupIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       subnetIds: (json['subnetIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       vpcLinkId: json['vpcLinkId'] as String?,
-      vpcLinkStatus: (json['vpcLinkStatus'] as String?)?.toVpcLinkStatus(),
+      vpcLinkStatus:
+          (json['vpcLinkStatus'] as String?)?.let(VpcLinkStatus.fromString),
       vpcLinkStatusMessage: json['vpcLinkStatusMessage'] as String?,
-      vpcLinkVersion: (json['vpcLinkVersion'] as String?)?.toVpcLinkVersion(),
+      vpcLinkVersion:
+          (json['vpcLinkVersion'] as String?)?.let(VpcLinkVersion.fromString),
     );
   }
 
@@ -10293,10 +10115,10 @@ class UpdateVpcLinkResponse {
       if (subnetIds != null) 'subnetIds': subnetIds,
       if (tags != null) 'tags': tags,
       if (vpcLinkId != null) 'vpcLinkId': vpcLinkId,
-      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.toValue(),
+      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.value,
       if (vpcLinkStatusMessage != null)
         'vpcLinkStatusMessage': vpcLinkStatusMessage,
-      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.toValue(),
+      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.value,
     };
   }
 }
@@ -10346,20 +10168,20 @@ class VpcLink {
     return VpcLink(
       name: json['name'] as String,
       securityGroupIds: (json['securityGroupIds'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as String)
           .toList(),
-      subnetIds: (json['subnetIds'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      subnetIds:
+          (json['subnetIds'] as List).nonNulls.map((e) => e as String).toList(),
       vpcLinkId: json['vpcLinkId'] as String,
       createdDate: timeStampFromJson(json['createdDate']),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
-      vpcLinkStatus: (json['vpcLinkStatus'] as String?)?.toVpcLinkStatus(),
+      vpcLinkStatus:
+          (json['vpcLinkStatus'] as String?)?.let(VpcLinkStatus.fromString),
       vpcLinkStatusMessage: json['vpcLinkStatusMessage'] as String?,
-      vpcLinkVersion: (json['vpcLinkVersion'] as String?)?.toVpcLinkVersion(),
+      vpcLinkVersion:
+          (json['vpcLinkVersion'] as String?)?.let(VpcLinkVersion.fromString),
     );
   }
 
@@ -10380,80 +10202,46 @@ class VpcLink {
       'vpcLinkId': vpcLinkId,
       if (createdDate != null) 'createdDate': iso8601ToJson(createdDate),
       if (tags != null) 'tags': tags,
-      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.toValue(),
+      if (vpcLinkStatus != null) 'vpcLinkStatus': vpcLinkStatus.value,
       if (vpcLinkStatusMessage != null)
         'vpcLinkStatusMessage': vpcLinkStatusMessage,
-      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.toValue(),
+      if (vpcLinkVersion != null) 'vpcLinkVersion': vpcLinkVersion.value,
     };
   }
 }
 
 /// The status of the VPC link.
 enum VpcLinkStatus {
-  pending,
-  available,
-  deleting,
-  failed,
-  inactive,
-}
+  pending('PENDING'),
+  available('AVAILABLE'),
+  deleting('DELETING'),
+  failed('FAILED'),
+  inactive('INACTIVE'),
+  ;
 
-extension VpcLinkStatusValueExtension on VpcLinkStatus {
-  String toValue() {
-    switch (this) {
-      case VpcLinkStatus.pending:
-        return 'PENDING';
-      case VpcLinkStatus.available:
-        return 'AVAILABLE';
-      case VpcLinkStatus.deleting:
-        return 'DELETING';
-      case VpcLinkStatus.failed:
-        return 'FAILED';
-      case VpcLinkStatus.inactive:
-        return 'INACTIVE';
-    }
-  }
-}
+  final String value;
 
-extension VpcLinkStatusFromString on String {
-  VpcLinkStatus toVpcLinkStatus() {
-    switch (this) {
-      case 'PENDING':
-        return VpcLinkStatus.pending;
-      case 'AVAILABLE':
-        return VpcLinkStatus.available;
-      case 'DELETING':
-        return VpcLinkStatus.deleting;
-      case 'FAILED':
-        return VpcLinkStatus.failed;
-      case 'INACTIVE':
-        return VpcLinkStatus.inactive;
-    }
-    throw Exception('$this is not known in enum VpcLinkStatus');
-  }
+  const VpcLinkStatus(this.value);
+
+  static VpcLinkStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum VpcLinkStatus'));
 }
 
 /// The version of the VPC link.
 enum VpcLinkVersion {
-  v2,
-}
+  v2('V2'),
+  ;
 
-extension VpcLinkVersionValueExtension on VpcLinkVersion {
-  String toValue() {
-    switch (this) {
-      case VpcLinkVersion.v2:
-        return 'V2';
-    }
-  }
-}
+  final String value;
 
-extension VpcLinkVersionFromString on String {
-  VpcLinkVersion toVpcLinkVersion() {
-    switch (this) {
-      case 'V2':
-        return VpcLinkVersion.v2;
-    }
-    throw Exception('$this is not known in enum VpcLinkVersion');
-  }
+  const VpcLinkVersion(this.value);
+
+  static VpcLinkVersion fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum VpcLinkVersion'));
 }
 
 class AccessDeniedException extends _s.GenericAwsException {

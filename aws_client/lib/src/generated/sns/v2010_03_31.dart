@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,7 +18,6 @@ import '../../shared/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'v2010_03_31.meta.dart';
 export '../../shared/shared.dart' show AwsClientCredentials;
 
 /// Amazon Simple Notification Service (Amazon SNS) is a web service that
@@ -31,7 +31,6 @@ export '../../shared/shared.dart' show AwsClientCredentials;
 /// Guide</a>.
 class Sns {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   Sns({
     required String region,
@@ -39,7 +38,7 @@ class Sns {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'sns',
@@ -48,9 +47,7 @@ class Sns {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -97,11 +94,20 @@ class Sns {
     required String label,
     required String topicArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['AWSAccountId'] = awsAccountId;
-    $request['ActionName'] = actionName;
-    $request['Label'] = label;
-    $request['TopicArn'] = topicArn;
+    final $request = <String, String>{
+      if (awsAccountId.isEmpty)
+        'AWSAccountId': ''
+      else
+        for (var i1 = 0; i1 < awsAccountId.length; i1++)
+          'AWSAccountId.member.${i1 + 1}': awsAccountId[i1],
+      if (actionName.isEmpty)
+        'ActionName': ''
+      else
+        for (var i1 = 0; i1 < actionName.length; i1++)
+          'ActionName.member.${i1 + 1}': actionName[i1],
+      'Label': label,
+      'TopicArn': topicArn,
+    };
     await _protocol.send(
       $request,
       action: 'AddPermission',
@@ -109,8 +115,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['AddPermissionInput'],
-      shapes: shapes,
     );
   }
 
@@ -131,8 +135,9 @@ class Sns {
   Future<CheckIfPhoneNumberIsOptedOutResponse> checkIfPhoneNumberIsOptedOut({
     required String phoneNumber,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['phoneNumber'] = phoneNumber;
+    final $request = <String, String>{
+      'phoneNumber': phoneNumber,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'CheckIfPhoneNumberIsOptedOut',
@@ -140,8 +145,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['CheckIfPhoneNumberIsOptedOutInput'],
-      shapes: shapes,
       resultWrapper: 'CheckIfPhoneNumberIsOptedOutResult',
     );
     return CheckIfPhoneNumberIsOptedOutResponse.fromXml($result);
@@ -159,6 +162,7 @@ class Sns {
   /// May throw [InternalErrorException].
   /// May throw [AuthorizationErrorException].
   /// May throw [FilterPolicyLimitExceededException].
+  /// May throw [ReplayLimitExceededException].
   ///
   /// Parameter [token] :
   /// Short-lived token sent to an endpoint during the <code>Subscribe</code>
@@ -178,11 +182,12 @@ class Sns {
     required String topicArn,
     String? authenticateOnUnsubscribe,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Token'] = token;
-    $request['TopicArn'] = topicArn;
-    authenticateOnUnsubscribe
-        ?.also((arg) => $request['AuthenticateOnUnsubscribe'] = arg);
+    final $request = <String, String>{
+      'Token': token,
+      'TopicArn': topicArn,
+      if (authenticateOnUnsubscribe != null)
+        'AuthenticateOnUnsubscribe': authenticateOnUnsubscribe,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ConfirmSubscription',
@@ -190,8 +195,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ConfirmSubscriptionInput'],
-      shapes: shapes,
       resultWrapper: 'ConfirmSubscriptionResult',
     );
     return ConfirmSubscriptionResponse.fromXml($result);
@@ -208,39 +211,45 @@ class Sns {
   ///
   /// <ul>
   /// <li>
-  /// For <code>ADM</code>, <code>PlatformPrincipal</code> is <code>client
-  /// id</code> and <code>PlatformCredential</code> is <code>client
-  /// secret</code>.
+  /// For ADM, <code>PlatformPrincipal</code> is <code>client id</code> and
+  /// <code>PlatformCredential</code> is <code>client secret</code>.
   /// </li>
   /// <li>
-  /// For <code>Baidu</code>, <code>PlatformPrincipal</code> is <code>API
-  /// key</code> and <code>PlatformCredential</code> is <code>secret key</code>.
+  /// For APNS and <code>APNS_SANDBOX</code> using certificate credentials,
+  /// <code>PlatformPrincipal</code> is <code>SSL certificate</code> and
+  /// <code>PlatformCredential</code> is <code>private key</code>.
   /// </li>
   /// <li>
-  /// For <code>APNS</code> and <code>APNS_SANDBOX</code> using certificate
-  /// credentials, <code>PlatformPrincipal</code> is <code>SSL
-  /// certificate</code> and <code>PlatformCredential</code> is <code>private
-  /// key</code>.
+  /// For APNS and <code>APNS_SANDBOX</code> using token credentials,
+  /// <code>PlatformPrincipal</code> is <code>signing key ID</code> and
+  /// <code>PlatformCredential</code> is <code>signing key</code>.
   /// </li>
   /// <li>
-  /// For <code>APNS</code> and <code>APNS_SANDBOX</code> using token
-  /// credentials, <code>PlatformPrincipal</code> is <code>signing key ID</code>
-  /// and <code>PlatformCredential</code> is <code>signing key</code>.
+  /// For Baidu, <code>PlatformPrincipal</code> is <code>API key</code> and
+  /// <code>PlatformCredential</code> is <code>secret key</code>.
   /// </li>
   /// <li>
-  /// For <code>GCM</code> (Firebase Cloud Messaging), there is no
-  /// <code>PlatformPrincipal</code> and the <code>PlatformCredential</code> is
+  /// For GCM (Firebase Cloud Messaging) using key credentials, there is no
+  /// <code>PlatformPrincipal</code>. The <code>PlatformCredential</code> is
   /// <code>API key</code>.
   /// </li>
   /// <li>
-  /// For <code>MPNS</code>, <code>PlatformPrincipal</code> is <code>TLS
-  /// certificate</code> and <code>PlatformCredential</code> is <code>private
-  /// key</code>.
+  /// For GCM (Firebase Cloud Messaging) using token credentials, there is no
+  /// <code>PlatformPrincipal</code>. The <code>PlatformCredential</code> is a
+  /// JSON formatted private key file. When using the Amazon Web Services CLI,
+  /// the file must be in string format and special characters must be ignored.
+  /// To format the file correctly, Amazon SNS recommends using the following
+  /// command: <code>SERVICE_JSON=`jq @json &lt;&lt;&lt; cat
+  /// service.json`</code>.
   /// </li>
   /// <li>
-  /// For <code>WNS</code>, <code>PlatformPrincipal</code> is <code>Package
-  /// Security Identifier</code> and <code>PlatformCredential</code> is
-  /// <code>secret key</code>.
+  /// For MPNS, <code>PlatformPrincipal</code> is <code>TLS certificate</code>
+  /// and <code>PlatformCredential</code> is <code>private key</code>.
+  /// </li>
+  /// <li>
+  /// For WNS, <code>PlatformPrincipal</code> is <code>Package Security
+  /// Identifier</code> and <code>PlatformCredential</code> is <code>secret
+  /// key</code>.
   /// </li>
   /// </ul>
   /// You can use the returned <code>PlatformApplicationArn</code> as an
@@ -252,7 +261,8 @@ class Sns {
   ///
   /// Parameter [attributes] :
   /// For a list of attributes, see <a
-  /// href="https://docs.aws.amazon.com/sns/latest/api/API_SetPlatformApplicationAttributes.html">SetPlatformApplicationAttributes</a>.
+  /// href="https://docs.aws.amazon.com/sns/latest/api/API_SetPlatformApplicationAttributes.html">
+  /// <code>SetPlatformApplicationAttributes</code> </a>.
   ///
   /// Parameter [name] :
   /// Application names must be made up of only uppercase and lowercase ASCII
@@ -268,10 +278,14 @@ class Sns {
     required String name,
     required String platform,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Attributes'] = attributes;
-    $request['Name'] = name;
-    $request['Platform'] = platform;
+    final $request = <String, String>{
+      for (var e1 in attributes.entries.toList().asMap().entries) ...{
+        'Attributes.entry.${e1.key + 1}.key': e1.value.key,
+        'Attributes.entry.${e1.key + 1}.value': e1.value.value,
+      },
+      'Name': name,
+      'Platform': platform,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'CreatePlatformApplication',
@@ -279,8 +293,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['CreatePlatformApplicationInput'],
-      shapes: shapes,
       resultWrapper: 'CreatePlatformApplicationResult',
     );
     return CreatePlatformApplicationResponse.fromXml($result);
@@ -312,8 +324,8 @@ class Sns {
   /// May throw [NotFoundException].
   ///
   /// Parameter [platformApplicationArn] :
-  /// PlatformApplicationArn returned from CreatePlatformApplication is used to
-  /// create a an endpoint.
+  /// <code>PlatformApplicationArn</code> returned from
+  /// CreatePlatformApplication is used to create a an endpoint.
   ///
   /// Parameter [token] :
   /// Unique identifier created by the notification service for an app on a
@@ -325,7 +337,8 @@ class Sns {
   ///
   /// Parameter [attributes] :
   /// For a list of attributes, see <a
-  /// href="https://docs.aws.amazon.com/sns/latest/api/API_SetEndpointAttributes.html">SetEndpointAttributes</a>.
+  /// href="https://docs.aws.amazon.com/sns/latest/api/API_SetEndpointAttributes.html">
+  /// <code>SetEndpointAttributes</code> </a>.
   ///
   /// Parameter [customUserData] :
   /// Arbitrary user data to associate with the endpoint. Amazon SNS does not
@@ -336,11 +349,16 @@ class Sns {
     Map<String, String>? attributes,
     String? customUserData,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['PlatformApplicationArn'] = platformApplicationArn;
-    $request['Token'] = token;
-    attributes?.also((arg) => $request['Attributes'] = arg);
-    customUserData?.also((arg) => $request['CustomUserData'] = arg);
+    final $request = <String, String>{
+      'PlatformApplicationArn': platformApplicationArn,
+      'Token': token,
+      if (attributes != null)
+        for (var e1 in attributes.entries.toList().asMap().entries) ...{
+          'Attributes.entry.${e1.key + 1}.key': e1.value.key,
+          'Attributes.entry.${e1.key + 1}.value': e1.value.value,
+        },
+      if (customUserData != null) 'CustomUserData': customUserData,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'CreatePlatformEndpoint',
@@ -348,8 +366,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['CreatePlatformEndpointInput'],
-      shapes: shapes,
       resultWrapper: 'CreatePlatformEndpointResult',
     );
     return CreateEndpointResponse.fromXml($result);
@@ -388,9 +404,10 @@ class Sns {
     required String phoneNumber,
     LanguageCodeString? languageCode,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['PhoneNumber'] = phoneNumber;
-    languageCode?.also((arg) => $request['LanguageCode'] = arg.toValue());
+    final $request = <String, String>{
+      'PhoneNumber': phoneNumber,
+      if (languageCode != null) 'LanguageCode': languageCode.value,
+    };
     await _protocol.send(
       $request,
       action: 'CreateSMSSandboxPhoneNumber',
@@ -398,8 +415,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['CreateSMSSandboxPhoneNumberInput'],
-      shapes: shapes,
       resultWrapper: 'CreateSMSSandboxPhoneNumberResult',
     );
   }
@@ -435,8 +450,8 @@ class Sns {
   /// Parameter [attributes] :
   /// A map of attributes with their corresponding values.
   ///
-  /// The following lists the names, descriptions, and values of the special
-  /// request parameters that the <code>CreateTopic</code> action uses:
+  /// The following lists names, descriptions, and values of the special request
+  /// parameters that the <code>CreateTopic</code> action uses:
   ///
   /// <ul>
   /// <li>
@@ -491,8 +506,14 @@ class Sns {
   ///
   /// <ul>
   /// <li>
-  /// <code>FifoTopic</code> – When this is set to <code>true</code>, a FIFO
-  /// topic is created.
+  /// <code>ArchivePolicy</code> – Adds or updates an inline policy document to
+  /// archive messages stored in the specified Amazon SNS topic.
+  /// </li>
+  /// <li>
+  /// <code>BeginningArchiveTime</code> – The earliest starting point at which a
+  /// message in the topic’s archive can be replayed from. This point in time is
+  /// based on the configured message retention period set by the topic’s
+  /// message archiving policy.
   /// </li>
   /// <li>
   /// <code>ContentBasedDeduplication</code> – Enables content-based
@@ -541,11 +562,23 @@ class Sns {
     String? dataProtectionPolicy,
     List<Tag>? tags,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Name'] = name;
-    attributes?.also((arg) => $request['Attributes'] = arg);
-    dataProtectionPolicy?.also((arg) => $request['DataProtectionPolicy'] = arg);
-    tags?.also((arg) => $request['Tags'] = arg);
+    final $request = <String, String>{
+      'Name': name,
+      if (attributes != null)
+        for (var e1 in attributes.entries.toList().asMap().entries) ...{
+          'Attributes.entry.${e1.key + 1}.key': e1.value.key,
+          'Attributes.entry.${e1.key + 1}.value': e1.value.value,
+        },
+      if (dataProtectionPolicy != null)
+        'DataProtectionPolicy': dataProtectionPolicy,
+      if (tags != null)
+        if (tags.isEmpty)
+          'Tags': ''
+        else
+          for (var i1 = 0; i1 < tags.length; i1++)
+            for (var e3 in tags[i1].toQueryMap().entries)
+              'Tags.member.${i1 + 1}.${e3.key}': e3.value,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'CreateTopic',
@@ -553,8 +586,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['CreateTopicInput'],
-      shapes: shapes,
       resultWrapper: 'CreateTopicResult',
     );
     return CreateTopicResponse.fromXml($result);
@@ -573,12 +604,13 @@ class Sns {
   /// May throw [AuthorizationErrorException].
   ///
   /// Parameter [endpointArn] :
-  /// EndpointArn of endpoint to delete.
+  /// <code>EndpointArn</code> of endpoint to delete.
   Future<void> deleteEndpoint({
     required String endpointArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['EndpointArn'] = endpointArn;
+    final $request = <String, String>{
+      'EndpointArn': endpointArn,
+    };
     await _protocol.send(
       $request,
       action: 'DeleteEndpoint',
@@ -586,8 +618,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['DeleteEndpointInput'],
-      shapes: shapes,
     );
   }
 
@@ -602,12 +632,14 @@ class Sns {
   /// May throw [AuthorizationErrorException].
   ///
   /// Parameter [platformApplicationArn] :
-  /// PlatformApplicationArn of platform application object to delete.
+  /// <code>PlatformApplicationArn</code> of platform application object to
+  /// delete.
   Future<void> deletePlatformApplication({
     required String platformApplicationArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['PlatformApplicationArn'] = platformApplicationArn;
+    final $request = <String, String>{
+      'PlatformApplicationArn': platformApplicationArn,
+    };
     await _protocol.send(
       $request,
       action: 'DeletePlatformApplication',
@@ -615,8 +647,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['DeletePlatformApplicationInput'],
-      shapes: shapes,
     );
   }
 
@@ -646,8 +676,9 @@ class Sns {
   Future<void> deleteSMSSandboxPhoneNumber({
     required String phoneNumber,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['PhoneNumber'] = phoneNumber;
+    final $request = <String, String>{
+      'PhoneNumber': phoneNumber,
+    };
     await _protocol.send(
       $request,
       action: 'DeleteSMSSandboxPhoneNumber',
@@ -655,8 +686,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['DeleteSMSSandboxPhoneNumberInput'],
-      shapes: shapes,
       resultWrapper: 'DeleteSMSSandboxPhoneNumberResult',
     );
   }
@@ -667,6 +696,7 @@ class Sns {
   /// exist does not result in an error.
   ///
   /// May throw [InvalidParameterException].
+  /// May throw [InvalidStateException].
   /// May throw [InternalErrorException].
   /// May throw [AuthorizationErrorException].
   /// May throw [NotFoundException].
@@ -679,8 +709,9 @@ class Sns {
   Future<void> deleteTopic({
     required String topicArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['TopicArn'] = topicArn;
+    final $request = <String, String>{
+      'TopicArn': topicArn,
+    };
     await _protocol.send(
       $request,
       action: 'DeleteTopic',
@@ -688,8 +719,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['DeleteTopicInput'],
-      shapes: shapes,
     );
   }
 
@@ -712,8 +741,9 @@ class Sns {
   Future<GetDataProtectionPolicyResponse> getDataProtectionPolicy({
     required String resourceArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['ResourceArn'] = resourceArn;
+    final $request = <String, String>{
+      'ResourceArn': resourceArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'GetDataProtectionPolicy',
@@ -721,8 +751,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['GetDataProtectionPolicyInput'],
-      shapes: shapes,
       resultWrapper: 'GetDataProtectionPolicyResult',
     );
     return GetDataProtectionPolicyResponse.fromXml($result);
@@ -740,12 +768,13 @@ class Sns {
   /// May throw [NotFoundException].
   ///
   /// Parameter [endpointArn] :
-  /// EndpointArn for GetEndpointAttributes input.
+  /// <code>EndpointArn</code> for <code>GetEndpointAttributes</code> input.
   Future<GetEndpointAttributesResponse> getEndpointAttributes({
     required String endpointArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['EndpointArn'] = endpointArn;
+    final $request = <String, String>{
+      'EndpointArn': endpointArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'GetEndpointAttributes',
@@ -753,8 +782,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['GetEndpointAttributesInput'],
-      shapes: shapes,
       resultWrapper: 'GetEndpointAttributesResult',
     );
     return GetEndpointAttributesResponse.fromXml($result);
@@ -772,13 +799,15 @@ class Sns {
   /// May throw [NotFoundException].
   ///
   /// Parameter [platformApplicationArn] :
-  /// PlatformApplicationArn for GetPlatformApplicationAttributesInput.
+  /// <code>PlatformApplicationArn</code> for
+  /// GetPlatformApplicationAttributesInput.
   Future<GetPlatformApplicationAttributesResponse>
       getPlatformApplicationAttributes({
     required String platformApplicationArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['PlatformApplicationArn'] = platformApplicationArn;
+    final $request = <String, String>{
+      'PlatformApplicationArn': platformApplicationArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'GetPlatformApplicationAttributes',
@@ -786,8 +815,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['GetPlatformApplicationAttributesInput'],
-      shapes: shapes,
       resultWrapper: 'GetPlatformApplicationAttributesResult',
     );
     return GetPlatformApplicationAttributesResponse.fromXml($result);
@@ -814,8 +841,14 @@ class Sns {
   Future<GetSMSAttributesResponse> getSMSAttributes({
     List<String>? attributes,
   }) async {
-    final $request = <String, dynamic>{};
-    attributes?.also((arg) => $request['attributes'] = arg);
+    final $request = <String, String>{
+      if (attributes != null)
+        if (attributes.isEmpty)
+          'attributes': ''
+        else
+          for (var i1 = 0; i1 < attributes.length; i1++)
+            'attributes.member.${i1 + 1}': attributes[i1],
+    };
     final $result = await _protocol.send(
       $request,
       action: 'GetSMSAttributes',
@@ -823,8 +856,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['GetSMSAttributesInput'],
-      shapes: shapes,
       resultWrapper: 'GetSMSAttributesResult',
     );
     return GetSMSAttributesResponse.fromXml($result);
@@ -848,7 +879,7 @@ class Sns {
   /// May throw [InternalErrorException].
   /// May throw [ThrottledException].
   Future<GetSMSSandboxAccountStatusResult> getSMSSandboxAccountStatus() async {
-    final $request = <String, dynamic>{};
+    final $request = <String, String>{};
     final $result = await _protocol.send(
       $request,
       action: 'GetSMSSandboxAccountStatus',
@@ -856,8 +887,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['GetSMSSandboxAccountStatusInput'],
-      shapes: shapes,
       resultWrapper: 'GetSMSSandboxAccountStatusResult',
     );
     return GetSMSSandboxAccountStatusResult.fromXml($result);
@@ -875,8 +904,9 @@ class Sns {
   Future<GetSubscriptionAttributesResponse> getSubscriptionAttributes({
     required String subscriptionArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['SubscriptionArn'] = subscriptionArn;
+    final $request = <String, String>{
+      'SubscriptionArn': subscriptionArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'GetSubscriptionAttributes',
@@ -884,8 +914,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['GetSubscriptionAttributesInput'],
-      shapes: shapes,
       resultWrapper: 'GetSubscriptionAttributesResult',
     );
     return GetSubscriptionAttributesResponse.fromXml($result);
@@ -905,8 +933,9 @@ class Sns {
   Future<GetTopicAttributesResponse> getTopicAttributes({
     required String topicArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['TopicArn'] = topicArn;
+    final $request = <String, String>{
+      'TopicArn': topicArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'GetTopicAttributes',
@@ -914,8 +943,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['GetTopicAttributesInput'],
-      shapes: shapes,
       resultWrapper: 'GetTopicAttributesResult',
     );
     return GetTopicAttributesResponse.fromXml($result);
@@ -941,20 +968,22 @@ class Sns {
   /// May throw [NotFoundException].
   ///
   /// Parameter [platformApplicationArn] :
-  /// PlatformApplicationArn for ListEndpointsByPlatformApplicationInput action.
+  /// <code>PlatformApplicationArn</code> for
+  /// <code>ListEndpointsByPlatformApplicationInput</code> action.
   ///
   /// Parameter [nextToken] :
-  /// NextToken string is used when calling ListEndpointsByPlatformApplication
-  /// action to retrieve additional records that are available after the first
-  /// page results.
+  /// <code>NextToken</code> string is used when calling
+  /// <code>ListEndpointsByPlatformApplication</code> action to retrieve
+  /// additional records that are available after the first page results.
   Future<ListEndpointsByPlatformApplicationResponse>
       listEndpointsByPlatformApplication({
     required String platformApplicationArn,
     String? nextToken,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['PlatformApplicationArn'] = platformApplicationArn;
-    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $request = <String, String>{
+      'PlatformApplicationArn': platformApplicationArn,
+      if (nextToken != null) 'NextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListEndpointsByPlatformApplication',
@@ -962,8 +991,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListEndpointsByPlatformApplicationInput'],
-      shapes: shapes,
       resultWrapper: 'ListEndpointsByPlatformApplicationResult',
     );
     return ListEndpointsByPlatformApplicationResponse.fromXml($result);
@@ -997,9 +1024,10 @@ class Sns {
       1,
       30,
     );
-    final $request = <String, dynamic>{};
-    maxResults?.also((arg) => $request['MaxResults'] = arg);
-    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $request = <String, String>{
+      if (maxResults != null) 'MaxResults': maxResults.toString(),
+      if (nextToken != null) 'NextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListOriginationNumbers',
@@ -1007,8 +1035,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListOriginationNumbersRequest'],
-      shapes: shapes,
       resultWrapper: 'ListOriginationNumbersResult',
     );
     return ListOriginationNumbersResult.fromXml($result);
@@ -1037,8 +1063,9 @@ class Sns {
   Future<ListPhoneNumbersOptedOutResponse> listPhoneNumbersOptedOut({
     String? nextToken,
   }) async {
-    final $request = <String, dynamic>{};
-    nextToken?.also((arg) => $request['nextToken'] = arg);
+    final $request = <String, String>{
+      if (nextToken != null) 'nextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListPhoneNumbersOptedOut',
@@ -1046,8 +1073,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListPhoneNumbersOptedOutInput'],
-      shapes: shapes,
       resultWrapper: 'ListPhoneNumbersOptedOutResult',
     );
     return ListPhoneNumbersOptedOutResponse.fromXml($result);
@@ -1072,14 +1097,15 @@ class Sns {
   /// May throw [AuthorizationErrorException].
   ///
   /// Parameter [nextToken] :
-  /// NextToken string is used when calling ListPlatformApplications action to
-  /// retrieve additional records that are available after the first page
-  /// results.
+  /// <code>NextToken</code> string is used when calling
+  /// <code>ListPlatformApplications</code> action to retrieve additional
+  /// records that are available after the first page results.
   Future<ListPlatformApplicationsResponse> listPlatformApplications({
     String? nextToken,
   }) async {
-    final $request = <String, dynamic>{};
-    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $request = <String, String>{
+      if (nextToken != null) 'NextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListPlatformApplications',
@@ -1087,8 +1113,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListPlatformApplicationsInput'],
-      shapes: shapes,
       resultWrapper: 'ListPlatformApplicationsResult',
     );
     return ListPlatformApplicationsResponse.fromXml($result);
@@ -1130,9 +1154,10 @@ class Sns {
       1,
       100,
     );
-    final $request = <String, dynamic>{};
-    maxResults?.also((arg) => $request['MaxResults'] = arg);
-    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $request = <String, String>{
+      if (maxResults != null) 'MaxResults': maxResults.toString(),
+      if (nextToken != null) 'NextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListSMSSandboxPhoneNumbers',
@@ -1140,8 +1165,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListSMSSandboxPhoneNumbersInput'],
-      shapes: shapes,
       resultWrapper: 'ListSMSSandboxPhoneNumbersResult',
     );
     return ListSMSSandboxPhoneNumbersResult.fromXml($result);
@@ -1164,8 +1187,9 @@ class Sns {
   Future<ListSubscriptionsResponse> listSubscriptions({
     String? nextToken,
   }) async {
-    final $request = <String, dynamic>{};
-    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $request = <String, String>{
+      if (nextToken != null) 'NextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListSubscriptions',
@@ -1173,8 +1197,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListSubscriptionsInput'],
-      shapes: shapes,
       resultWrapper: 'ListSubscriptionsResult',
     );
     return ListSubscriptionsResponse.fromXml($result);
@@ -1203,9 +1225,10 @@ class Sns {
     required String topicArn,
     String? nextToken,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['TopicArn'] = topicArn;
-    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $request = <String, String>{
+      'TopicArn': topicArn,
+      if (nextToken != null) 'NextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListSubscriptionsByTopic',
@@ -1213,8 +1236,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListSubscriptionsByTopicInput'],
-      shapes: shapes,
       resultWrapper: 'ListSubscriptionsByTopicResult',
     );
     return ListSubscriptionsByTopicResponse.fromXml($result);
@@ -1236,8 +1257,9 @@ class Sns {
   Future<ListTagsForResourceResponse> listTagsForResource({
     required String resourceArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['ResourceArn'] = resourceArn;
+    final $request = <String, String>{
+      'ResourceArn': resourceArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListTagsForResource',
@@ -1245,8 +1267,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListTagsForResourceRequest'],
-      shapes: shapes,
       resultWrapper: 'ListTagsForResourceResult',
     );
     return ListTagsForResourceResponse.fromXml($result);
@@ -1268,8 +1288,9 @@ class Sns {
   Future<ListTopicsResponse> listTopics({
     String? nextToken,
   }) async {
-    final $request = <String, dynamic>{};
-    nextToken?.also((arg) => $request['NextToken'] = arg);
+    final $request = <String, String>{
+      if (nextToken != null) 'NextToken': nextToken,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'ListTopics',
@@ -1277,8 +1298,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['ListTopicsInput'],
-      shapes: shapes,
       resultWrapper: 'ListTopicsResult',
     );
     return ListTopicsResponse.fromXml($result);
@@ -1299,8 +1318,9 @@ class Sns {
   Future<void> optInPhoneNumber({
     required String phoneNumber,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['phoneNumber'] = phoneNumber;
+    final $request = <String, String>{
+      'phoneNumber': phoneNumber,
+    };
     await _protocol.send(
       $request,
       action: 'OptInPhoneNumber',
@@ -1308,8 +1328,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['OptInPhoneNumberInput'],
-      shapes: shapes,
       resultWrapper: 'OptInPhoneNumberResult',
     );
   }
@@ -1491,9 +1509,8 @@ class Sns {
   /// delivered to email endpoints. This field will also be included, if
   /// present, in the standard JSON messages delivered to other endpoints.
   ///
-  /// Constraints: Subjects must be ASCII text that begins with a letter,
-  /// number, or punctuation mark; must not include line breaks or control
-  /// characters; and must be less than 100 characters long.
+  /// Constraints: Subjects must be UTF-8 text with no line breaks or control
+  /// characters, and less than 100 characters long.
   ///
   /// Parameter [targetArn] :
   /// If you don't specify a value for the <code>TargetArn</code> parameter, you
@@ -1517,17 +1534,23 @@ class Sns {
     String? targetArn,
     String? topicArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Message'] = message;
-    messageAttributes?.also((arg) => $request['MessageAttributes'] = arg);
-    messageDeduplicationId
-        ?.also((arg) => $request['MessageDeduplicationId'] = arg);
-    messageGroupId?.also((arg) => $request['MessageGroupId'] = arg);
-    messageStructure?.also((arg) => $request['MessageStructure'] = arg);
-    phoneNumber?.also((arg) => $request['PhoneNumber'] = arg);
-    subject?.also((arg) => $request['Subject'] = arg);
-    targetArn?.also((arg) => $request['TargetArn'] = arg);
-    topicArn?.also((arg) => $request['TopicArn'] = arg);
+    final $request = <String, String>{
+      'Message': message,
+      if (messageAttributes != null)
+        for (var e1 in messageAttributes.entries.toList().asMap().entries) ...{
+          'MessageAttributes.entry.${e1.key + 1}.Name': e1.value.key,
+          for (var e4 in e1.value.value.toQueryMap().entries)
+            'MessageAttributes.entry.${e1.key + 1}.Value.${e4.key}': e4.value,
+        },
+      if (messageDeduplicationId != null)
+        'MessageDeduplicationId': messageDeduplicationId,
+      if (messageGroupId != null) 'MessageGroupId': messageGroupId,
+      if (messageStructure != null) 'MessageStructure': messageStructure,
+      if (phoneNumber != null) 'PhoneNumber': phoneNumber,
+      if (subject != null) 'Subject': subject,
+      if (targetArn != null) 'TargetArn': targetArn,
+      if (topicArn != null) 'TopicArn': topicArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'Publish',
@@ -1535,8 +1558,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['PublishInput'],
-      shapes: shapes,
       resultWrapper: 'PublishResult',
     );
     return PublishResponse.fromXml($result);
@@ -1604,9 +1625,15 @@ class Sns {
     required List<PublishBatchRequestEntry> publishBatchRequestEntries,
     required String topicArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['PublishBatchRequestEntries'] = publishBatchRequestEntries;
-    $request['TopicArn'] = topicArn;
+    final $request = <String, String>{
+      if (publishBatchRequestEntries.isEmpty)
+        'PublishBatchRequestEntries': ''
+      else
+        for (var i1 = 0; i1 < publishBatchRequestEntries.length; i1++)
+          for (var e3 in publishBatchRequestEntries[i1].toQueryMap().entries)
+            'PublishBatchRequestEntries.member.${i1 + 1}.${e3.key}': e3.value,
+      'TopicArn': topicArn,
+    };
     final $result = await _protocol.send(
       $request,
       action: 'PublishBatch',
@@ -1614,8 +1641,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['PublishBatchInput'],
-      shapes: shapes,
       resultWrapper: 'PublishBatchResult',
     );
     return PublishBatchResponse.fromXml($result);
@@ -1648,9 +1673,10 @@ class Sns {
     required String dataProtectionPolicy,
     required String resourceArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['DataProtectionPolicy'] = dataProtectionPolicy;
-    $request['ResourceArn'] = resourceArn;
+    final $request = <String, String>{
+      'DataProtectionPolicy': dataProtectionPolicy,
+      'ResourceArn': resourceArn,
+    };
     await _protocol.send(
       $request,
       action: 'PutDataProtectionPolicy',
@@ -1658,8 +1684,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['PutDataProtectionPolicyInput'],
-      shapes: shapes,
     );
   }
 
@@ -1685,9 +1709,10 @@ class Sns {
     required String label,
     required String topicArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Label'] = label;
-    $request['TopicArn'] = topicArn;
+    final $request = <String, String>{
+      'Label': label,
+      'TopicArn': topicArn,
+    };
     await _protocol.send(
       $request,
       action: 'RemovePermission',
@@ -1695,8 +1720,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['RemovePermissionInput'],
-      shapes: shapes,
     );
   }
 
@@ -1736,14 +1759,18 @@ class Sns {
   /// </ul>
   ///
   /// Parameter [endpointArn] :
-  /// EndpointArn used for SetEndpointAttributes action.
+  /// EndpointArn used for <code>SetEndpointAttributes</code> action.
   Future<void> setEndpointAttributes({
     required Map<String, String> attributes,
     required String endpointArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Attributes'] = attributes;
-    $request['EndpointArn'] = endpointArn;
+    final $request = <String, String>{
+      for (var e1 in attributes.entries.toList().asMap().entries) ...{
+        'Attributes.entry.${e1.key + 1}.key': e1.value.key,
+        'Attributes.entry.${e1.key + 1}.value': e1.value.value,
+      },
+      'EndpointArn': endpointArn,
+    };
     await _protocol.send(
       $request,
       action: 'SetEndpointAttributes',
@@ -1751,8 +1778,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['SetEndpointAttributesInput'],
-      shapes: shapes,
     );
   }
 
@@ -1792,8 +1817,18 @@ class Sns {
   /// <code>PlatformCredential</code> is signing key.
   /// </li>
   /// <li>
-  /// For GCM (Firebase Cloud Messaging), <code>PlatformCredential</code> is API
-  /// key.
+  /// For GCM (Firebase Cloud Messaging) using key credentials, there is no
+  /// <code>PlatformPrincipal</code>. The <code>PlatformCredential</code> is
+  /// <code>API key</code>.
+  /// </li>
+  /// <li>
+  /// For GCM (Firebase Cloud Messaging) using token credentials, there is no
+  /// <code>PlatformPrincipal</code>. The <code>PlatformCredential</code> is a
+  /// JSON formatted private key file. When using the Amazon Web Services CLI,
+  /// the file must be in string format and special characters must be ignored.
+  /// To format the file correctly, Amazon SNS recommends using the following
+  /// command: <code>SERVICE_JSON=`jq @json &lt;&lt;&lt; cat
+  /// service.json`</code>.
   /// </li>
   /// </ul> </li>
   /// </ul>
@@ -1867,14 +1902,19 @@ class Sns {
   /// </ul>
   ///
   /// Parameter [platformApplicationArn] :
-  /// PlatformApplicationArn for SetPlatformApplicationAttributes action.
+  /// <code>PlatformApplicationArn</code> for
+  /// <code>SetPlatformApplicationAttributes</code> action.
   Future<void> setPlatformApplicationAttributes({
     required Map<String, String> attributes,
     required String platformApplicationArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Attributes'] = attributes;
-    $request['PlatformApplicationArn'] = platformApplicationArn;
+    final $request = <String, String>{
+      for (var e1 in attributes.entries.toList().asMap().entries) ...{
+        'Attributes.entry.${e1.key + 1}.key': e1.value.key,
+        'Attributes.entry.${e1.key + 1}.value': e1.value.value,
+      },
+      'PlatformApplicationArn': platformApplicationArn,
+    };
     await _protocol.send(
       $request,
       action: 'SetPlatformApplicationAttributes',
@@ -1882,8 +1922,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['SetPlatformApplicationAttributesInput'],
-      shapes: shapes,
     );
   }
 
@@ -2004,8 +2042,12 @@ class Sns {
   Future<void> setSMSAttributes({
     required Map<String, String> attributes,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['attributes'] = attributes;
+    final $request = <String, String>{
+      for (var e1 in attributes.entries.toList().asMap().entries) ...{
+        'attributes.entry.${e1.key + 1}.key': e1.value.key,
+        'attributes.entry.${e1.key + 1}.value': e1.value.value,
+      },
+    };
     await _protocol.send(
       $request,
       action: 'SetSMSAttributes',
@@ -2013,8 +2055,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['SetSMSAttributesInput'],
-      shapes: shapes,
       resultWrapper: 'SetSMSAttributesResult',
     );
   }
@@ -2024,6 +2064,7 @@ class Sns {
   ///
   /// May throw [InvalidParameterException].
   /// May throw [FilterPolicyLimitExceededException].
+  /// May throw [ReplayLimitExceededException].
   /// May throw [InternalErrorException].
   /// May throw [NotFoundException].
   /// May throw [AuthorizationErrorException].
@@ -2072,8 +2113,8 @@ class Sns {
   /// dead-letter queue for further analysis or reprocessing.
   /// </li>
   /// </ul>
-  /// The following attribute applies only to Amazon Kinesis Data Firehose
-  /// delivery stream subscriptions:
+  /// The following attribute applies only to Amazon Data Firehose delivery
+  /// stream subscriptions:
   ///
   /// <ul>
   /// <li>
@@ -2082,17 +2123,16 @@ class Sns {
   ///
   /// <ul>
   /// <li>
-  /// Permission to write to the Kinesis Data Firehose delivery stream
+  /// Permission to write to the Firehose delivery stream
   /// </li>
   /// <li>
   /// Amazon SNS listed as a trusted entity
   /// </li>
   /// </ul>
-  /// Specifying a valid ARN for this attribute is required for Kinesis Data
-  /// Firehose delivery stream subscriptions. For more information, see <a
+  /// Specifying a valid ARN for this attribute is required for Firehose
+  /// delivery stream subscriptions. For more information, see <a
   /// href="https://docs.aws.amazon.com/sns/latest/dg/sns-firehose-as-subscriber.html">Fanout
-  /// to Kinesis Data Firehose delivery streams</a> in the <i>Amazon SNS
-  /// Developer Guide</i>.
+  /// to Firehose delivery streams</a> in the <i>Amazon SNS Developer Guide</i>.
   /// </li>
   /// </ul>
   ///
@@ -2106,10 +2146,11 @@ class Sns {
     required String subscriptionArn,
     String? attributeValue,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['AttributeName'] = attributeName;
-    $request['SubscriptionArn'] = subscriptionArn;
-    attributeValue?.also((arg) => $request['AttributeValue'] = arg);
+    final $request = <String, String>{
+      'AttributeName': attributeName,
+      'SubscriptionArn': subscriptionArn,
+      if (attributeValue != null) 'AttributeValue': attributeValue,
+    };
     await _protocol.send(
       $request,
       action: 'SetSubscriptionAttributes',
@@ -2117,8 +2158,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['SetSubscriptionAttributesInput'],
-      shapes: shapes,
     );
   }
 
@@ -2348,10 +2387,11 @@ class Sns {
     required String topicArn,
     String? attributeValue,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['AttributeName'] = attributeName;
-    $request['TopicArn'] = topicArn;
-    attributeValue?.also((arg) => $request['AttributeValue'] = arg);
+    final $request = <String, String>{
+      'AttributeName': attributeName,
+      'TopicArn': topicArn,
+      if (attributeValue != null) 'AttributeValue': attributeValue,
+    };
     await _protocol.send(
       $request,
       action: 'SetTopicAttributes',
@@ -2359,8 +2399,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['SetTopicAttributesInput'],
-      shapes: shapes,
     );
   }
 
@@ -2370,12 +2408,13 @@ class Sns {
   /// <code>ConfirmSubscription</code> action to confirm the subscription.
   ///
   /// You call the <code>ConfirmSubscription</code> action with the token from
-  /// the subscription response. Confirmation tokens are valid for three days.
+  /// the subscription response. Confirmation tokens are valid for two days.
   ///
   /// This action is throttled at 100 transactions per second (TPS).
   ///
   /// May throw [SubscriptionLimitExceededException].
   /// May throw [FilterPolicyLimitExceededException].
+  /// May throw [ReplayLimitExceededException].
   /// May throw [InvalidParameterException].
   /// May throw [InternalErrorException].
   /// May throw [NotFoundException].
@@ -2465,8 +2504,8 @@ class Sns {
   /// dead-letter queue for further analysis or reprocessing.
   /// </li>
   /// </ul>
-  /// The following attribute applies only to Amazon Kinesis Data Firehose
-  /// delivery stream subscriptions:
+  /// The following attribute applies only to Amazon Data Firehose delivery
+  /// stream subscriptions:
   ///
   /// <ul>
   /// <li>
@@ -2475,18 +2514,50 @@ class Sns {
   ///
   /// <ul>
   /// <li>
-  /// Permission to write to the Kinesis Data Firehose delivery stream
+  /// Permission to write to the Firehose delivery stream
   /// </li>
   /// <li>
   /// Amazon SNS listed as a trusted entity
   /// </li>
   /// </ul>
-  /// Specifying a valid ARN for this attribute is required for Kinesis Data
-  /// Firehose delivery stream subscriptions. For more information, see <a
+  /// Specifying a valid ARN for this attribute is required for Firehose
+  /// delivery stream subscriptions. For more information, see <a
   /// href="https://docs.aws.amazon.com/sns/latest/dg/sns-firehose-as-subscriber.html">Fanout
-  /// to Kinesis Data Firehose delivery streams</a> in the <i>Amazon SNS
-  /// Developer Guide</i>.
+  /// to Firehose delivery streams</a> in the <i>Amazon SNS Developer Guide</i>.
   /// </li>
+  /// </ul>
+  /// The following attributes apply only to <a
+  /// href="https://docs.aws.amazon.com/sns/latest/dg/sns-fifo-topics.html">FIFO
+  /// topics</a>:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>ReplayPolicy</code> – Adds or updates an inline policy document for
+  /// a subscription to replay messages stored in the specified Amazon SNS
+  /// topic.
+  /// </li>
+  /// <li>
+  /// <code>ReplayStatus</code> – Retrieves the status of the subscription
+  /// message replay, which can be one of the following:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Completed</code> – The replay has successfully redelivered all
+  /// messages, and is now delivering newly published messages. If an ending
+  /// point was specified in the <code>ReplayPolicy</code> then the subscription
+  /// will no longer receive newly published messages.
+  /// </li>
+  /// <li>
+  /// <code>In progress</code> – The replay is currently replaying the selected
+  /// messages.
+  /// </li>
+  /// <li>
+  /// <code>Failed</code> – The replay was unable to complete.
+  /// </li>
+  /// <li>
+  /// <code>Pending</code> – The default state while the replay initiates.
+  /// </li>
+  /// </ul> </li>
   /// </ul>
   ///
   /// Parameter [endpoint] :
@@ -2551,13 +2622,18 @@ class Sns {
     String? endpoint,
     bool? returnSubscriptionArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Protocol'] = protocol;
-    $request['TopicArn'] = topicArn;
-    attributes?.also((arg) => $request['Attributes'] = arg);
-    endpoint?.also((arg) => $request['Endpoint'] = arg);
-    returnSubscriptionArn
-        ?.also((arg) => $request['ReturnSubscriptionArn'] = arg);
+    final $request = <String, String>{
+      'Protocol': protocol,
+      'TopicArn': topicArn,
+      if (attributes != null)
+        for (var e1 in attributes.entries.toList().asMap().entries) ...{
+          'Attributes.entry.${e1.key + 1}.key': e1.value.key,
+          'Attributes.entry.${e1.key + 1}.value': e1.value.value,
+        },
+      if (endpoint != null) 'Endpoint': endpoint,
+      if (returnSubscriptionArn != null)
+        'ReturnSubscriptionArn': returnSubscriptionArn.toString(),
+    };
     final $result = await _protocol.send(
       $request,
       action: 'Subscribe',
@@ -2565,8 +2641,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['SubscribeInput'],
-      shapes: shapes,
       resultWrapper: 'SubscribeResult',
     );
     return SubscribeResponse.fromXml($result);
@@ -2620,9 +2694,15 @@ class Sns {
     required String resourceArn,
     required List<Tag> tags,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['ResourceArn'] = resourceArn;
-    $request['Tags'] = tags;
+    final $request = <String, String>{
+      'ResourceArn': resourceArn,
+      if (tags.isEmpty)
+        'Tags': ''
+      else
+        for (var i1 = 0; i1 < tags.length; i1++)
+          for (var e3 in tags[i1].toQueryMap().entries)
+            'Tags.member.${i1 + 1}.${e3.key}': e3.value,
+    };
     await _protocol.send(
       $request,
       action: 'TagResource',
@@ -2630,8 +2710,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['TagResourceRequest'],
-      shapes: shapes,
       resultWrapper: 'TagResourceResult',
     );
   }
@@ -2662,8 +2740,9 @@ class Sns {
   Future<void> unsubscribe({
     required String subscriptionArn,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['SubscriptionArn'] = subscriptionArn;
+    final $request = <String, String>{
+      'SubscriptionArn': subscriptionArn,
+    };
     await _protocol.send(
       $request,
       action: 'Unsubscribe',
@@ -2671,8 +2750,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['UnsubscribeInput'],
-      shapes: shapes,
     );
   }
 
@@ -2697,9 +2774,14 @@ class Sns {
     required String resourceArn,
     required List<String> tagKeys,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['ResourceArn'] = resourceArn;
-    $request['TagKeys'] = tagKeys;
+    final $request = <String, String>{
+      'ResourceArn': resourceArn,
+      if (tagKeys.isEmpty)
+        'TagKeys': ''
+      else
+        for (var i1 = 0; i1 < tagKeys.length; i1++)
+          'TagKeys.member.${i1 + 1}': tagKeys[i1],
+    };
     await _protocol.send(
       $request,
       action: 'UntagResource',
@@ -2707,8 +2789,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['UntagResourceRequest'],
-      shapes: shapes,
       resultWrapper: 'UntagResourceResult',
     );
   }
@@ -2744,9 +2824,10 @@ class Sns {
     required String oneTimePassword,
     required String phoneNumber,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['OneTimePassword'] = oneTimePassword;
-    $request['PhoneNumber'] = phoneNumber;
+    final $request = <String, String>{
+      'OneTimePassword': oneTimePassword,
+      'PhoneNumber': phoneNumber,
+    };
     await _protocol.send(
       $request,
       action: 'VerifySMSSandboxPhoneNumber',
@@ -2754,8 +2835,6 @@ class Sns {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['VerifySMSSandboxPhoneNumberInput'],
-      shapes: shapes,
       resultWrapper: 'VerifySMSSandboxPhoneNumberResult',
     );
   }
@@ -2884,7 +2963,7 @@ class CreateEndpointResponse {
 
 /// Response from CreatePlatformApplication action.
 class CreatePlatformApplicationResponse {
-  /// PlatformApplicationArn is returned.
+  /// <code>PlatformApplicationArn</code> is returned.
   final String? platformApplicationArn;
 
   CreatePlatformApplicationResponse({
@@ -3014,7 +3093,8 @@ class GetDataProtectionPolicyResponse {
   }
 }
 
-/// Response from GetEndpointAttributes of the EndpointArn.
+/// Response from <code>GetEndpointAttributes</code> of the
+/// <code>EndpointArn</code>.
 class GetEndpointAttributesResponse {
   /// Attributes include the following:
   ///
@@ -3065,7 +3145,7 @@ class GetEndpointAttributesResponse {
   }
 }
 
-/// Response for GetPlatformApplicationAttributes action.
+/// Response for <code>GetPlatformApplicationAttributes</code> action.
 class GetPlatformApplicationAttributesResponse {
   /// Attributes include the following:
   ///
@@ -3082,6 +3162,19 @@ class GetPlatformApplicationAttributesResponse {
   /// <code>ApplePlatformBundleID</code> – The app identifier used to configure
   /// token-based authentication.
   /// </li>
+  /// <li>
+  /// <code>AuthenticationMethod</code> – Returns the credential type used when
+  /// sending push notifications from application to APNS/APNS_Sandbox, or
+  /// application to GCM.
+  ///
+  /// <ul>
+  /// <li>
+  /// APNS – Returns the token or certificate.
+  /// </li>
+  /// <li>
+  /// GCM – Returns the token or key.
+  /// </li>
+  /// </ul> </li>
   /// <li>
   /// <code>EventEndpointCreated</code> – Topic ARN to which EndpointCreated event
   /// notifications should be sent.
@@ -3247,8 +3340,8 @@ class GetSubscriptionAttributesResponse {
   /// with.
   /// </li>
   /// </ul>
-  /// The following attribute applies only to Amazon Kinesis Data Firehose
-  /// delivery stream subscriptions:
+  /// The following attribute applies only to Amazon Data Firehose delivery stream
+  /// subscriptions:
   ///
   /// <ul>
   /// <li>
@@ -3257,17 +3350,16 @@ class GetSubscriptionAttributesResponse {
   ///
   /// <ul>
   /// <li>
-  /// Permission to write to the Kinesis Data Firehose delivery stream
+  /// Permission to write to the Firehose delivery stream
   /// </li>
   /// <li>
   /// Amazon SNS listed as a trusted entity
   /// </li>
   /// </ul>
-  /// Specifying a valid ARN for this attribute is required for Kinesis Data
-  /// Firehose delivery stream subscriptions. For more information, see <a
+  /// Specifying a valid ARN for this attribute is required for Firehose delivery
+  /// stream subscriptions. For more information, see <a
   /// href="https://docs.aws.amazon.com/sns/latest/dg/sns-firehose-as-subscriber.html">Fanout
-  /// to Kinesis Data Firehose delivery streams</a> in the <i>Amazon SNS Developer
-  /// Guide</i>.
+  /// to Firehose delivery streams</a> in the <i>Amazon SNS Developer Guide</i>.
   /// </li>
   /// </ul>
   final Map<String, String>? attributes;
@@ -3445,95 +3537,40 @@ class GetTopicAttributesResponse {
 
 /// Supported language code for sending OTP message
 enum LanguageCodeString {
-  enUs,
-  enGb,
-  es_419,
-  esEs,
-  deDe,
-  frCa,
-  frFr,
-  itIt,
-  jaJp,
-  ptBr,
-  krKr,
-  zhCn,
-  zhTw,
+  enUs('en-US'),
+  enGb('en-GB'),
+  es_419('es-419'),
+  esEs('es-ES'),
+  deDe('de-DE'),
+  frCa('fr-CA'),
+  frFr('fr-FR'),
+  itIt('it-IT'),
+  jaJp('ja-JP'),
+  ptBr('pt-BR'),
+  krKr('kr-KR'),
+  zhCn('zh-CN'),
+  zhTw('zh-TW'),
+  ;
+
+  final String value;
+
+  const LanguageCodeString(this.value);
+
+  static LanguageCodeString fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum LanguageCodeString'));
 }
 
-extension LanguageCodeStringValueExtension on LanguageCodeString {
-  String toValue() {
-    switch (this) {
-      case LanguageCodeString.enUs:
-        return 'en-US';
-      case LanguageCodeString.enGb:
-        return 'en-GB';
-      case LanguageCodeString.es_419:
-        return 'es-419';
-      case LanguageCodeString.esEs:
-        return 'es-ES';
-      case LanguageCodeString.deDe:
-        return 'de-DE';
-      case LanguageCodeString.frCa:
-        return 'fr-CA';
-      case LanguageCodeString.frFr:
-        return 'fr-FR';
-      case LanguageCodeString.itIt:
-        return 'it-IT';
-      case LanguageCodeString.jaJp:
-        return 'ja-JP';
-      case LanguageCodeString.ptBr:
-        return 'pt-BR';
-      case LanguageCodeString.krKr:
-        return 'kr-KR';
-      case LanguageCodeString.zhCn:
-        return 'zh-CN';
-      case LanguageCodeString.zhTw:
-        return 'zh-TW';
-    }
-  }
-}
-
-extension LanguageCodeStringFromString on String {
-  LanguageCodeString toLanguageCodeString() {
-    switch (this) {
-      case 'en-US':
-        return LanguageCodeString.enUs;
-      case 'en-GB':
-        return LanguageCodeString.enGb;
-      case 'es-419':
-        return LanguageCodeString.es_419;
-      case 'es-ES':
-        return LanguageCodeString.esEs;
-      case 'de-DE':
-        return LanguageCodeString.deDe;
-      case 'fr-CA':
-        return LanguageCodeString.frCa;
-      case 'fr-FR':
-        return LanguageCodeString.frFr;
-      case 'it-IT':
-        return LanguageCodeString.itIt;
-      case 'ja-JP':
-        return LanguageCodeString.jaJp;
-      case 'pt-BR':
-        return LanguageCodeString.ptBr;
-      case 'kr-KR':
-        return LanguageCodeString.krKr;
-      case 'zh-CN':
-        return LanguageCodeString.zhCn;
-      case 'zh-TW':
-        return LanguageCodeString.zhTw;
-    }
-    throw Exception('$this is not known in enum LanguageCodeString');
-  }
-}
-
-/// Response for ListEndpointsByPlatformApplication action.
+/// Response for <code>ListEndpointsByPlatformApplication</code> action.
 class ListEndpointsByPlatformApplicationResponse {
-  /// Endpoints returned for ListEndpointsByPlatformApplication action.
+  /// Endpoints returned for <code>ListEndpointsByPlatformApplication</code>
+  /// action.
   final List<Endpoint>? endpoints;
 
-  /// NextToken string is returned when calling ListEndpointsByPlatformApplication
-  /// action if additional records are available after the first page results.
+  /// <code>NextToken</code> string is returned when calling
+  /// <code>ListEndpointsByPlatformApplication</code> action if additional records
+  /// are available after the first page results.
   final String? nextToken;
 
   ListEndpointsByPlatformApplicationResponse({
@@ -3626,13 +3663,15 @@ class ListPhoneNumbersOptedOutResponse {
   }
 }
 
-/// Response for ListPlatformApplications action.
+/// Response for <code>ListPlatformApplications</code> action.
 class ListPlatformApplicationsResponse {
-  /// NextToken string is returned when calling ListPlatformApplications action if
-  /// additional records are available after the first page results.
+  /// <code>NextToken</code> string is returned when calling
+  /// <code>ListPlatformApplications</code> action if additional records are
+  /// available after the first page results.
   final String? nextToken;
 
-  /// Platform applications returned when calling ListPlatformApplications action.
+  /// Platform applications returned when calling
+  /// <code>ListPlatformApplications</code> action.
   final List<PlatformApplication>? platformApplications;
 
   ListPlatformApplicationsResponse({
@@ -3859,40 +3898,34 @@ class MessageAttributeValue {
       if (stringValue != null) 'StringValue': stringValue,
     };
   }
+
+  Map<String, String> toQueryMap() {
+    final dataType = this.dataType;
+    final binaryValue = this.binaryValue;
+    final stringValue = this.stringValue;
+    return {
+      'DataType': dataType,
+      if (binaryValue != null) 'BinaryValue': base64Encode(binaryValue),
+      if (stringValue != null) 'StringValue': stringValue,
+    };
+  }
 }
 
 /// Enum listing out all supported number capabilities.
 enum NumberCapability {
-  sms,
-  mms,
-  voice,
-}
+  sms('SMS'),
+  mms('MMS'),
+  voice('VOICE'),
+  ;
 
-extension NumberCapabilityValueExtension on NumberCapability {
-  String toValue() {
-    switch (this) {
-      case NumberCapability.sms:
-        return 'SMS';
-      case NumberCapability.mms:
-        return 'MMS';
-      case NumberCapability.voice:
-        return 'VOICE';
-    }
-  }
-}
+  final String value;
 
-extension NumberCapabilityFromString on String {
-  NumberCapability toNumberCapability() {
-    switch (this) {
-      case 'SMS':
-        return NumberCapability.sms;
-      case 'MMS':
-        return NumberCapability.mms;
-      case 'VOICE':
-        return NumberCapability.voice;
-    }
-    throw Exception('$this is not known in enum NumberCapability');
-  }
+  const NumberCapability(this.value);
+
+  static NumberCapability fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum NumberCapability'));
 }
 
 /// The response for the OptInPhoneNumber action.
@@ -3945,10 +3978,12 @@ class PhoneNumberInformation {
       numberCapabilities: _s.extractXmlChild(elem, 'NumberCapabilities')?.let(
           (elem) => _s
               .extractXmlStringListValues(elem, 'member')
-              .map((s) => s.toNumberCapability())
+              .map(NumberCapability.fromString)
               .toList()),
       phoneNumber: _s.extractXmlStringValue(elem, 'PhoneNumber'),
-      routeType: _s.extractXmlStringValue(elem, 'RouteType')?.toRouteType(),
+      routeType: _s
+          .extractXmlStringValue(elem, 'RouteType')
+          ?.let(RouteType.fromString),
       status: _s.extractXmlStringValue(elem, 'Status'),
     );
   }
@@ -3964,10 +3999,9 @@ class PhoneNumberInformation {
       if (createdAt != null) 'CreatedAt': iso8601ToJson(createdAt),
       if (iso2CountryCode != null) 'Iso2CountryCode': iso2CountryCode,
       if (numberCapabilities != null)
-        'NumberCapabilities':
-            numberCapabilities.map((e) => e.toValue()).toList(),
+        'NumberCapabilities': numberCapabilities.map((e) => e.value).toList(),
       if (phoneNumber != null) 'PhoneNumber': phoneNumber,
-      if (routeType != null) 'RouteType': routeType.toValue(),
+      if (routeType != null) 'RouteType': routeType.value,
       if (status != null) 'Status': status,
     };
   }
@@ -4170,6 +4204,31 @@ class PublishBatchRequestEntry {
       if (subject != null) 'Subject': subject,
     };
   }
+
+  Map<String, String> toQueryMap() {
+    final id = this.id;
+    final message = this.message;
+    final messageAttributes = this.messageAttributes;
+    final messageDeduplicationId = this.messageDeduplicationId;
+    final messageGroupId = this.messageGroupId;
+    final messageStructure = this.messageStructure;
+    final subject = this.subject;
+    return {
+      'Id': id,
+      'Message': message,
+      if (messageAttributes != null)
+        for (var e1 in messageAttributes.entries.toList().asMap().entries) ...{
+          'MessageAttributes.entry.${e1.key + 1}.Name': e1.value.key,
+          for (var e4 in e1.value.value.toQueryMap().entries)
+            'MessageAttributes.entry.${e1.key + 1}.Value.${e4.key}': e4.value,
+        },
+      if (messageDeduplicationId != null)
+        'MessageDeduplicationId': messageDeduplicationId,
+      if (messageGroupId != null) 'MessageGroupId': messageGroupId,
+      if (messageStructure != null) 'MessageStructure': messageStructure,
+      if (subject != null) 'Subject': subject,
+    };
+  }
 }
 
 class PublishBatchResponse {
@@ -4288,36 +4347,18 @@ class PublishResponse {
 /// supported. 1. Transactional : Non-marketing traffic 2. Promotional :
 /// Marketing 3. Premium : Premium routes for OTP delivery to the carriers
 enum RouteType {
-  transactional,
-  promotional,
-  premium,
-}
+  transactional('Transactional'),
+  promotional('Promotional'),
+  premium('Premium'),
+  ;
 
-extension RouteTypeValueExtension on RouteType {
-  String toValue() {
-    switch (this) {
-      case RouteType.transactional:
-        return 'Transactional';
-      case RouteType.promotional:
-        return 'Promotional';
-      case RouteType.premium:
-        return 'Premium';
-    }
-  }
-}
+  final String value;
 
-extension RouteTypeFromString on String {
-  RouteType toRouteType() {
-    switch (this) {
-      case 'Transactional':
-        return RouteType.transactional;
-      case 'Promotional':
-        return RouteType.promotional;
-      case 'Premium':
-        return RouteType.premium;
-    }
-    throw Exception('$this is not known in enum RouteType');
-  }
+  const RouteType(this.value);
+
+  static RouteType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum RouteType'));
 }
 
 /// A verified or pending destination phone number in the SMS sandbox.
@@ -4348,7 +4389,7 @@ class SMSSandboxPhoneNumber {
       phoneNumber: _s.extractXmlStringValue(elem, 'PhoneNumber'),
       status: _s
           .extractXmlStringValue(elem, 'Status')
-          ?.toSMSSandboxPhoneNumberVerificationStatus(),
+          ?.let(SMSSandboxPhoneNumberVerificationStatus.fromString),
     );
   }
 
@@ -4357,7 +4398,7 @@ class SMSSandboxPhoneNumber {
     final status = this.status;
     return {
       if (phoneNumber != null) 'PhoneNumber': phoneNumber,
-      if (status != null) 'Status': status.toValue(),
+      if (status != null) 'Status': status.value,
     };
   }
 }
@@ -4367,34 +4408,18 @@ class SMSSandboxPhoneNumber {
 /// destination phone number is pending verification. 2. VERIFIED : The
 /// destination phone number is verified.
 enum SMSSandboxPhoneNumberVerificationStatus {
-  pending,
-  verified,
-}
+  pending('Pending'),
+  verified('Verified'),
+  ;
 
-extension SMSSandboxPhoneNumberVerificationStatusValueExtension
-    on SMSSandboxPhoneNumberVerificationStatus {
-  String toValue() {
-    switch (this) {
-      case SMSSandboxPhoneNumberVerificationStatus.pending:
-        return 'Pending';
-      case SMSSandboxPhoneNumberVerificationStatus.verified:
-        return 'Verified';
-    }
-  }
-}
+  final String value;
 
-extension SMSSandboxPhoneNumberVerificationStatusFromString on String {
-  SMSSandboxPhoneNumberVerificationStatus
-      toSMSSandboxPhoneNumberVerificationStatus() {
-    switch (this) {
-      case 'Pending':
-        return SMSSandboxPhoneNumberVerificationStatus.pending;
-      case 'Verified':
-        return SMSSandboxPhoneNumberVerificationStatus.verified;
-    }
-    throw Exception(
-        '$this is not known in enum SMSSandboxPhoneNumberVerificationStatus');
-  }
+  const SMSSandboxPhoneNumberVerificationStatus(this.value);
+
+  static SMSSandboxPhoneNumberVerificationStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum SMSSandboxPhoneNumberVerificationStatus'));
 }
 
 /// The response for the SetSMSAttributes action.
@@ -4507,6 +4532,15 @@ class Tag {
   }
 
   Map<String, dynamic> toJson() {
+    final key = this.key;
+    final value = this.value;
+    return {
+      'Key': key,
+      'Value': value,
+    };
+  }
+
+  Map<String, String> toQueryMap() {
     final key = this.key;
     final value = this.value;
     return {
@@ -4651,6 +4685,11 @@ class InvalidSecurityException extends _s.GenericAwsException {
       : super(type: type, code: 'InvalidSecurityException', message: message);
 }
 
+class InvalidStateException extends _s.GenericAwsException {
+  InvalidStateException({String? type, String? message})
+      : super(type: type, code: 'InvalidStateException', message: message);
+}
+
 class KMSAccessDeniedException extends _s.GenericAwsException {
   KMSAccessDeniedException({String? type, String? message})
       : super(type: type, code: 'KMSAccessDeniedException', message: message);
@@ -4697,6 +4736,12 @@ class PlatformApplicationDisabledException extends _s.GenericAwsException {
             type: type,
             code: 'PlatformApplicationDisabledException',
             message: message);
+}
+
+class ReplayLimitExceededException extends _s.GenericAwsException {
+  ReplayLimitExceededException({String? type, String? message})
+      : super(
+            type: type, code: 'ReplayLimitExceededException', message: message);
 }
 
 class ResourceNotFoundException extends _s.GenericAwsException {
@@ -4786,6 +4831,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       InvalidParameterValueException(type: type, message: message),
   'InvalidSecurityException': (type, message) =>
       InvalidSecurityException(type: type, message: message),
+  'InvalidStateException': (type, message) =>
+      InvalidStateException(type: type, message: message),
   'KMSAccessDeniedException': (type, message) =>
       KMSAccessDeniedException(type: type, message: message),
   'KMSDisabledException': (type, message) =>
@@ -4804,6 +4851,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       OptedOutException(type: type, message: message),
   'PlatformApplicationDisabledException': (type, message) =>
       PlatformApplicationDisabledException(type: type, message: message),
+  'ReplayLimitExceededException': (type, message) =>
+      ReplayLimitExceededException(type: type, message: message),
   'ResourceNotFoundException': (type, message) =>
       ResourceNotFoundException(type: type, message: message),
   'StaleTagException': (type, message) =>

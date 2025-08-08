@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -47,6 +48,65 @@ class Account {
   /// do so can cause the Dart process to hang.
   void close() {
     _protocol.close();
+  }
+
+  /// Accepts the request that originated from <a>StartPrimaryEmailUpdate</a> to
+  /// update the primary email address (also known as the root user email
+  /// address) for the specified account.
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
+  /// May throw [ConflictException].
+  /// May throw [AccessDeniedException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [accountId] :
+  /// Specifies the 12-digit account ID number of the Amazon Web Services
+  /// account that you want to access or modify with this operation. To use this
+  /// parameter, the caller must be an identity in the <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
+  /// management account</a> or a delegated administrator account. The specified
+  /// account ID must be a member account in the same organization. The
+  /// organization must have <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
+  /// features enabled</a>, and the organization must have <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/using-orgs-trusted-access.html">trusted
+  /// access</a> enabled for the Account Management service, and optionally a <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/using-orgs-delegated-admin.html">delegated
+  /// admin</a> account assigned.
+  ///
+  /// This operation can only be called from the management account or the
+  /// delegated administrator account of an organization for a member account.
+  /// <note>
+  /// The management account can't specify its own <code>AccountId</code>.
+  /// </note>
+  ///
+  /// Parameter [otp] :
+  /// The OTP code sent to the <code>PrimaryEmail</code> specified on the
+  /// <code>StartPrimaryEmailUpdate</code> API call.
+  ///
+  /// Parameter [primaryEmail] :
+  /// The new primary email address for use with the specified account. This
+  /// must match the <code>PrimaryEmail</code> from the
+  /// <code>StartPrimaryEmailUpdate</code> API call.
+  Future<AcceptPrimaryEmailUpdateResponse> acceptPrimaryEmailUpdate({
+    required String accountId,
+    required String otp,
+    required String primaryEmail,
+  }) async {
+    final $payload = <String, dynamic>{
+      'AccountId': accountId,
+      'Otp': otp,
+      'PrimaryEmail': primaryEmail,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/acceptPrimaryEmailUpdate',
+      exceptionFnMap: _exceptionFns,
+    );
+    return AcceptPrimaryEmailUpdateResponse.fromJson(response);
   }
 
   /// Deletes the specified alternate contact from an Amazon Web Services
@@ -106,7 +166,7 @@ class Account {
     String? accountId,
   }) async {
     final $payload = <String, dynamic>{
-      'AlternateContactType': alternateContactType.toValue(),
+      'AlternateContactType': alternateContactType.value,
       if (accountId != null) 'AccountId': accountId,
     };
     await _protocol.send(
@@ -118,6 +178,10 @@ class Account {
   }
 
   /// Disables (opts-out) a particular Region for an account.
+  /// <note>
+  /// The act of disabling a Region will remove all IAM access to any resources
+  /// that reside in that Region.
+  /// </note>
   ///
   /// May throw [ValidationException].
   /// May throw [ConflictException].
@@ -141,7 +205,7 @@ class Account {
   /// the caller must be an identity in the <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
   /// management account</a> or a delegated administrator account. The specified
-  /// account ID must also be a member account in the same organization. The
+  /// account ID must be a member account in the same organization. The
   /// organization must have <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
   /// features enabled</a>, and the organization must have <a
@@ -199,7 +263,7 @@ class Account {
   /// the caller must be an identity in the <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
   /// management account</a> or a delegated administrator account. The specified
-  /// account ID must also be a member account in the same organization. The
+  /// account ID must be a member account in the same organization. The
   /// organization must have <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
   /// features enabled</a>, and the organization must have <a
@@ -289,7 +353,7 @@ class Account {
     String? accountId,
   }) async {
     final $payload = <String, dynamic>{
-      'AlternateContactType': alternateContactType.toValue(),
+      'AlternateContactType': alternateContactType.value,
       if (accountId != null) 'AccountId': accountId,
     };
     final response = await _protocol.send(
@@ -323,7 +387,7 @@ class Account {
   /// the caller must be an identity in the <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
   /// management account</a> or a delegated administrator account. The specified
-  /// account ID must also be a member account in the same organization. The
+  /// account ID must be a member account in the same organization. The
   /// organization must have <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
   /// features enabled</a>, and the organization must have <a
@@ -355,6 +419,49 @@ class Account {
     return GetContactInformationResponse.fromJson(response);
   }
 
+  /// Retrieves the primary email address for the specified account.
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
+  /// May throw [AccessDeniedException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [accountId] :
+  /// Specifies the 12-digit account ID number of the Amazon Web Services
+  /// account that you want to access or modify with this operation. To use this
+  /// parameter, the caller must be an identity in the <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
+  /// management account</a> or a delegated administrator account. The specified
+  /// account ID must be a member account in the same organization. The
+  /// organization must have <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
+  /// features enabled</a>, and the organization must have <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/using-orgs-trusted-access.html">trusted
+  /// access</a> enabled for the Account Management service, and optionally a <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/using-orgs-delegated-admin.html">delegated
+  /// admin</a> account assigned.
+  ///
+  /// This operation can only be called from the management account or the
+  /// delegated administrator account of an organization for a member account.
+  /// <note>
+  /// The management account can't specify its own <code>AccountId</code>.
+  /// </note>
+  Future<GetPrimaryEmailResponse> getPrimaryEmail({
+    required String accountId,
+  }) async {
+    final $payload = <String, dynamic>{
+      'AccountId': accountId,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/getPrimaryEmail',
+      exceptionFnMap: _exceptionFns,
+    );
+    return GetPrimaryEmailResponse.fromJson(response);
+  }
+
   /// Retrieves the opt-in status of a particular Region.
   ///
   /// May throw [ValidationException].
@@ -375,7 +482,7 @@ class Account {
   /// the caller must be an identity in the <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
   /// management account</a> or a delegated administrator account. The specified
-  /// account ID must also be a member account in the same organization. The
+  /// account ID must be a member account in the same organization. The
   /// organization must have <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
   /// features enabled</a>, and the organization must have <a
@@ -426,7 +533,7 @@ class Account {
   /// the caller must be an identity in the <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
   /// management account</a> or a delegated administrator account. The specified
-  /// account ID must also be a member account in the same organization. The
+  /// account ID must be a member account in the same organization. The
   /// organization must have <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
   /// features enabled</a>, and the organization must have <a
@@ -485,7 +592,7 @@ class Account {
       if (nextToken != null) 'NextToken': nextToken,
       if (regionOptStatusContains != null)
         'RegionOptStatusContains':
-            regionOptStatusContains.map((e) => e.toValue()).toList(),
+            regionOptStatusContains.map((e) => e.value).toList(),
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -568,7 +675,7 @@ class Account {
     String? accountId,
   }) async {
     final $payload = <String, dynamic>{
-      'AlternateContactType': alternateContactType.toValue(),
+      'AlternateContactType': alternateContactType.value,
       'EmailAddress': emailAddress,
       'Name': name,
       'PhoneNumber': phoneNumber,
@@ -607,7 +714,7 @@ class Account {
   /// the caller must be an identity in the <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
   /// management account</a> or a delegated administrator account. The specified
-  /// account ID must also be a member account in the same organization. The
+  /// account ID must be a member account in the same organization. The
   /// organization must have <a
   /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
   /// features enabled</a>, and the organization must have <a
@@ -639,6 +746,80 @@ class Account {
       exceptionFnMap: _exceptionFns,
     );
   }
+
+  /// Starts the process to update the primary email address for the specified
+  /// account.
+  ///
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ValidationException].
+  /// May throw [ConflictException].
+  /// May throw [AccessDeniedException].
+  /// May throw [TooManyRequestsException].
+  /// May throw [InternalServerException].
+  ///
+  /// Parameter [accountId] :
+  /// Specifies the 12-digit account ID number of the Amazon Web Services
+  /// account that you want to access or modify with this operation. To use this
+  /// parameter, the caller must be an identity in the <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_getting-started_concepts.html#account">organization's
+  /// management account</a> or a delegated administrator account. The specified
+  /// account ID must be a member account in the same organization. The
+  /// organization must have <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_org_support-all-features.html">all
+  /// features enabled</a>, and the organization must have <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/using-orgs-trusted-access.html">trusted
+  /// access</a> enabled for the Account Management service, and optionally a <a
+  /// href="https://docs.aws.amazon.com/organizations/latest/userguide/using-orgs-delegated-admin.html">delegated
+  /// admin</a> account assigned.
+  ///
+  /// This operation can only be called from the management account or the
+  /// delegated administrator account of an organization for a member account.
+  /// <note>
+  /// The management account can't specify its own <code>AccountId</code>.
+  /// </note>
+  ///
+  /// Parameter [primaryEmail] :
+  /// The new primary email address (also known as the root user email address)
+  /// to use in the specified account.
+  Future<StartPrimaryEmailUpdateResponse> startPrimaryEmailUpdate({
+    required String accountId,
+    required String primaryEmail,
+  }) async {
+    final $payload = <String, dynamic>{
+      'AccountId': accountId,
+      'PrimaryEmail': primaryEmail,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/startPrimaryEmailUpdate',
+      exceptionFnMap: _exceptionFns,
+    );
+    return StartPrimaryEmailUpdateResponse.fromJson(response);
+  }
+}
+
+class AcceptPrimaryEmailUpdateResponse {
+  /// Retrieves the status of the accepted primary email update request.
+  final PrimaryEmailUpdateStatus? status;
+
+  AcceptPrimaryEmailUpdateResponse({
+    this.status,
+  });
+
+  factory AcceptPrimaryEmailUpdateResponse.fromJson(Map<String, dynamic> json) {
+    return AcceptPrimaryEmailUpdateResponse(
+      status:
+          (json['Status'] as String?)?.let(PrimaryEmailUpdateStatus.fromString),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final status = this.status;
+    return {
+      if (status != null) 'Status': status.value,
+    };
+  }
 }
 
 /// A structure that contains the details of an alternate contact associated
@@ -669,8 +850,8 @@ class AlternateContact {
 
   factory AlternateContact.fromJson(Map<String, dynamic> json) {
     return AlternateContact(
-      alternateContactType:
-          (json['AlternateContactType'] as String?)?.toAlternateContactType(),
+      alternateContactType: (json['AlternateContactType'] as String?)
+          ?.let(AlternateContactType.fromString),
       emailAddress: json['EmailAddress'] as String?,
       name: json['Name'] as String?,
       phoneNumber: json['PhoneNumber'] as String?,
@@ -686,7 +867,7 @@ class AlternateContact {
     final title = this.title;
     return {
       if (alternateContactType != null)
-        'AlternateContactType': alternateContactType.toValue(),
+        'AlternateContactType': alternateContactType.value,
       if (emailAddress != null) 'EmailAddress': emailAddress,
       if (name != null) 'Name': name,
       if (phoneNumber != null) 'PhoneNumber': phoneNumber,
@@ -696,36 +877,19 @@ class AlternateContact {
 }
 
 enum AlternateContactType {
-  billing,
-  operations,
-  security,
-}
+  billing('BILLING'),
+  operations('OPERATIONS'),
+  security('SECURITY'),
+  ;
 
-extension AlternateContactTypeValueExtension on AlternateContactType {
-  String toValue() {
-    switch (this) {
-      case AlternateContactType.billing:
-        return 'BILLING';
-      case AlternateContactType.operations:
-        return 'OPERATIONS';
-      case AlternateContactType.security:
-        return 'SECURITY';
-    }
-  }
-}
+  final String value;
 
-extension AlternateContactTypeFromString on String {
-  AlternateContactType toAlternateContactType() {
-    switch (this) {
-      case 'BILLING':
-        return AlternateContactType.billing;
-      case 'OPERATIONS':
-        return AlternateContactType.operations;
-      case 'SECURITY':
-        return AlternateContactType.security;
-    }
-    throw Exception('$this is not known in enum AlternateContactType');
-  }
+  const AlternateContactType(this.value);
+
+  static AlternateContactType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum AlternateContactType'));
 }
 
 /// Contains the details of the primary contact information associated with an
@@ -763,8 +927,12 @@ class ContactInformation {
   /// The district or county of the primary contact address, if any.
   final String? districtOrCounty;
 
-  /// The state or region of the primary contact address. This field is required
-  /// in selected countries.
+  /// The state or region of the primary contact address. If the mailing address
+  /// is within the United States (US), the value in this field can be either a
+  /// two character state code (for example, <code>NJ</code>) or the full state
+  /// name (for example, <code>New Jersey</code>). This field is required in the
+  /// following countries: <code>US</code>, <code>CA</code>, <code>GB</code>,
+  /// <code>DE</code>, <code>JP</code>, <code>IN</code>, and <code>BR</code>.
   final String? stateOrRegion;
 
   /// The URL of the website associated with the primary contact information, if
@@ -884,6 +1052,28 @@ class GetContactInformationResponse {
   }
 }
 
+class GetPrimaryEmailResponse {
+  /// Retrieves the primary email address associated with the specified account.
+  final String? primaryEmail;
+
+  GetPrimaryEmailResponse({
+    this.primaryEmail,
+  });
+
+  factory GetPrimaryEmailResponse.fromJson(Map<String, dynamic> json) {
+    return GetPrimaryEmailResponse(
+      primaryEmail: json['PrimaryEmail'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final primaryEmail = this.primaryEmail;
+    return {
+      if (primaryEmail != null) 'PrimaryEmail': primaryEmail,
+    };
+  }
+}
+
 class GetRegionOptStatusResponse {
   /// The Region code that was passed in.
   final String? regionName;
@@ -901,7 +1091,7 @@ class GetRegionOptStatusResponse {
     return GetRegionOptStatusResponse(
       regionName: json['RegionName'] as String?,
       regionOptStatus:
-          (json['RegionOptStatus'] as String?)?.toRegionOptStatus(),
+          (json['RegionOptStatus'] as String?)?.let(RegionOptStatus.fromString),
     );
   }
 
@@ -910,7 +1100,7 @@ class GetRegionOptStatusResponse {
     final regionOptStatus = this.regionOptStatus;
     return {
       if (regionName != null) 'RegionName': regionName,
-      if (regionOptStatus != null) 'RegionOptStatus': regionOptStatus.toValue(),
+      if (regionOptStatus != null) 'RegionOptStatus': regionOptStatus.value,
     };
   }
 }
@@ -935,7 +1125,7 @@ class ListRegionsResponse {
     return ListRegionsResponse(
       nextToken: json['NextToken'] as String?,
       regions: (json['Regions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Region.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -949,6 +1139,21 @@ class ListRegionsResponse {
       if (regions != null) 'Regions': regions,
     };
   }
+}
+
+enum PrimaryEmailUpdateStatus {
+  pending('PENDING'),
+  accepted('ACCEPTED'),
+  ;
+
+  final String value;
+
+  const PrimaryEmailUpdateStatus(this.value);
+
+  static PrimaryEmailUpdateStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum PrimaryEmailUpdateStatus'));
 }
 
 /// This is a structure that expresses the Region for a given account,
@@ -970,7 +1175,7 @@ class Region {
     return Region(
       regionName: json['RegionName'] as String?,
       regionOptStatus:
-          (json['RegionOptStatus'] as String?)?.toRegionOptStatus(),
+          (json['RegionOptStatus'] as String?)?.let(RegionOptStatus.fromString),
     );
   }
 
@@ -979,51 +1184,49 @@ class Region {
     final regionOptStatus = this.regionOptStatus;
     return {
       if (regionName != null) 'RegionName': regionName,
-      if (regionOptStatus != null) 'RegionOptStatus': regionOptStatus.toValue(),
+      if (regionOptStatus != null) 'RegionOptStatus': regionOptStatus.value,
     };
   }
 }
 
 enum RegionOptStatus {
-  enabled,
-  enabling,
-  disabling,
-  disabled,
-  enabledByDefault,
+  enabled('ENABLED'),
+  enabling('ENABLING'),
+  disabling('DISABLING'),
+  disabled('DISABLED'),
+  enabledByDefault('ENABLED_BY_DEFAULT'),
+  ;
+
+  final String value;
+
+  const RegionOptStatus(this.value);
+
+  static RegionOptStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum RegionOptStatus'));
 }
 
-extension RegionOptStatusValueExtension on RegionOptStatus {
-  String toValue() {
-    switch (this) {
-      case RegionOptStatus.enabled:
-        return 'ENABLED';
-      case RegionOptStatus.enabling:
-        return 'ENABLING';
-      case RegionOptStatus.disabling:
-        return 'DISABLING';
-      case RegionOptStatus.disabled:
-        return 'DISABLED';
-      case RegionOptStatus.enabledByDefault:
-        return 'ENABLED_BY_DEFAULT';
-    }
+class StartPrimaryEmailUpdateResponse {
+  /// The status of the primary email update request.
+  final PrimaryEmailUpdateStatus? status;
+
+  StartPrimaryEmailUpdateResponse({
+    this.status,
+  });
+
+  factory StartPrimaryEmailUpdateResponse.fromJson(Map<String, dynamic> json) {
+    return StartPrimaryEmailUpdateResponse(
+      status:
+          (json['Status'] as String?)?.let(PrimaryEmailUpdateStatus.fromString),
+    );
   }
-}
 
-extension RegionOptStatusFromString on String {
-  RegionOptStatus toRegionOptStatus() {
-    switch (this) {
-      case 'ENABLED':
-        return RegionOptStatus.enabled;
-      case 'ENABLING':
-        return RegionOptStatus.enabling;
-      case 'DISABLING':
-        return RegionOptStatus.disabling;
-      case 'DISABLED':
-        return RegionOptStatus.disabled;
-      case 'ENABLED_BY_DEFAULT':
-        return RegionOptStatus.enabledByDefault;
-    }
-    throw Exception('$this is not known in enum RegionOptStatus');
+  Map<String, dynamic> toJson() {
+    final status = this.status;
+    return {
+      if (status != null) 'Status': status.value,
+    };
   }
 }
 

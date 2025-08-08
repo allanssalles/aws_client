@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -541,9 +542,9 @@ class Lambda {
     );
     final $query = <String, List<String>>{
       'Handler': [handler],
-      'Mode': [mode.toValue()],
+      'Mode': [mode.value],
       'Role': [role],
-      'Runtime': [runtime.toValue()],
+      'Runtime': [runtime.value],
       if (description != null) 'Description': [description],
       if (memorySize != null) 'MemorySize': [memorySize.toString()],
       if (timeout != null) 'Timeout': [timeout.toString()],
@@ -716,9 +717,9 @@ class FunctionConfiguration {
       handler: json['Handler'] as String?,
       lastModified: timeStampFromJson(json['LastModified']),
       memorySize: json['MemorySize'] as int?,
-      mode: (json['Mode'] as String?)?.toMode(),
+      mode: (json['Mode'] as String?)?.let(Mode.fromString),
       role: json['Role'] as String?,
-      runtime: (json['Runtime'] as String?)?.toRuntime(),
+      runtime: (json['Runtime'] as String?)?.let(Runtime.fromString),
       timeout: json['Timeout'] as int?,
     );
   }
@@ -819,7 +820,7 @@ class ListEventSourcesResponse {
   factory ListEventSourcesResponse.fromJson(Map<String, dynamic> json) {
     return ListEventSourcesResponse(
       eventSources: (json['EventSources'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               EventSourceConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -845,7 +846,7 @@ class ListFunctionsResponse {
   factory ListFunctionsResponse.fromJson(Map<String, dynamic> json) {
     return ListFunctionsResponse(
       functions: (json['Functions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => FunctionConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextMarker: json['NextMarker'] as String?,
@@ -854,26 +855,16 @@ class ListFunctionsResponse {
 }
 
 enum Mode {
-  event,
-}
+  event('event'),
+  ;
 
-extension ModeValueExtension on Mode {
-  String toValue() {
-    switch (this) {
-      case Mode.event:
-        return 'event';
-    }
-  }
-}
+  final String value;
 
-extension ModeFromString on String {
-  Mode toMode() {
-    switch (this) {
-      case 'event':
-        return Mode.event;
-    }
-    throw Exception('$this is not known in enum Mode');
-  }
+  const Mode(this.value);
+
+  static Mode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum Mode'));
 }
 
 /// The function or the event source specified in the request does not exist.
@@ -895,26 +886,16 @@ class ResourceNotFoundException implements _s.AwsException {
 }
 
 enum Runtime {
-  nodejs,
-}
+  nodejs('nodejs'),
+  ;
 
-extension RuntimeValueExtension on Runtime {
-  String toValue() {
-    switch (this) {
-      case Runtime.nodejs:
-        return 'nodejs';
-    }
-  }
-}
+  final String value;
 
-extension RuntimeFromString on String {
-  Runtime toRuntime() {
-    switch (this) {
-      case 'nodejs':
-        return Runtime.nodejs;
-    }
-    throw Exception('$this is not known in enum Runtime');
-  }
+  const Runtime(this.value);
+
+  static Runtime fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum Runtime'));
 }
 
 /// The AWS Lambda service encountered an internal error.

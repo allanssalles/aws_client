@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -117,6 +118,40 @@ class MigrationHubConfig {
     );
 
     return CreateHomeRegionControlResult.fromJson(jsonResponse.body);
+  }
+
+  /// This operation deletes the home region configuration for the calling
+  /// account. The operation does not delete discovery or migration tracking
+  /// data in the home region.
+  ///
+  /// May throw [InternalServerError].
+  /// May throw [ServiceUnavailableException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ThrottlingException].
+  /// May throw [InvalidInputException].
+  ///
+  /// Parameter [controlId] :
+  /// A unique identifier that's generated for each home region control. It's
+  /// always a string that begins with "hrc-" followed by 12 lowercase letters
+  /// and numbers.
+  Future<void> deleteHomeRegionControl({
+    required String controlId,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AWSMigrationHubMultiAccountService.DeleteHomeRegionControl'
+    };
+    await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ControlId': controlId,
+      },
+    );
   }
 
   /// This API permits filtering on the <code>ControlId</code> and
@@ -238,6 +273,18 @@ class CreateHomeRegionControlResult {
   }
 }
 
+class DeleteHomeRegionControlResult {
+  DeleteHomeRegionControlResult();
+
+  factory DeleteHomeRegionControlResult.fromJson(Map<String, dynamic> _) {
+    return DeleteHomeRegionControlResult();
+  }
+
+  Map<String, dynamic> toJson() {
+    return {};
+  }
+}
+
 class DescribeHomeRegionControlsResult {
   /// An array that contains your <code>HomeRegionControl</code> objects.
   final List<HomeRegionControl>? homeRegionControls;
@@ -255,7 +302,7 @@ class DescribeHomeRegionControlsResult {
   factory DescribeHomeRegionControlsResult.fromJson(Map<String, dynamic> json) {
     return DescribeHomeRegionControlsResult(
       homeRegionControls: (json['HomeRegionControls'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => HomeRegionControl.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -370,7 +417,7 @@ class Target {
 
   factory Target.fromJson(Map<String, dynamic> json) {
     return Target(
-      type: (json['Type'] as String).toTargetType(),
+      type: TargetType.fromString((json['Type'] as String)),
       id: json['Id'] as String?,
     );
   }
@@ -379,33 +426,23 @@ class Target {
     final type = this.type;
     final id = this.id;
     return {
-      'Type': type.toValue(),
+      'Type': type.value,
       if (id != null) 'Id': id,
     };
   }
 }
 
 enum TargetType {
-  account,
-}
+  account('ACCOUNT'),
+  ;
 
-extension TargetTypeValueExtension on TargetType {
-  String toValue() {
-    switch (this) {
-      case TargetType.account:
-        return 'ACCOUNT';
-    }
-  }
-}
+  final String value;
 
-extension TargetTypeFromString on String {
-  TargetType toTargetType() {
-    switch (this) {
-      case 'ACCOUNT':
-        return TargetType.account;
-    }
-    throw Exception('$this is not known in enum TargetType');
-  }
+  const TargetType(this.value);
+
+  static TargetType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum TargetType'));
 }
 
 class AccessDeniedException extends _s.GenericAwsException {

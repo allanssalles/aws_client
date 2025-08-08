@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -117,7 +118,7 @@ class BatchPutMetricsError {
 
   factory BatchPutMetricsError.fromJson(Map<String, dynamic> json) {
     return BatchPutMetricsError(
-      code: (json['Code'] as String?)?.toPutMetricsErrorCode(),
+      code: (json['Code'] as String?)?.let(PutMetricsErrorCode.fromString),
       metricIndex: json['MetricIndex'] as int?,
     );
   }
@@ -126,7 +127,7 @@ class BatchPutMetricsError {
     final code = this.code;
     final metricIndex = this.metricIndex;
     return {
-      if (code != null) 'Code': code.toValue(),
+      if (code != null) 'Code': code.value,
       if (metricIndex != null) 'MetricIndex': metricIndex,
     };
   }
@@ -143,7 +144,7 @@ class BatchPutMetricsResponse {
   factory BatchPutMetricsResponse.fromJson(Map<String, dynamic> json) {
     return BatchPutMetricsResponse(
       errors: (json['Errors'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => BatchPutMetricsError.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -158,41 +159,20 @@ class BatchPutMetricsResponse {
 }
 
 enum PutMetricsErrorCode {
-  metricLimitExceeded,
-  internalError,
-  validationError,
-  conflictError,
-}
+  metricLimitExceeded('METRIC_LIMIT_EXCEEDED'),
+  internalError('INTERNAL_ERROR'),
+  validationError('VALIDATION_ERROR'),
+  conflictError('CONFLICT_ERROR'),
+  ;
 
-extension PutMetricsErrorCodeValueExtension on PutMetricsErrorCode {
-  String toValue() {
-    switch (this) {
-      case PutMetricsErrorCode.metricLimitExceeded:
-        return 'METRIC_LIMIT_EXCEEDED';
-      case PutMetricsErrorCode.internalError:
-        return 'INTERNAL_ERROR';
-      case PutMetricsErrorCode.validationError:
-        return 'VALIDATION_ERROR';
-      case PutMetricsErrorCode.conflictError:
-        return 'CONFLICT_ERROR';
-    }
-  }
-}
+  final String value;
 
-extension PutMetricsErrorCodeFromString on String {
-  PutMetricsErrorCode toPutMetricsErrorCode() {
-    switch (this) {
-      case 'METRIC_LIMIT_EXCEEDED':
-        return PutMetricsErrorCode.metricLimitExceeded;
-      case 'INTERNAL_ERROR':
-        return PutMetricsErrorCode.internalError;
-      case 'VALIDATION_ERROR':
-        return PutMetricsErrorCode.validationError;
-      case 'CONFLICT_ERROR':
-        return PutMetricsErrorCode.conflictError;
-    }
-    throw Exception('$this is not known in enum PutMetricsErrorCode');
-  }
+  const PutMetricsErrorCode(this.value);
+
+  static PutMetricsErrorCode fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum PutMetricsErrorCode'));
 }
 
 /// The raw metric data to associate with the resource.

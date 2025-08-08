@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -126,20 +127,23 @@ class FSx {
 
   /// Cancels an existing Amazon FSx for Lustre data repository task if that
   /// task is in either the <code>PENDING</code> or <code>EXECUTING</code>
-  /// state. When you cancel a task, Amazon FSx does the following.
+  /// state. When you cancel am export task, Amazon FSx does the following.
   ///
   /// <ul>
   /// <li>
   /// Any files that FSx has already exported are not reverted.
   /// </li>
   /// <li>
-  /// FSx continues to export any files that are "in-flight" when the cancel
+  /// FSx continues to export any files that are in-flight when the cancel
   /// operation is received.
   /// </li>
   /// <li>
   /// FSx does not export any files that have not yet been exported.
   /// </li>
   /// </ul>
+  /// For a release task, Amazon FSx will stop releasing files upon
+  /// cancellation. Any files that have already been released will remain in the
+  /// released state.
   ///
   /// May throw [BadRequest].
   /// May throw [UnsupportedOperation].
@@ -269,6 +273,90 @@ class FSx {
     );
 
     return CopyBackupResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Updates an existing volume by using a snapshot from another Amazon FSx for
+  /// OpenZFS file system. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/on-demand-replication.html">on-demand
+  /// data replication</a> in the Amazon FSx for OpenZFS User Guide.
+  ///
+  /// May throw [BadRequest].
+  /// May throw [IncompatibleParameterError].
+  /// May throw [InternalServerError].
+  /// May throw [ServiceLimitExceeded].
+  ///
+  /// Parameter [volumeId] :
+  /// Specifies the ID of the volume that you are copying the snapshot to.
+  ///
+  /// Parameter [copyStrategy] :
+  /// Specifies the strategy to use when copying data from a snapshot to the
+  /// volume.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>FULL_COPY</code> - Copies all data from the snapshot to the volume.
+  /// </li>
+  /// <li>
+  /// <code>INCREMENTAL_COPY</code> - Copies only the snapshot data that's
+  /// changed since the previous replication.
+  /// </li>
+  /// </ul> <note>
+  /// <code>CLONE</code> isn't a valid copy strategy option for the
+  /// <code>CopySnapshotAndUpdateVolume</code> operation.
+  /// </note>
+  ///
+  /// Parameter [options] :
+  /// Confirms that you want to delete data on the destination volume that
+  /// wasn’t there during the previous snapshot replication.
+  ///
+  /// Your replication will fail if you don’t include an option for a specific
+  /// type of data and that data is on your destination. For example, if you
+  /// don’t include <code>DELETE_INTERMEDIATE_SNAPSHOTS</code> and there are
+  /// intermediate snapshots on the destination, you can’t copy the snapshot.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>DELETE_INTERMEDIATE_SNAPSHOTS</code> - Deletes snapshots on the
+  /// destination volume that aren’t on the source volume.
+  /// </li>
+  /// <li>
+  /// <code>DELETE_CLONED_VOLUMES</code> - Deletes snapshot clones on the
+  /// destination volume that aren't on the source volume.
+  /// </li>
+  /// <li>
+  /// <code>DELETE_INTERMEDIATE_DATA</code> - Overwrites snapshots on the
+  /// destination volume that don’t match the source snapshot that you’re
+  /// copying.
+  /// </li>
+  /// </ul>
+  Future<CopySnapshotAndUpdateVolumeResponse> copySnapshotAndUpdateVolume({
+    required String sourceSnapshotARN,
+    required String volumeId,
+    String? clientRequestToken,
+    OpenZFSCopyStrategy? copyStrategy,
+    List<UpdateOpenZFSVolumeOption>? options,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AWSSimbaAPIService_v20180301.CopySnapshotAndUpdateVolume'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'SourceSnapshotARN': sourceSnapshotARN,
+        'VolumeId': volumeId,
+        'ClientRequestToken':
+            clientRequestToken ?? _s.generateIdempotencyToken(),
+        if (copyStrategy != null) 'CopyStrategy': copyStrategy.value,
+        if (options != null) 'Options': options.map((e) => e.value).toList(),
+      },
+    );
+
+    return CopySnapshotAndUpdateVolumeResponse.fromJson(jsonResponse.body);
   }
 
   /// Creates a backup of an existing Amazon FSx for Windows File Server file
@@ -402,8 +490,8 @@ class FSx {
   /// repository association is a link between a directory on the file system
   /// and an Amazon S3 bucket or prefix. You can have a maximum of 8 data
   /// repository associations on a file system. Data repository associations are
-  /// supported for all file systems except for <code>Scratch_1</code>
-  /// deployment type.
+  /// supported on all FSx for Lustre 2.12 and 2.15 file systems, excluding
+  /// <code>scratch_1</code> deployment type.
   ///
   /// Each data repository association must have a unique Amazon FSx file system
   /// directory and a unique S3 bucket or prefix associated with it. You can
@@ -519,15 +607,23 @@ class FSx {
     return CreateDataRepositoryAssociationResponse.fromJson(jsonResponse.body);
   }
 
-  /// Creates an Amazon FSx for Lustre data repository task. You use data
-  /// repository tasks to perform bulk operations between your Amazon FSx file
-  /// system and its linked data repositories. An example of a data repository
-  /// task is exporting any data and metadata changes, including POSIX metadata,
-  /// to files, directories, and symbolic links (symlinks) from your FSx file
-  /// system to a linked data repository. A
+  /// Creates an Amazon FSx for Lustre data repository task. A
   /// <code>CreateDataRepositoryTask</code> operation will fail if a data
-  /// repository is not linked to the FSx file system. To learn more about data
-  /// repository tasks, see <a
+  /// repository is not linked to the FSx file system.
+  ///
+  /// You use import and export data repository tasks to perform bulk operations
+  /// between your FSx for Lustre file system and its linked data repositories.
+  /// An example of a data repository task is exporting any data and metadata
+  /// changes, including POSIX metadata, to files, directories, and symbolic
+  /// links (symlinks) from your FSx file system to a linked data repository.
+  ///
+  /// You use release data repository tasks to release data from your file
+  /// system for files that are exported to S3. The metadata of released files
+  /// remains on the file system so users or applications can still access
+  /// released files by reading the files again, which will restore data from
+  /// Amazon S3 to the FSx for Lustre file system.
+  ///
+  /// To learn more about data repository tasks, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/data-repository-tasks.html">Data
   /// Repository Tasks</a>. To learn more about linking a data repository to
   /// your file system, see <a
@@ -553,6 +649,26 @@ class FSx {
   /// Parameter [type] :
   /// Specifies the type of data repository task to create.
   ///
+  /// <ul>
+  /// <li>
+  /// <code>EXPORT_TO_REPOSITORY</code> tasks export from your Amazon FSx for
+  /// Lustre file system to a linked data repository.
+  /// </li>
+  /// <li>
+  /// <code>IMPORT_METADATA_FROM_REPOSITORY</code> tasks import metadata changes
+  /// from a linked S3 bucket to your Amazon FSx for Lustre file system.
+  /// </li>
+  /// <li>
+  /// <code>RELEASE_DATA_FROM_FILESYSTEM</code> tasks release files in your
+  /// Amazon FSx for Lustre file system that have been exported to a linked S3
+  /// bucket and that meet your specified release criteria.
+  /// </li>
+  /// <li>
+  /// <code>AUTO_RELEASE_DATA</code> tasks automatically release files from an
+  /// Amazon File Cache resource.
+  /// </li>
+  /// </ul>
+  ///
   /// Parameter [capacityToRelease] :
   /// Specifies the amount of data to release, in GiB, by an Amazon File Cache
   /// <code>AUTO_RELEASE_DATA</code> task that automatically releases files from
@@ -560,26 +676,44 @@ class FSx {
   ///
   /// Parameter [paths] :
   /// A list of paths for the data repository task to use when the task is
-  /// processed. If a path that you provide isn't valid, the task fails.
+  /// processed. If a path that you provide isn't valid, the task fails. If you
+  /// don't provide paths, the default behavior is to export all files to S3
+  /// (for export tasks), import all files from S3 (for import tasks), or
+  /// release all exported files that meet the last accessed time criteria (for
+  /// release tasks).
   ///
   /// <ul>
   /// <li>
-  /// For export tasks, the list contains paths on the Amazon FSx file system
-  /// from which the files are exported to the Amazon S3 bucket. The default
-  /// path is the file system root directory. The paths you provide need to be
-  /// relative to the mount point of the file system. If the mount point is
-  /// <code>/mnt/fsx</code> and <code>/mnt/fsx/path1</code> is a directory or
+  /// For export tasks, the list contains paths on the FSx for Lustre file
+  /// system from which the files are exported to the Amazon S3 bucket. The
+  /// default path is the file system root directory. The paths you provide need
+  /// to be relative to the mount point of the file system. If the mount point
+  /// is <code>/mnt/fsx</code> and <code>/mnt/fsx/path1</code> is a directory or
   /// file on the file system you want to export, then the path to provide is
   /// <code>path1</code>.
   /// </li>
   /// <li>
   /// For import tasks, the list contains paths in the Amazon S3 bucket from
-  /// which POSIX metadata changes are imported to the Amazon FSx file system.
-  /// The path can be an S3 bucket or prefix in the format
+  /// which POSIX metadata changes are imported to the FSx for Lustre file
+  /// system. The path can be an S3 bucket or prefix in the format
   /// <code>s3://myBucket/myPrefix</code> (where <code>myPrefix</code> is
   /// optional).
   /// </li>
+  /// <li>
+  /// For release tasks, the list contains directory or file paths on the FSx
+  /// for Lustre file system from which to release exported files. If a
+  /// directory is specified, files within the directory are released. If a file
+  /// path is specified, only that file is released. To release all exported
+  /// files in the file system, specify a forward slash (/) as the path.
+  /// <note>
+  /// A file must also meet the last accessed time criteria specified in for the
+  /// file to be released.
+  /// </note> </li>
   /// </ul>
+  ///
+  /// Parameter [releaseConfiguration] :
+  /// The configuration that specifies the last accessed time criteria for files
+  /// that will be released from an Amazon FSx for Lustre file system.
   Future<CreateDataRepositoryTaskResponse> createDataRepositoryTask({
     required String fileSystemId,
     required CompletionReport report,
@@ -587,6 +721,7 @@ class FSx {
     int? capacityToRelease,
     String? clientRequestToken,
     List<String>? paths,
+    ReleaseConfiguration? releaseConfiguration,
     List<Tag>? tags,
   }) async {
     _s.validateNumRange(
@@ -608,11 +743,13 @@ class FSx {
       payload: {
         'FileSystemId': fileSystemId,
         'Report': report,
-        'Type': type.toValue(),
+        'Type': type.value,
         if (capacityToRelease != null) 'CapacityToRelease': capacityToRelease,
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (paths != null) 'Paths': paths,
+        if (releaseConfiguration != null)
+          'ReleaseConfiguration': releaseConfiguration,
         if (tags != null) 'Tags': tags,
       },
     );
@@ -751,7 +888,7 @@ class FSx {
       // TODO queryParams
       headers: headers,
       payload: {
-        'FileCacheType': fileCacheType.toValue(),
+        'FileCacheType': fileCacheType.value,
         'FileCacheTypeVersion': fileCacheTypeVersion,
         'StorageCapacity': storageCapacity,
         'SubnetIds': subnetIds,
@@ -855,7 +992,7 @@ class FSx {
   ///
   /// <ul>
   /// <li>
-  /// For <code>SCRATCH_2</code>, <code>PERSISTENT_2</code> and
+  /// For <code>SCRATCH_2</code>, <code>PERSISTENT_2</code>, and
   /// <code>PERSISTENT_1</code> deployment types using SSD storage type, the
   /// valid values are 1200 GiB, 2400 GiB, and increments of 2400 GiB.
   /// </li>
@@ -870,7 +1007,9 @@ class FSx {
   /// </li>
   /// </ul>
   /// <b>FSx for ONTAP file systems</b> - The amount of storage capacity that
-  /// you can configure is from 1024 GiB up to 196,608 GiB (192 TiB).
+  /// you can configure depends on the value of the <code>HAPairs</code>
+  /// property. The minimum value is calculated as 1,024 * <code>HAPairs</code>
+  /// and the maximum is calculated as 524,288 * <code>HAPairs</code>.
   ///
   /// <b>FSx for OpenZFS file systems</b> - The amount of storage capacity that
   /// you can configure is from 64 GiB up to 524,288 GiB (512 TiB).
@@ -915,28 +1054,36 @@ class FSx {
   /// SDK.
   ///
   /// Parameter [fileSystemTypeVersion] :
-  /// (Optional) For FSx for Lustre file systems, sets the Lustre version for
-  /// the file system that you're creating. Valid values are <code>2.10</code>
-  /// and <code>2.12</code>:
+  /// For FSx for Lustre file systems, sets the Lustre version for the file
+  /// system that you're creating. Valid values are <code>2.10</code>,
+  /// <code>2.12</code>, and <code>2.15</code>:
   ///
   /// <ul>
   /// <li>
-  /// 2.10 is supported by the Scratch and Persistent_1 Lustre deployment types.
+  /// <code>2.10</code> is supported by the Scratch and Persistent_1 Lustre
+  /// deployment types.
   /// </li>
   /// <li>
-  /// 2.12 is supported by all Lustre deployment types. <code>2.12</code> is
-  /// required when setting FSx for Lustre <code>DeploymentType</code> to
-  /// <code>PERSISTENT_2</code>.
+  /// <code>2.12</code> is supported by all Lustre deployment types, except for
+  /// <code>PERSISTENT_2</code> with a metadata configuration mode.
+  /// </li>
+  /// <li>
+  /// <code>2.15</code> is supported by all Lustre deployment types and is
+  /// recommended for all new file systems.
   /// </li>
   /// </ul>
-  /// Default value = <code>2.10</code>, except when <code>DeploymentType</code>
-  /// is set to <code>PERSISTENT_2</code>, then the default is
-  /// <code>2.12</code>.
-  /// <note>
-  /// If you set <code>FileSystemTypeVersion</code> to <code>2.10</code> for a
-  /// <code>PERSISTENT_2</code> Lustre deployment type, the
-  /// <code>CreateFileSystem</code> operation fails.
-  /// </note>
+  /// Default value is <code>2.10</code>, except for the following deployments:
+  ///
+  /// <ul>
+  /// <li>
+  /// Default value is <code>2.12</code> when <code>DeploymentType</code> is set
+  /// to <code>PERSISTENT_2</code> without a metadata configuration mode.
+  /// </li>
+  /// <li>
+  /// Default value is <code>2.15</code> when <code>DeploymentType</code> is set
+  /// to <code>PERSISTENT_2</code> with a metadata configuration mode.
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [openZFSConfiguration] :
   /// The OpenZFS configuration for the file system that's being created.
@@ -945,6 +1092,10 @@ class FSx {
   /// A list of IDs specifying the security groups to apply to all network
   /// interfaces created for file system access. This list isn't returned in
   /// later requests to describe the file system.
+  /// <important>
+  /// You must specify a security group if you are creating a Multi-AZ FSx for
+  /// ONTAP file system in a VPC subnet that has been shared with you.
+  /// </important>
   ///
   /// Parameter [storageType] :
   /// Sets the storage type for the file system that you're creating. Valid
@@ -1010,7 +1161,7 @@ class FSx {
       // TODO queryParams
       headers: headers,
       payload: {
-        'FileSystemType': fileSystemType.toValue(),
+        'FileSystemType': fileSystemType.value,
         'StorageCapacity': storageCapacity,
         'SubnetIds': subnetIds,
         'ClientRequestToken':
@@ -1025,7 +1176,7 @@ class FSx {
         if (openZFSConfiguration != null)
           'OpenZFSConfiguration': openZFSConfiguration,
         if (securityGroupIds != null) 'SecurityGroupIds': securityGroupIds,
-        if (storageType != null) 'StorageType': storageType.toValue(),
+        if (storageType != null) 'StorageType': storageType.value,
         if (tags != null) 'Tags': tags,
         if (windowsConfiguration != null)
           'WindowsConfiguration': windowsConfiguration,
@@ -1108,8 +1259,8 @@ class FSx {
   ///
   /// Parameter [fileSystemTypeVersion] :
   /// Sets the version for the Amazon FSx for Lustre file system that you're
-  /// creating from a backup. Valid values are <code>2.10</code> and
-  /// <code>2.12</code>.
+  /// creating from a backup. Valid values are <code>2.10</code>,
+  /// <code>2.12</code>, and <code>2.15</code>.
   ///
   /// You don't need to specify <code>FileSystemTypeVersion</code> because it
   /// will be applied using the backup's <code>FileSystemTypeVersion</code>
@@ -1136,7 +1287,8 @@ class FSx {
   ///
   /// If used to create a file system other than OpenZFS, you must provide a
   /// value that matches the backup's <code>StorageCapacity</code> value. If you
-  /// provide any other value, Amazon FSx responds with a 400 Bad Request.
+  /// provide any other value, Amazon FSx responds with with an HTTP status code
+  /// 400 Bad Request.
   ///
   /// Parameter [storageType] :
   /// Sets the storage type for the Windows or OpenZFS file system that you're
@@ -1214,7 +1366,7 @@ class FSx {
           'OpenZFSConfiguration': openZFSConfiguration,
         if (securityGroupIds != null) 'SecurityGroupIds': securityGroupIds,
         if (storageCapacity != null) 'StorageCapacity': storageCapacity,
-        if (storageType != null) 'StorageType': storageType.toValue(),
+        if (storageType != null) 'StorageType': storageType.value,
         if (tags != null) 'Tags': tags,
         if (windowsConfiguration != null)
           'WindowsConfiguration': windowsConfiguration,
@@ -1315,7 +1467,7 @@ class FSx {
   /// Describes the self-managed Microsoft Active Directory to which you want to
   /// join the SVM. Joining an Active Directory provides user authentication and
   /// access control for SMB clients, including Microsoft Windows and macOS
-  /// client accessing the file system.
+  /// clients accessing the file system.
   ///
   /// Parameter [rootVolumeSecurityStyle] :
   /// The security style of the root volume of the SVM. Specify one of the
@@ -1328,15 +1480,17 @@ class FSx {
   /// data uses a UNIX user as the service account.
   /// </li>
   /// <li>
-  /// <code>NTFS</code> if the file system is managed by a Windows
+  /// <code>NTFS</code> if the file system is managed by a Microsoft Windows
   /// administrator, the majority of users are SMB clients, and an application
-  /// accessing the data uses a Windows user as the service account.
+  /// accessing the data uses a Microsoft Windows user as the service account.
   /// </li>
   /// <li>
-  /// <code>MIXED</code> if the file system is managed by both UNIX and Windows
-  /// administrators and users consist of both NFS and SMB clients.
+  /// <code>MIXED</code> This is an advanced setting. For more information, see
+  /// <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/volume-security-style.html">Volume
+  /// security style</a> in the Amazon FSx for NetApp ONTAP User Guide.
   /// </li>
-  /// </ul>
+  /// </ul> <p/>
   ///
   /// Parameter [svmAdminPassword] :
   /// The password to use when managing the SVM using the NetApp ONTAP CLI or
@@ -1369,7 +1523,7 @@ class FSx {
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (rootVolumeSecurityStyle != null)
-          'RootVolumeSecurityStyle': rootVolumeSecurityStyle.toValue(),
+          'RootVolumeSecurityStyle': rootVolumeSecurityStyle.value,
         if (svmAdminPassword != null) 'SvmAdminPassword': svmAdminPassword,
         if (tags != null) 'Tags': tags,
       },
@@ -1421,7 +1575,7 @@ class FSx {
       headers: headers,
       payload: {
         'Name': name,
-        'VolumeType': volumeType.toValue(),
+        'VolumeType': volumeType.value,
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
         if (ontapConfiguration != null)
@@ -1537,8 +1691,8 @@ class FSx {
   /// from the Amazon S3 bucket. When deleting a data repository association,
   /// you have the option of deleting the data in the file system that
   /// corresponds to the data repository association. Data repository
-  /// associations are supported for all file systems except for
-  /// <code>Scratch_1</code> deployment type.
+  /// associations are supported on all FSx for Lustre 2.12 and 2.15 file
+  /// systems, excluding <code>scratch_1</code> deployment type.
   ///
   /// May throw [BadRequest].
   /// May throw [IncompatibleParameterError].
@@ -1635,12 +1789,30 @@ class FSx {
   /// To delete an Amazon FSx for NetApp ONTAP file system, first delete all the
   /// volumes and storage virtual machines (SVMs) on the file system. Then
   /// provide a <code>FileSystemId</code> value to the
-  /// <code>DeleFileSystem</code> operation.
+  /// <code>DeleteFileSystem</code> operation.
   ///
   /// By default, when you delete an Amazon FSx for Windows File Server file
   /// system, a final backup is created upon deletion. This final backup isn't
   /// subject to the file system's retention policy, and must be manually
   /// deleted.
+  ///
+  /// To delete an Amazon FSx for Lustre file system, first <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/unmounting-fs.html">unmount</a>
+  /// it from every connected Amazon EC2 instance, then provide a
+  /// <code>FileSystemId</code> value to the <code>DeleteFileSystem</code>
+  /// operation. By default, Amazon FSx will not take a final backup when the
+  /// <code>DeleteFileSystem</code> operation is invoked. On file systems not
+  /// linked to an Amazon S3 bucket, set <code>SkipFinalBackup</code> to
+  /// <code>false</code> to take a final backup of the file system you are
+  /// deleting. Backups cannot be enabled on S3-linked file systems. To ensure
+  /// all of your data is written back to S3 before deleting your file system,
+  /// you can either monitor for the <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/monitoring-cloudwatch.html#auto-import-export-metrics">AgeOfOldestQueuedMessage</a>
+  /// metric to be zero (if using automatic export) or you can run an <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/export-data-repo-task-dra.html">export
+  /// data repository task</a>. If you have automatic export enabled and want to
+  /// use an export data repository task, you have to disable automatic export
+  /// before executing the export data repository task.
   ///
   /// The <code>DeleteFileSystem</code> operation returns while the file system
   /// has the <code>DELETING</code> status. You can check the file system
@@ -1788,6 +1960,7 @@ class FSx {
   /// May throw [IncompatibleParameterError].
   /// May throw [InternalServerError].
   /// May throw [VolumeNotFound].
+  /// May throw [ServiceLimitExceeded].
   ///
   /// Parameter [volumeId] :
   /// The ID of the volume that you are deleting.
@@ -1926,8 +2099,8 @@ class FSx {
   /// Cache data repository associations, if one or more
   /// <code>AssociationIds</code> values are provided in the request, or if
   /// filters are used in the request. Data repository associations are
-  /// supported on Amazon File Cache resources and all Amazon FSx for Lustre
-  /// file systems excluding <code>Scratch_1</code> deployment types.
+  /// supported on Amazon File Cache resources and all FSx for Lustre 2.12 and
+  /// 2,15 file systems, excluding <code>scratch_1</code> deployment type.
   ///
   /// You can use filters to narrow the response to include just data repository
   /// associations for specific file systems (use the
@@ -2273,6 +2446,33 @@ class FSx {
     return DescribeFileSystemsResponse.fromJson(jsonResponse.body);
   }
 
+  /// Indicates whether participant accounts in your organization can create
+  /// Amazon FSx for NetApp ONTAP Multi-AZ file systems in subnets that are
+  /// shared by a virtual private cloud (VPC) owner. For more information, see
+  /// <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/creating-file-systems.html#fsxn-vpc-shared-subnets">Creating
+  /// FSx for ONTAP file systems in shared subnets</a>.
+  ///
+  /// May throw [BadRequest].
+  /// May throw [InternalServerError].
+  Future<DescribeSharedVpcConfigurationResponse>
+      describeSharedVpcConfiguration() async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AWSSimbaAPIService_v20180301.DescribeSharedVpcConfiguration'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+    );
+
+    return DescribeSharedVpcConfigurationResponse.fromJson(jsonResponse.body);
+  }
+
   /// Returns the description of specific Amazon FSx for OpenZFS snapshots, if a
   /// <code>SnapshotIds</code> value is provided. Otherwise, this operation
   /// returns all snapshots owned by your Amazon Web Services account in the
@@ -2315,12 +2515,19 @@ class FSx {
   /// The filters structure. The supported names are <code>file-system-id</code>
   /// or <code>volume-id</code>.
   ///
+  /// Parameter [includeShared] :
+  /// Set to <code>false</code> (default) if you want to only see the snapshots
+  /// owned by your Amazon Web Services account. Set to <code>true</code> if you
+  /// want to see the snapshots in your account and the ones shared with you
+  /// from another account.
+  ///
   /// Parameter [snapshotIds] :
   /// The IDs of the snapshots that you want to retrieve. This parameter value
   /// overrides any filters. If any IDs aren't found, a
   /// <code>SnapshotNotFound</code> error occurs.
   Future<DescribeSnapshotsResponse> describeSnapshots({
     List<SnapshotFilter>? filters,
+    bool? includeShared,
     int? maxResults,
     String? nextToken,
     List<String>? snapshotIds,
@@ -2343,6 +2550,7 @@ class FSx {
       headers: headers,
       payload: {
         if (filters != null) 'Filters': filters,
+        if (includeShared != null) 'IncludeShared': includeShared,
         if (maxResults != null) 'MaxResults': maxResults,
         if (nextToken != null) 'NextToken': nextToken,
         if (snapshotIds != null) 'SnapshotIds': snapshotIds,
@@ -2449,8 +2657,8 @@ class FSx {
   /// Use this action to disassociate, or remove, one or more Domain Name
   /// Service (DNS) aliases from an Amazon FSx for Windows File Server file
   /// system. If you attempt to disassociate a DNS alias that is not associated
-  /// with the file system, Amazon FSx responds with a 400 Bad Request. For more
-  /// information, see <a
+  /// with the file system, Amazon FSx responds with an HTTP status code 400
+  /// (Bad Request). For more information, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/managing-dns-aliases.html">Working
   /// with DNS Aliases</a>.
   ///
@@ -2659,12 +2867,44 @@ class FSx {
         'VolumeId': volumeId,
         'ClientRequestToken':
             clientRequestToken ?? _s.generateIdempotencyToken(),
-        if (options != null)
-          'Options': options.map((e) => e.toValue()).toList(),
+        if (options != null) 'Options': options.map((e) => e.value).toList(),
       },
     );
 
     return RestoreVolumeFromSnapshotResponse.fromJson(jsonResponse.body);
+  }
+
+  /// After performing steps to repair the Active Directory configuration of an
+  /// FSx for Windows File Server file system, use this action to initiate the
+  /// process of Amazon FSx attempting to reconnect to the file system.
+  ///
+  /// May throw [BadRequest].
+  /// May throw [FileSystemNotFound].
+  /// May throw [InternalServerError].
+  Future<StartMisconfiguredStateRecoveryResponse>
+      startMisconfiguredStateRecovery({
+    required String fileSystemId,
+    String? clientRequestToken,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AWSSimbaAPIService_v20180301.StartMisconfiguredStateRecovery'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'FileSystemId': fileSystemId,
+        'ClientRequestToken':
+            clientRequestToken ?? _s.generateIdempotencyToken(),
+      },
+    );
+
+    return StartMisconfiguredStateRecoveryResponse.fromJson(jsonResponse.body);
   }
 
   /// Tags an Amazon FSx resource.
@@ -2740,8 +2980,8 @@ class FSx {
 
   /// Updates the configuration of an existing data repository association on an
   /// Amazon FSx for Lustre file system. Data repository associations are
-  /// supported for all file systems except for <code>Scratch_1</code>
-  /// deployment type.
+  /// supported on all FSx for Lustre 2.12 and 2.15 file systems, excluding
+  /// <code>scratch_1</code> deployment type.
   ///
   /// May throw [BadRequest].
   /// May throw [IncompatibleParameterError].
@@ -2872,7 +3112,13 @@ class FSx {
   /// <code>StorageCapacity</code>
   /// </li>
   /// <li>
+  /// <code>StorageType</code>
+  /// </li>
+  /// <li>
   /// <code>ThroughputCapacity</code>
+  /// </li>
+  /// <li>
+  /// <code>DiskIopsConfiguration</code>
   /// </li>
   /// <li>
   /// <code>WeeklyMaintenanceStartTime</code>
@@ -2894,7 +3140,16 @@ class FSx {
   /// <code>DataCompressionType</code>
   /// </li>
   /// <li>
+  /// <code>LogConfiguration</code>
+  /// </li>
+  /// <li>
   /// <code>LustreRootSquashConfiguration</code>
+  /// </li>
+  /// <li>
+  /// <code>MetadataConfiguration</code>
+  /// </li>
+  /// <li>
+  /// <code>PerUnitStorageThroughput</code>
   /// </li>
   /// <li>
   /// <code>StorageCapacity</code>
@@ -2922,6 +3177,9 @@ class FSx {
   /// <code>FsxAdminPassword</code>
   /// </li>
   /// <li>
+  /// <code>HAPairs</code>
+  /// </li>
+  /// <li>
   /// <code>RemoveRouteTableIds</code>
   /// </li>
   /// <li>
@@ -2931,12 +3189,18 @@ class FSx {
   /// <code>ThroughputCapacity</code>
   /// </li>
   /// <li>
+  /// <code>ThroughputCapacityPerHAPair</code>
+  /// </li>
+  /// <li>
   /// <code>WeeklyMaintenanceStartTime</code>
   /// </li>
   /// </ul>
   /// For FSx for OpenZFS file systems, you can update the following properties:
   ///
   /// <ul>
+  /// <li>
+  /// <code>AddRouteTableIds</code>
+  /// </li>
   /// <li>
   /// <code>AutomaticBackupRetentionDays</code>
   /// </li>
@@ -2951,6 +3215,9 @@ class FSx {
   /// </li>
   /// <li>
   /// <code>DiskIopsConfiguration</code>
+  /// </li>
+  /// <li>
+  /// <code>RemoveRouteTableIds</code>
   /// </li>
   /// <li>
   /// <code>StorageCapacity</code>
@@ -2982,7 +3249,7 @@ class FSx {
   /// SDK.
   ///
   /// Parameter [openZFSConfiguration] :
-  /// The configuration updates for an Amazon FSx for OpenZFS file system.
+  /// The configuration updates for an FSx for OpenZFS file system.
   ///
   /// Parameter [storageCapacity] :
   /// Use this parameter to increase the storage capacity of an FSx for Windows
@@ -3030,7 +3297,7 @@ class FSx {
   /// increase storage capacity, the file system must have at least 16 MBps of
   /// throughput capacity. For more information, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/managing-storage-capacity.html">Managing
-  /// storage capacity</a> in the <i>Amazon FSx for Windows File Server User
+  /// storage capacity</a> in the <i>Amazon FSxfor Windows File Server User
   /// Guide</i>.
   ///
   /// For ONTAP file systems, the storage capacity target value must be at least
@@ -3050,6 +3317,7 @@ class FSx {
     UpdateFileSystemOntapConfiguration? ontapConfiguration,
     UpdateFileSystemOpenZFSConfiguration? openZFSConfiguration,
     int? storageCapacity,
+    StorageType? storageType,
     UpdateFileSystemWindowsConfiguration? windowsConfiguration,
   }) async {
     _s.validateNumRange(
@@ -3079,12 +3347,65 @@ class FSx {
         if (openZFSConfiguration != null)
           'OpenZFSConfiguration': openZFSConfiguration,
         if (storageCapacity != null) 'StorageCapacity': storageCapacity,
+        if (storageType != null) 'StorageType': storageType.value,
         if (windowsConfiguration != null)
           'WindowsConfiguration': windowsConfiguration,
       },
     );
 
     return UpdateFileSystemResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Configures whether participant accounts in your organization can create
+  /// Amazon FSx for NetApp ONTAP Multi-AZ file systems in subnets that are
+  /// shared by a virtual private cloud (VPC) owner. For more information, see
+  /// the <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/maz-shared-vpc.html">Amazon
+  /// FSx for NetApp ONTAP User Guide</a>.
+  /// <note>
+  /// We strongly recommend that participant-created Multi-AZ file systems in
+  /// the shared VPC are deleted before you disable this feature. Once the
+  /// feature is disabled, these file systems will enter a
+  /// <code>MISCONFIGURED</code> state and behave like Single-AZ file systems.
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/maz-shared-vpc.html#disabling-maz-vpc-sharing">Important
+  /// considerations before disabling shared VPC support for Multi-AZ file
+  /// systems</a>.
+  /// </note>
+  ///
+  /// May throw [BadRequest].
+  /// May throw [IncompatibleParameterError].
+  /// May throw [InternalServerError].
+  ///
+  /// Parameter [enableFsxRouteTableUpdatesFromParticipantAccounts] :
+  /// Specifies whether participant accounts can create FSx for ONTAP Multi-AZ
+  /// file systems in shared subnets. Set to <code>true</code> to enable or
+  /// <code>false</code> to disable.
+  Future<UpdateSharedVpcConfigurationResponse> updateSharedVpcConfiguration({
+    String? clientRequestToken,
+    String? enableFsxRouteTableUpdatesFromParticipantAccounts,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AWSSimbaAPIService_v20180301.UpdateSharedVpcConfiguration'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ClientRequestToken':
+            clientRequestToken ?? _s.generateIdempotencyToken(),
+        if (enableFsxRouteTableUpdatesFromParticipantAccounts != null)
+          'EnableFsxRouteTableUpdatesFromParticipantAccounts':
+              enableFsxRouteTableUpdatesFromParticipantAccounts,
+      },
+    );
+
+    return UpdateSharedVpcConfigurationResponse.fromJson(jsonResponse.body);
   }
 
   /// Updates the name of an Amazon FSx for OpenZFS snapshot.
@@ -3125,7 +3446,7 @@ class FSx {
     return UpdateSnapshotResponse.fromJson(jsonResponse.body);
   }
 
-  /// Updates an Amazon FSx for ONTAP storage virtual machine (SVM).
+  /// Updates an FSx for ONTAP storage virtual machine (SVM).
   ///
   /// May throw [BadRequest].
   /// May throw [IncompatibleParameterError].
@@ -3138,11 +3459,11 @@ class FSx {
   /// <code>svm-0123456789abcdef0</code>.
   ///
   /// Parameter [activeDirectoryConfiguration] :
-  /// Updates the Microsoft Active Directory (AD) configuration for an SVM that
-  /// is joined to an AD.
+  /// Specifies updates to an SVM's Microsoft Active Directory (AD)
+  /// configuration.
   ///
   /// Parameter [svmAdminPassword] :
-  /// Enter a new SvmAdminPassword if you are updating it.
+  /// Specifies a new SvmAdminPassword.
   Future<UpdateStorageVirtualMachineResponse> updateStorageVirtualMachine({
     required String storageVirtualMachineId,
     UpdateSvmActiveDirectoryConfiguration? activeDirectoryConfiguration,
@@ -3257,20 +3578,24 @@ class ActiveDirectoryBackupAttributes {
 }
 
 /// Describes a specific Amazon FSx administrative action for the current
-/// Windows, Lustre, or OpenZFS file system.
+/// Windows, Lustre, OpenZFS, or ONTAP file system or volume.
 class AdministrativeAction {
   final AdministrativeActionType? administrativeActionType;
   final AdministrativeActionFailureDetails? failureDetails;
 
-  /// The percentage-complete status of a <code>STORAGE_OPTIMIZATION</code>
-  /// administrative action. Does not apply to any other administrative action
-  /// type.
+  /// The percentage-complete status of a <code>STORAGE_OPTIMIZATION</code> or
+  /// <code>DOWNLOAD_DATA_FROM_BACKUP</code> administrative action. Does not apply
+  /// to any other administrative action type.
   final int? progressPercent;
+
+  /// The remaining bytes to transfer for the FSx for OpenZFS snapshot that you're
+  /// copying.
+  final int? remainingTransferBytes;
 
   /// The time that the administrative action request was received.
   final DateTime? requestTime;
 
-  /// Describes the status of the administrative action, as follows:
+  /// The status of the administrative action, as follows:
   ///
   /// <ul>
   /// <li>
@@ -3288,44 +3613,67 @@ class AdministrativeAction {
   /// <li>
   /// <code>COMPLETED</code> - Amazon FSx has finished processing the
   /// administrative task.
+  ///
+  /// For a backup restore to a second-generation FSx for ONTAP file system,
+  /// indicates that all data has been downloaded to the volume, and clients now
+  /// have read-write access to volume.
   /// </li>
   /// <li>
   /// <code>UPDATED_OPTIMIZING</code> - For a storage-capacity increase update,
   /// Amazon FSx has updated the file system with the new storage capacity, and is
   /// now performing the storage-optimization process.
   /// </li>
+  /// <li>
+  /// <code>PENDING</code> - For a backup restore to a second-generation FSx for
+  /// ONTAP file system, indicates that the file metadata is being downloaded onto
+  /// the volume. The volume's Lifecycle state is CREATING.
+  /// </li>
+  /// <li>
+  /// <code>IN_PROGRESS</code> - For a backup restore to a second-generation FSx
+  /// for ONTAP file system, indicates that all metadata has been downloaded to
+  /// the new volume and client can access data with read-only access while Amazon
+  /// FSx downloads the file data to the volume. Track the progress of this
+  /// process with the <code>ProgressPercent</code> element.
+  /// </li>
   /// </ul>
   final Status? status;
 
-  /// Describes the target value for the administration action, provided in the
+  /// The target value for the administration action, provided in the
   /// <code>UpdateFileSystem</code> operation. Returned for
   /// <code>FILE_SYSTEM_UPDATE</code> administrative actions.
   final FileSystem? targetFileSystemValues;
   final Snapshot? targetSnapshotValues;
   final Volume? targetVolumeValues;
 
+  /// The number of bytes that have transferred for the FSx for OpenZFS snapshot
+  /// that you're copying.
+  final int? totalTransferBytes;
+
   AdministrativeAction({
     this.administrativeActionType,
     this.failureDetails,
     this.progressPercent,
+    this.remainingTransferBytes,
     this.requestTime,
     this.status,
     this.targetFileSystemValues,
     this.targetSnapshotValues,
     this.targetVolumeValues,
+    this.totalTransferBytes,
   });
 
   factory AdministrativeAction.fromJson(Map<String, dynamic> json) {
     return AdministrativeAction(
       administrativeActionType: (json['AdministrativeActionType'] as String?)
-          ?.toAdministrativeActionType(),
+          ?.let(AdministrativeActionType.fromString),
       failureDetails: json['FailureDetails'] != null
           ? AdministrativeActionFailureDetails.fromJson(
               json['FailureDetails'] as Map<String, dynamic>)
           : null,
       progressPercent: json['ProgressPercent'] as int?,
+      remainingTransferBytes: json['RemainingTransferBytes'] as int?,
       requestTime: timeStampFromJson(json['RequestTime']),
-      status: (json['Status'] as String?)?.toStatus(),
+      status: (json['Status'] as String?)?.let(Status.fromString),
       targetFileSystemValues: json['TargetFileSystemValues'] != null
           ? FileSystem.fromJson(
               json['TargetFileSystemValues'] as Map<String, dynamic>)
@@ -3337,6 +3685,7 @@ class AdministrativeAction {
       targetVolumeValues: json['TargetVolumeValues'] != null
           ? Volume.fromJson(json['TargetVolumeValues'] as Map<String, dynamic>)
           : null,
+      totalTransferBytes: json['TotalTransferBytes'] as int?,
     );
   }
 }
@@ -3367,10 +3716,25 @@ class AdministrativeActionFailureDetails {
 /// or CLI (<code>update-file-system</code>).
 /// </li>
 /// <li>
+/// <code>THROUGHPUT_OPTIMIZATION</code> - After the
+/// <code>FILE_SYSTEM_UPDATE</code> task to increase a file system's throughput
+/// capacity has been completed successfully, a
+/// <code>THROUGHPUT_OPTIMIZATION</code> task starts.
+///
+/// You can track the storage-optimization progress using the
+/// <code>ProgressPercent</code> property. When
+/// <code>THROUGHPUT_OPTIMIZATION</code> has been completed successfully, the
+/// parent <code>FILE_SYSTEM_UPDATE</code> action status changes to
+/// <code>COMPLETED</code>. For more information, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/managing-throughput-capacity.html">Managing
+/// throughput capacity</a> in the <i>Amazon FSx for Windows File Server User
+/// Guide</i>.
+/// </li>
+/// <li>
 /// <code>STORAGE_OPTIMIZATION</code> - After the
 /// <code>FILE_SYSTEM_UPDATE</code> task to increase a file system's storage
-/// capacity has been completed successfully, a
-/// <code>STORAGE_OPTIMIZATION</code> task starts.
+/// capacity has completed successfully, a <code>STORAGE_OPTIMIZATION</code>
+/// task starts.
 ///
 /// <ul>
 /// <li>
@@ -3391,8 +3755,7 @@ class AdministrativeActionFailureDetails {
 /// storage capacity</a> in the <i>Amazon FSx for Windows File Server User
 /// Guide</i>, <a
 /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/managing-storage-capacity.html">Managing
-/// storage and throughput capacity</a> in the <i>Amazon FSx for Lustre User
-/// Guide</i>, and <a
+/// storage capacity</a> in the <i>Amazon FSx for Lustre User Guide</i>, and <a
 /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-storage-capacity.html">Managing
 /// storage capacity and provisioned IOPS</a> in the <i>Amazon FSx for NetApp
 /// ONTAP User Guide</i>.
@@ -3410,10 +3773,35 @@ class AdministrativeActionFailureDetails {
 /// href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_DisassociateFileSystemAliases.html">DisassociateFileSystemAliases</a>.
 /// </li>
 /// <li>
-/// <code>VOLUME_UPDATE</code> - A volume update to an Amazon FSx for NetApp
-/// ONTAP or Amazon FSx for OpenZFS volume initiated from the Amazon FSx
-/// console, API (<code>UpdateVolume</code>), or CLI
-/// (<code>update-volume</code>).
+/// <code>IOPS_OPTIMIZATION</code> - After the <code>FILE_SYSTEM_UPDATE</code>
+/// task to increase a file system's throughput capacity has been completed
+/// successfully, a <code>IOPS_OPTIMIZATION</code> task starts.
+///
+/// You can track the storage-optimization progress using the
+/// <code>ProgressPercent</code> property. When <code>IOPS_OPTIMIZATION</code>
+/// has been completed successfully, the parent <code>FILE_SYSTEM_UPDATE</code>
+/// action status changes to <code>COMPLETED</code>. For more information, see
+/// <a
+/// href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/managing-provisioned-ssd-iops.html">Managing
+/// provisioned SSD IOPS</a> in the Amazon FSx for Windows File Server User
+/// Guide.
+/// </li>
+/// <li>
+/// <code>STORAGE_TYPE_OPTIMIZATION</code> - After the
+/// <code>FILE_SYSTEM_UPDATE</code> task to increase a file system's throughput
+/// capacity has been completed successfully, a
+/// <code>STORAGE_TYPE_OPTIMIZATION</code> task starts.
+///
+/// You can track the storage-optimization progress using the
+/// <code>ProgressPercent</code> property. When
+/// <code>STORAGE_TYPE_OPTIMIZATION</code> has been completed successfully, the
+/// parent <code>FILE_SYSTEM_UPDATE</code> action status changes to
+/// <code>COMPLETED</code>.
+/// </li>
+/// <li>
+/// <code>VOLUME_UPDATE</code> - A volume update to an Amazon FSx for OpenZFS
+/// volume initiated from the Amazon FSx console, API
+/// (<code>UpdateVolume</code>), or CLI (<code>update-volume</code>).
 /// </li>
 /// <li>
 /// <code>VOLUME_RESTORE</code> - An Amazon FSx for OpenZFS volume is returned
@@ -3430,62 +3818,99 @@ class AdministrativeActionFailureDetails {
 /// <code>RELEASE_NFS_V3_LOCKS</code> - Tracks the release of Network File
 /// System (NFS) V3 locks on an Amazon FSx for OpenZFS file system.
 /// </li>
+/// <li>
+/// <code>DOWNLOAD_DATA_FROM_BACKUP</code> - An FSx for ONTAP backup is being
+/// restored to a new volume on a second-generation file system. Once the all
+/// the file metadata is loaded onto the volume, you can mount the volume with
+/// read-only access. during this process.
+/// </li>
+/// <li>
+/// <code>VOLUME_INITIALIZE_WITH_SNAPSHOT</code> - A volume is being created
+/// from a snapshot on a different FSx for OpenZFS file system. You can initiate
+/// this from the Amazon FSx console, API (<code>CreateVolume</code>), or CLI
+/// (<code>create-volume</code>) when using the using the <code>FULL_COPY</code>
+/// strategy.
+/// </li>
+/// <li>
+/// <code>VOLUME_UPDATE_WITH_SNAPSHOT</code> - A volume is being updated from a
+/// snapshot on a different FSx for OpenZFS file system. You can initiate this
+/// from the Amazon FSx console, API (<code>CopySnapshotAndUpdateVolume</code>),
+/// or CLI (<code>copy-snapshot-and-update-volume</code>).
+/// </li>
 /// </ul>
 enum AdministrativeActionType {
-  fileSystemUpdate,
-  storageOptimization,
-  fileSystemAliasAssociation,
-  fileSystemAliasDisassociation,
-  volumeUpdate,
-  snapshotUpdate,
-  releaseNfsV3Locks,
-  volumeRestore,
+  fileSystemUpdate('FILE_SYSTEM_UPDATE'),
+  storageOptimization('STORAGE_OPTIMIZATION'),
+  fileSystemAliasAssociation('FILE_SYSTEM_ALIAS_ASSOCIATION'),
+  fileSystemAliasDisassociation('FILE_SYSTEM_ALIAS_DISASSOCIATION'),
+  volumeUpdate('VOLUME_UPDATE'),
+  snapshotUpdate('SNAPSHOT_UPDATE'),
+  releaseNfsV3Locks('RELEASE_NFS_V3_LOCKS'),
+  volumeRestore('VOLUME_RESTORE'),
+  throughputOptimization('THROUGHPUT_OPTIMIZATION'),
+  iopsOptimization('IOPS_OPTIMIZATION'),
+  storageTypeOptimization('STORAGE_TYPE_OPTIMIZATION'),
+  misconfiguredStateRecovery('MISCONFIGURED_STATE_RECOVERY'),
+  volumeUpdateWithSnapshot('VOLUME_UPDATE_WITH_SNAPSHOT'),
+  volumeInitializeWithSnapshot('VOLUME_INITIALIZE_WITH_SNAPSHOT'),
+  downloadDataFromBackup('DOWNLOAD_DATA_FROM_BACKUP'),
+  ;
+
+  final String value;
+
+  const AdministrativeActionType(this.value);
+
+  static AdministrativeActionType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum AdministrativeActionType'));
 }
 
-extension AdministrativeActionTypeValueExtension on AdministrativeActionType {
-  String toValue() {
-    switch (this) {
-      case AdministrativeActionType.fileSystemUpdate:
-        return 'FILE_SYSTEM_UPDATE';
-      case AdministrativeActionType.storageOptimization:
-        return 'STORAGE_OPTIMIZATION';
-      case AdministrativeActionType.fileSystemAliasAssociation:
-        return 'FILE_SYSTEM_ALIAS_ASSOCIATION';
-      case AdministrativeActionType.fileSystemAliasDisassociation:
-        return 'FILE_SYSTEM_ALIAS_DISASSOCIATION';
-      case AdministrativeActionType.volumeUpdate:
-        return 'VOLUME_UPDATE';
-      case AdministrativeActionType.snapshotUpdate:
-        return 'SNAPSHOT_UPDATE';
-      case AdministrativeActionType.releaseNfsV3Locks:
-        return 'RELEASE_NFS_V3_LOCKS';
-      case AdministrativeActionType.volumeRestore:
-        return 'VOLUME_RESTORE';
-    }
-  }
-}
+/// Used to specify configuration options for a volume’s storage aggregate or
+/// aggregates.
+class AggregateConfiguration {
+  /// The list of aggregates that this volume resides on. Aggregates are storage
+  /// pools which make up your primary storage tier. Each high-availability (HA)
+  /// pair has one aggregate. The names of the aggregates map to the names of the
+  /// aggregates in the ONTAP CLI and REST API. For FlexVols, there will always be
+  /// a single entry.
+  ///
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The strings in the value of <code>Aggregates</code> are not are not
+  /// formatted as <code>aggrX</code>, where X is a number between 1 and 12.
+  /// </li>
+  /// <li>
+  /// The value of <code>Aggregates</code> contains aggregates that are not
+  /// present.
+  /// </li>
+  /// <li>
+  /// One or more of the aggregates supplied are too close to the volume limit to
+  /// support adding more volumes.
+  /// </li>
+  /// </ul>
+  final List<String>? aggregates;
 
-extension AdministrativeActionTypeFromString on String {
-  AdministrativeActionType toAdministrativeActionType() {
-    switch (this) {
-      case 'FILE_SYSTEM_UPDATE':
-        return AdministrativeActionType.fileSystemUpdate;
-      case 'STORAGE_OPTIMIZATION':
-        return AdministrativeActionType.storageOptimization;
-      case 'FILE_SYSTEM_ALIAS_ASSOCIATION':
-        return AdministrativeActionType.fileSystemAliasAssociation;
-      case 'FILE_SYSTEM_ALIAS_DISASSOCIATION':
-        return AdministrativeActionType.fileSystemAliasDisassociation;
-      case 'VOLUME_UPDATE':
-        return AdministrativeActionType.volumeUpdate;
-      case 'SNAPSHOT_UPDATE':
-        return AdministrativeActionType.snapshotUpdate;
-      case 'RELEASE_NFS_V3_LOCKS':
-        return AdministrativeActionType.releaseNfsV3Locks;
-      case 'VOLUME_RESTORE':
-        return AdministrativeActionType.volumeRestore;
-    }
-    throw Exception('$this is not known in enum AdministrativeActionType');
+  /// The total number of constituents this FlexGroup volume has. Not applicable
+  /// for FlexVols.
+  final int? totalConstituents;
+
+  AggregateConfiguration({
+    this.aggregates,
+    this.totalConstituents,
+  });
+
+  factory AggregateConfiguration.fromJson(Map<String, dynamic> json) {
+    return AggregateConfiguration(
+      aggregates: (json['Aggregates'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
+      totalConstituents: json['TotalConstituents'] as int?,
+    );
   }
 }
 
@@ -3552,53 +3977,28 @@ class Alias {
 
   factory Alias.fromJson(Map<String, dynamic> json) {
     return Alias(
-      lifecycle: (json['Lifecycle'] as String?)?.toAliasLifecycle(),
+      lifecycle: (json['Lifecycle'] as String?)?.let(AliasLifecycle.fromString),
       name: json['Name'] as String?,
     );
   }
 }
 
 enum AliasLifecycle {
-  available,
-  creating,
-  deleting,
-  createFailed,
-  deleteFailed,
-}
+  available('AVAILABLE'),
+  creating('CREATING'),
+  deleting('DELETING'),
+  createFailed('CREATE_FAILED'),
+  deleteFailed('DELETE_FAILED'),
+  ;
 
-extension AliasLifecycleValueExtension on AliasLifecycle {
-  String toValue() {
-    switch (this) {
-      case AliasLifecycle.available:
-        return 'AVAILABLE';
-      case AliasLifecycle.creating:
-        return 'CREATING';
-      case AliasLifecycle.deleting:
-        return 'DELETING';
-      case AliasLifecycle.createFailed:
-        return 'CREATE_FAILED';
-      case AliasLifecycle.deleteFailed:
-        return 'DELETE_FAILED';
-    }
-  }
-}
+  final String value;
 
-extension AliasLifecycleFromString on String {
-  AliasLifecycle toAliasLifecycle() {
-    switch (this) {
-      case 'AVAILABLE':
-        return AliasLifecycle.available;
-      case 'CREATING':
-        return AliasLifecycle.creating;
-      case 'DELETING':
-        return AliasLifecycle.deleting;
-      case 'CREATE_FAILED':
-        return AliasLifecycle.createFailed;
-      case 'DELETE_FAILED':
-        return AliasLifecycle.deleteFailed;
-    }
-    throw Exception('$this is not known in enum AliasLifecycle');
-  }
+  const AliasLifecycle(this.value);
+
+  static AliasLifecycle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum AliasLifecycle'));
 }
 
 /// The system generated response showing the DNS aliases that Amazon FSx is
@@ -3619,7 +4019,7 @@ class AssociateFileSystemAliasesResponse {
       Map<String, dynamic> json) {
     return AssociateFileSystemAliasesResponse(
       aliases: (json['Aliases'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Alias.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -3663,8 +4063,8 @@ class AutoExportPolicy {
   factory AutoExportPolicy.fromJson(Map<String, dynamic> json) {
     return AutoExportPolicy(
       events: (json['Events'] as List?)
-          ?.whereNotNull()
-          .map((e) => (e as String).toEventType())
+          ?.nonNulls
+          .map((e) => EventType.fromString((e as String)))
           .toList(),
     );
   }
@@ -3672,7 +4072,7 @@ class AutoExportPolicy {
   Map<String, dynamic> toJson() {
     final events = this.events;
     return {
-      if (events != null) 'Events': events.map((e) => e.toValue()).toList(),
+      if (events != null) 'Events': events.map((e) => e.value).toList(),
     };
   }
 }
@@ -3713,8 +4113,8 @@ class AutoImportPolicy {
   factory AutoImportPolicy.fromJson(Map<String, dynamic> json) {
     return AutoImportPolicy(
       events: (json['Events'] as List?)
-          ?.whereNotNull()
-          .map((e) => (e as String).toEventType())
+          ?.nonNulls
+          .map((e) => EventType.fromString((e as String)))
           .toList(),
     );
   }
@@ -3722,47 +4122,101 @@ class AutoImportPolicy {
   Map<String, dynamic> toJson() {
     final events = this.events;
     return {
-      if (events != null) 'Events': events.map((e) => e.toValue()).toList(),
+      if (events != null) 'Events': events.map((e) => e.value).toList(),
     };
   }
 }
 
 enum AutoImportPolicyType {
-  none,
-  $new,
-  newChanged,
-  newChangedDeleted,
+  none('NONE'),
+  $new('NEW'),
+  newChanged('NEW_CHANGED'),
+  newChangedDeleted('NEW_CHANGED_DELETED'),
+  ;
+
+  final String value;
+
+  const AutoImportPolicyType(this.value);
+
+  static AutoImportPolicyType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum AutoImportPolicyType'));
 }
 
-extension AutoImportPolicyTypeValueExtension on AutoImportPolicyType {
-  String toValue() {
-    switch (this) {
-      case AutoImportPolicyType.none:
-        return 'NONE';
-      case AutoImportPolicyType.$new:
-        return 'NEW';
-      case AutoImportPolicyType.newChanged:
-        return 'NEW_CHANGED';
-      case AutoImportPolicyType.newChangedDeleted:
-        return 'NEW_CHANGED_DELETED';
-    }
+/// Sets the autocommit period of files in an FSx for ONTAP SnapLock volume,
+/// which determines how long the files must remain unmodified before they're
+/// automatically transitioned to the write once, read many (WORM) state.
+///
+/// For more information, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/worm-state.html#worm-state-autocommit">Autocommit</a>.
+class AutocommitPeriod {
+  /// Defines the type of time for the autocommit period of a file in an FSx for
+  /// ONTAP SnapLock volume. Setting this value to <code>NONE</code> disables
+  /// autocommit. The default value is <code>NONE</code>.
+  final AutocommitPeriodType type;
+
+  /// Defines the amount of time for the autocommit period of a file in an FSx for
+  /// ONTAP SnapLock volume. The following ranges are valid:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Minutes</code>: 5 - 65,535
+  /// </li>
+  /// <li>
+  /// <code>Hours</code>: 1 - 65,535
+  /// </li>
+  /// <li>
+  /// <code>Days</code>: 1 - 3,650
+  /// </li>
+  /// <li>
+  /// <code>Months</code>: 1 - 120
+  /// </li>
+  /// <li>
+  /// <code>Years</code>: 1 - 10
+  /// </li>
+  /// </ul>
+  final int? value;
+
+  AutocommitPeriod({
+    required this.type,
+    this.value,
+  });
+
+  factory AutocommitPeriod.fromJson(Map<String, dynamic> json) {
+    return AutocommitPeriod(
+      type: AutocommitPeriodType.fromString((json['Type'] as String)),
+      value: json['Value'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final type = this.type;
+    final value = this.value;
+    return {
+      'Type': type.value,
+      if (value != null) 'Value': value,
+    };
   }
 }
 
-extension AutoImportPolicyTypeFromString on String {
-  AutoImportPolicyType toAutoImportPolicyType() {
-    switch (this) {
-      case 'NONE':
-        return AutoImportPolicyType.none;
-      case 'NEW':
-        return AutoImportPolicyType.$new;
-      case 'NEW_CHANGED':
-        return AutoImportPolicyType.newChanged;
-      case 'NEW_CHANGED_DELETED':
-        return AutoImportPolicyType.newChangedDeleted;
-    }
-    throw Exception('$this is not known in enum AutoImportPolicyType');
-  }
+enum AutocommitPeriodType {
+  minutes('MINUTES'),
+  hours('HOURS'),
+  days('DAYS'),
+  months('MONTHS'),
+  years('YEARS'),
+  none('NONE'),
+  ;
+
+  final String value;
+
+  const AutocommitPeriodType(this.value);
+
+  static AutocommitPeriodType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum AutocommitPeriodType'));
 }
 
 /// A backup of an Amazon FSx for Windows File Server, Amazon FSx for Lustre
@@ -3866,8 +4320,8 @@ class Backup {
           nonNullableTimeStampFromJson(json['CreationTime'] as Object),
       fileSystem:
           FileSystem.fromJson(json['FileSystem'] as Map<String, dynamic>),
-      lifecycle: (json['Lifecycle'] as String).toBackupLifecycle(),
-      type: (json['Type'] as String).toBackupType(),
+      lifecycle: BackupLifecycle.fromString((json['Lifecycle'] as String)),
+      type: BackupType.fromString((json['Type'] as String)),
       directoryInformation: json['DirectoryInformation'] != null
           ? ActiveDirectoryBackupAttributes.fromJson(
               json['DirectoryInformation'] as Map<String, dynamic>)
@@ -3880,11 +4334,12 @@ class Backup {
       ownerId: json['OwnerId'] as String?,
       progressPercent: json['ProgressPercent'] as int?,
       resourceARN: json['ResourceARN'] as String?,
-      resourceType: (json['ResourceType'] as String?)?.toResourceType(),
+      resourceType:
+          (json['ResourceType'] as String?)?.let(ResourceType.fromString),
       sourceBackupId: json['SourceBackupId'] as String?,
       sourceBackupRegion: json['SourceBackupRegion'] as String?,
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       volume: json['Volume'] != null
@@ -3941,90 +4396,39 @@ class BackupFailureDetails {
 /// </li>
 /// </ul>
 enum BackupLifecycle {
-  available,
-  creating,
-  transferring,
-  deleted,
-  failed,
-  pending,
-  copying,
-}
+  available('AVAILABLE'),
+  creating('CREATING'),
+  transferring('TRANSFERRING'),
+  deleted('DELETED'),
+  failed('FAILED'),
+  pending('PENDING'),
+  copying('COPYING'),
+  ;
 
-extension BackupLifecycleValueExtension on BackupLifecycle {
-  String toValue() {
-    switch (this) {
-      case BackupLifecycle.available:
-        return 'AVAILABLE';
-      case BackupLifecycle.creating:
-        return 'CREATING';
-      case BackupLifecycle.transferring:
-        return 'TRANSFERRING';
-      case BackupLifecycle.deleted:
-        return 'DELETED';
-      case BackupLifecycle.failed:
-        return 'FAILED';
-      case BackupLifecycle.pending:
-        return 'PENDING';
-      case BackupLifecycle.copying:
-        return 'COPYING';
-    }
-  }
-}
+  final String value;
 
-extension BackupLifecycleFromString on String {
-  BackupLifecycle toBackupLifecycle() {
-    switch (this) {
-      case 'AVAILABLE':
-        return BackupLifecycle.available;
-      case 'CREATING':
-        return BackupLifecycle.creating;
-      case 'TRANSFERRING':
-        return BackupLifecycle.transferring;
-      case 'DELETED':
-        return BackupLifecycle.deleted;
-      case 'FAILED':
-        return BackupLifecycle.failed;
-      case 'PENDING':
-        return BackupLifecycle.pending;
-      case 'COPYING':
-        return BackupLifecycle.copying;
-    }
-    throw Exception('$this is not known in enum BackupLifecycle');
-  }
+  const BackupLifecycle(this.value);
+
+  static BackupLifecycle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum BackupLifecycle'));
 }
 
 /// The type of the backup.
 enum BackupType {
-  automatic,
-  userInitiated,
-  awsBackup,
-}
+  automatic('AUTOMATIC'),
+  userInitiated('USER_INITIATED'),
+  awsBackup('AWS_BACKUP'),
+  ;
 
-extension BackupTypeValueExtension on BackupType {
-  String toValue() {
-    switch (this) {
-      case BackupType.automatic:
-        return 'AUTOMATIC';
-      case BackupType.userInitiated:
-        return 'USER_INITIATED';
-      case BackupType.awsBackup:
-        return 'AWS_BACKUP';
-    }
-  }
-}
+  final String value;
 
-extension BackupTypeFromString on String {
-  BackupType toBackupType() {
-    switch (this) {
-      case 'AUTOMATIC':
-        return BackupType.automatic;
-      case 'USER_INITIATED':
-        return BackupType.userInitiated;
-      case 'AWS_BACKUP':
-        return BackupType.awsBackup;
-    }
-    throw Exception('$this is not known in enum BackupType');
-  }
+  const BackupType(this.value);
+
+  static BackupType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum BackupType'));
 }
 
 class CancelDataRepositoryTaskResponse {
@@ -4066,8 +4470,8 @@ class CancelDataRepositoryTaskResponse {
 
   factory CancelDataRepositoryTaskResponse.fromJson(Map<String, dynamic> json) {
     return CancelDataRepositoryTaskResponse(
-      lifecycle:
-          (json['Lifecycle'] as String?)?.toDataRepositoryTaskLifecycle(),
+      lifecycle: (json['Lifecycle'] as String?)
+          ?.let(DataRepositoryTaskLifecycle.fromString),
       taskId: json['TaskId'] as String?,
     );
   }
@@ -4124,9 +4528,9 @@ class CompletionReport {
   factory CompletionReport.fromJson(Map<String, dynamic> json) {
     return CompletionReport(
       enabled: json['Enabled'] as bool,
-      format: (json['Format'] as String?)?.toReportFormat(),
+      format: (json['Format'] as String?)?.let(ReportFormat.fromString),
       path: json['Path'] as String?,
-      scope: (json['Scope'] as String?)?.toReportScope(),
+      scope: (json['Scope'] as String?)?.let(ReportScope.fromString),
     );
   }
 
@@ -4137,9 +4541,9 @@ class CompletionReport {
     final scope = this.scope;
     return {
       'Enabled': enabled,
-      if (format != null) 'Format': format.toValue(),
+      if (format != null) 'Format': format.value,
       if (path != null) 'Path': path,
-      if (scope != null) 'Scope': scope.toValue(),
+      if (scope != null) 'Scope': scope.value,
     };
   }
 }
@@ -4157,6 +4561,66 @@ class CopyBackupResponse {
           ? Backup.fromJson(json['Backup'] as Map<String, dynamic>)
           : null,
     );
+  }
+}
+
+class CopySnapshotAndUpdateVolumeResponse {
+  /// A list of administrative actions for the file system that are in process or
+  /// waiting to be processed. Administrative actions describe changes to the
+  /// Amazon FSx system.
+  final List<AdministrativeAction>? administrativeActions;
+
+  /// The lifecycle state of the destination volume.
+  final VolumeLifecycle? lifecycle;
+
+  /// The ID of the volume that you copied the snapshot to.
+  final String? volumeId;
+
+  CopySnapshotAndUpdateVolumeResponse({
+    this.administrativeActions,
+    this.lifecycle,
+    this.volumeId,
+  });
+
+  factory CopySnapshotAndUpdateVolumeResponse.fromJson(
+      Map<String, dynamic> json) {
+    return CopySnapshotAndUpdateVolumeResponse(
+      administrativeActions: (json['AdministrativeActions'] as List?)
+          ?.nonNulls
+          .map((e) => AdministrativeAction.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(VolumeLifecycle.fromString),
+      volumeId: json['VolumeId'] as String?,
+    );
+  }
+}
+
+/// Used to specify the configuration options for an FSx for ONTAP volume's
+/// storage aggregate or aggregates.
+class CreateAggregateConfiguration {
+  /// Used to specify the names of aggregates on which the volume will be created.
+  final List<String>? aggregates;
+
+  /// Used to explicitly set the number of constituents within the FlexGroup per
+  /// storage aggregate. This field is optional when creating a FlexGroup volume.
+  /// If unspecified, the default value will be 8. This field cannot be provided
+  /// when creating a FlexVol volume.
+  final int? constituentsPerAggregate;
+
+  CreateAggregateConfiguration({
+    this.aggregates,
+    this.constituentsPerAggregate,
+  });
+
+  Map<String, dynamic> toJson() {
+    final aggregates = this.aggregates;
+    final constituentsPerAggregate = this.constituentsPerAggregate;
+    return {
+      if (aggregates != null) 'Aggregates': aggregates,
+      if (constituentsPerAggregate != null)
+        'ConstituentsPerAggregate': constituentsPerAggregate,
+    };
   }
 }
 
@@ -4243,7 +4707,7 @@ class CreateFileCacheLustreConfiguration {
     final perUnitStorageThroughput = this.perUnitStorageThroughput;
     final weeklyMaintenanceStartTime = this.weeklyMaintenanceStartTime;
     return {
-      'DeploymentType': deploymentType.toValue(),
+      'DeploymentType': deploymentType.value,
       'MetadataConfiguration': metadataConfiguration,
       'PerUnitStorageThroughput': perUnitStorageThroughput,
       if (weeklyMaintenanceStartTime != null)
@@ -4303,7 +4767,7 @@ class CreateFileSystemFromBackupResponse {
 /// <code>ExportPath</code>
 /// </li>
 /// <li>
-/// <code>ImportedChunkSize</code>
+/// <code>ImportedFileChunkSize</code>
 /// </li>
 /// <li>
 /// <code>ImportPath</code>
@@ -4349,6 +4813,10 @@ class CreateFileSystemLustreConfiguration {
   /// association.
   /// </note>
   final AutoImportPolicyType? autoImportPolicy;
+
+  /// The number of days to retain automatic backups. Setting this property to
+  /// <code>0</code> disables automatic backups. You can retain automatic backups
+  /// for a maximum of 90 days. The default is <code>0</code>.
   final int? automaticBackupRetentionDays;
 
   /// (Optional) Not available for use with file systems that are linked to a data
@@ -4402,7 +4870,9 @@ class CreateFileSystemLustreConfiguration {
   /// Choose <code>PERSISTENT_2</code> for longer-term storage and for
   /// latency-sensitive workloads that require the highest levels of
   /// IOPS/throughput. <code>PERSISTENT_2</code> supports SSD storage, and offers
-  /// higher <code>PerUnitStorageThroughput</code> (up to 1000 MB/s/TiB).
+  /// higher <code>PerUnitStorageThroughput</code> (up to 1000 MB/s/TiB). You can
+  /// optionally specify a metadata configuration mode for
+  /// <code>PERSISTENT_2</code> which supports increasing metadata performance.
   /// <code>PERSISTENT_2</code> is available in a limited number of Amazon Web
   /// Services Regions. For more information, and an up-to-date list of Amazon Web
   /// Services Regions in which <code>PERSISTENT_2</code> is available, see <a
@@ -4415,7 +4885,7 @@ class CreateFileSystemLustreConfiguration {
   /// <code>CreateFileSystem</code> operation fails.
   /// </note>
   /// Encryption of data in transit is automatically turned on when you access
-  /// <code>SCRATCH_2</code>, <code>PERSISTENT_1</code> and
+  /// <code>SCRATCH_2</code>, <code>PERSISTENT_1</code>, and
   /// <code>PERSISTENT_2</code> file systems from Amazon EC2 instances that
   /// support automatic encryption in the Amazon Web Services Regions where they
   /// are available. For more information about encryption in transit for FSx for
@@ -4493,6 +4963,10 @@ class CreateFileSystemLustreConfiguration {
   /// Logs.
   final LustreLogCreateConfiguration? logConfiguration;
 
+  /// The Lustre metadata performance configuration for the creation of an FSx for
+  /// Lustre file system using a <code>PERSISTENT_2</code> deployment type.
+  final CreateFileSystemLustreMetadataConfiguration? metadataConfiguration;
+
   /// Required with <code>PERSISTENT_1</code> and <code>PERSISTENT_2</code>
   /// deployment types, provisions the amount of read and write throughput for
   /// each 1 tebibyte (TiB) of file system storage capacity, in MB/s/TiB. File
@@ -4539,6 +5013,7 @@ class CreateFileSystemLustreConfiguration {
     this.importPath,
     this.importedFileChunkSize,
     this.logConfiguration,
+    this.metadataConfiguration,
     this.perUnitStorageThroughput,
     this.rootSquashConfiguration,
     this.weeklyMaintenanceStartTime,
@@ -4556,32 +5031,89 @@ class CreateFileSystemLustreConfiguration {
     final importPath = this.importPath;
     final importedFileChunkSize = this.importedFileChunkSize;
     final logConfiguration = this.logConfiguration;
+    final metadataConfiguration = this.metadataConfiguration;
     final perUnitStorageThroughput = this.perUnitStorageThroughput;
     final rootSquashConfiguration = this.rootSquashConfiguration;
     final weeklyMaintenanceStartTime = this.weeklyMaintenanceStartTime;
     return {
-      if (autoImportPolicy != null)
-        'AutoImportPolicy': autoImportPolicy.toValue(),
+      if (autoImportPolicy != null) 'AutoImportPolicy': autoImportPolicy.value,
       if (automaticBackupRetentionDays != null)
         'AutomaticBackupRetentionDays': automaticBackupRetentionDays,
       if (copyTagsToBackups != null) 'CopyTagsToBackups': copyTagsToBackups,
       if (dailyAutomaticBackupStartTime != null)
         'DailyAutomaticBackupStartTime': dailyAutomaticBackupStartTime,
       if (dataCompressionType != null)
-        'DataCompressionType': dataCompressionType.toValue(),
-      if (deploymentType != null) 'DeploymentType': deploymentType.toValue(),
-      if (driveCacheType != null) 'DriveCacheType': driveCacheType.toValue(),
+        'DataCompressionType': dataCompressionType.value,
+      if (deploymentType != null) 'DeploymentType': deploymentType.value,
+      if (driveCacheType != null) 'DriveCacheType': driveCacheType.value,
       if (exportPath != null) 'ExportPath': exportPath,
       if (importPath != null) 'ImportPath': importPath,
       if (importedFileChunkSize != null)
         'ImportedFileChunkSize': importedFileChunkSize,
       if (logConfiguration != null) 'LogConfiguration': logConfiguration,
+      if (metadataConfiguration != null)
+        'MetadataConfiguration': metadataConfiguration,
       if (perUnitStorageThroughput != null)
         'PerUnitStorageThroughput': perUnitStorageThroughput,
       if (rootSquashConfiguration != null)
         'RootSquashConfiguration': rootSquashConfiguration,
       if (weeklyMaintenanceStartTime != null)
         'WeeklyMaintenanceStartTime': weeklyMaintenanceStartTime,
+    };
+  }
+}
+
+/// The Lustre metadata performance configuration for the creation of an Amazon
+/// FSx for Lustre file system using a <code>PERSISTENT_2</code> deployment
+/// type. The configuration uses a Metadata IOPS value to set the maximum rate
+/// of metadata disk IOPS supported by the file system.
+///
+/// After creation, the file system supports increasing metadata performance.
+/// For more information on Metadata IOPS, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/managing-metadata-performance.html#metadata-configuration">Lustre
+/// metadata performance configuration</a> in the <i>Amazon FSx for Lustre User
+/// Guide</i>.
+class CreateFileSystemLustreMetadataConfiguration {
+  /// The metadata configuration mode for provisioning Metadata IOPS for an FSx
+  /// for Lustre file system using a <code>PERSISTENT_2</code> deployment type.
+  ///
+  /// <ul>
+  /// <li>
+  /// In AUTOMATIC mode, FSx for Lustre automatically provisions and scales the
+  /// number of Metadata IOPS for your file system based on your file system
+  /// storage capacity.
+  /// </li>
+  /// <li>
+  /// In USER_PROVISIONED mode, you specify the number of Metadata IOPS to
+  /// provision for your file system.
+  /// </li>
+  /// </ul>
+  final MetadataConfigurationMode mode;
+
+  /// (USER_PROVISIONED mode only) Specifies the number of Metadata IOPS to
+  /// provision for the file system. This parameter sets the maximum rate of
+  /// metadata disk IOPS supported by the file system. Valid values are
+  /// <code>1500</code>, <code>3000</code>, <code>6000</code>, <code>12000</code>,
+  /// and multiples of <code>12000</code> up to a maximum of <code>192000</code>.
+  /// <note>
+  /// Iops doesn’t have a default value. If you're using USER_PROVISIONED mode,
+  /// you can choose to specify a valid value. If you're using AUTOMATIC mode, you
+  /// cannot specify a value because FSx for Lustre automatically sets the value
+  /// based on your file system storage capacity.
+  /// </note>
+  final int? iops;
+
+  CreateFileSystemLustreMetadataConfiguration({
+    required this.mode,
+    this.iops,
+  });
+
+  Map<String, dynamic> toJson() {
+    final mode = this.mode;
+    final iops = this.iops;
+    return {
+      'Mode': mode.value,
+      if (iops != null) 'Iops': iops,
     };
   }
 }
@@ -4594,13 +5126,23 @@ class CreateFileSystemOntapConfiguration {
   ///
   /// <ul>
   /// <li>
-  /// <code>MULTI_AZ_1</code> - (Default) A high availability file system
-  /// configured for Multi-AZ redundancy to tolerate temporary Availability Zone
-  /// (AZ) unavailability.
+  /// <code>MULTI_AZ_1</code> - A high availability file system configured for
+  /// Multi-AZ redundancy to tolerate temporary Availability Zone (AZ)
+  /// unavailability. This is a first-generation FSx for ONTAP file system.
+  /// </li>
+  /// <li>
+  /// <code>MULTI_AZ_2</code> - A high availability file system configured for
+  /// Multi-AZ redundancy to tolerate temporary AZ unavailability. This is a
+  /// second-generation FSx for ONTAP file system.
   /// </li>
   /// <li>
   /// <code>SINGLE_AZ_1</code> - A file system configured for Single-AZ
-  /// redundancy.
+  /// redundancy. This is a first-generation FSx for ONTAP file system.
+  /// </li>
+  /// <li>
+  /// <code>SINGLE_AZ_2</code> - A file system configured with multiple
+  /// high-availability (HA) pairs for Single-AZ redundancy. This is a
+  /// second-generation FSx for ONTAP file system.
   /// </li>
   /// </ul>
   /// For information about the use cases for Multi-AZ and Single-AZ deployments,
@@ -4608,10 +5150,6 @@ class CreateFileSystemOntapConfiguration {
   /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/high-availability-AZ.html">Choosing
   /// a file system deployment type</a>.
   final OntapDeploymentType deploymentType;
-
-  /// Sets the throughput capacity for the file system that you're creating. Valid
-  /// values are 128, 256, 512, 1024, 2048, and 4096 MBps.
-  final int throughputCapacity;
   final int? automaticBackupRetentionDays;
   final String? dailyAutomaticBackupStartTime;
 
@@ -4633,45 +5171,148 @@ class CreateFileSystemOntapConfiguration {
   /// API.
   final String? fsxAdminPassword;
 
-  /// Required when <code>DeploymentType</code> is set to <code>MULTI_AZ_1</code>.
-  /// This specifies the subnet in which you want the preferred file server to be
-  /// located.
+  /// Specifies how many high-availability (HA) pairs of file servers will power
+  /// your file system. First-generation file systems are powered by 1 HA pair.
+  /// Second-generation multi-AZ file systems are powered by 1 HA pair. Second
+  /// generation single-AZ file systems are powered by up to 12 HA pairs. The
+  /// default value is 1. The value of this property affects the values of
+  /// <code>StorageCapacity</code>, <code>Iops</code>, and
+  /// <code>ThroughputCapacity</code>. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/administering-file-systems.html#HA-pairs">High-availability
+  /// (HA) pairs</a> in the FSx for ONTAP user guide. Block storage protocol
+  /// support (iSCSI and NVMe over TCP) is disabled on file systems with more than
+  /// 6 HA pairs. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/supported-fsx-clients.html#using-block-storage">Using
+  /// block storage protocols</a>.
+  ///
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The value of <code>HAPairs</code> is less than 1 or greater than 12.
+  /// </li>
+  /// <li>
+  /// The value of <code>HAPairs</code> is greater than 1 and the value of
+  /// <code>DeploymentType</code> is <code>SINGLE_AZ_1</code>,
+  /// <code>MULTI_AZ_1</code>, or <code>MULTI_AZ_2</code>.
+  /// </li>
+  /// </ul>
+  final int? hAPairs;
+
+  /// Required when <code>DeploymentType</code> is set to <code>MULTI_AZ_1</code>
+  /// or <code>MULTI_AZ_2</code>. This specifies the subnet in which you want the
+  /// preferred file server to be located.
   final String? preferredSubnetId;
 
-  /// (Multi-AZ only) Specifies the virtual private cloud (VPC) route tables in
-  /// which your file system's endpoints will be created. You should specify all
-  /// VPC route tables associated with the subnets in which your clients are
-  /// located. By default, Amazon FSx selects your VPC's default route table.
+  /// (Multi-AZ only) Specifies the route tables in which Amazon FSx creates the
+  /// rules for routing traffic to the correct file server. You should specify all
+  /// virtual private cloud (VPC) route tables associated with the subnets in
+  /// which your clients are located. By default, Amazon FSx selects your VPC's
+  /// default route table.
+  /// <note>
+  /// Amazon FSx manages these route tables for Multi-AZ file systems using
+  /// tag-based authentication. These route tables are tagged with <code>Key:
+  /// AmazonFSx; Value: ManagedByAmazonFSx</code>. When creating FSx for ONTAP
+  /// Multi-AZ file systems using CloudFormation we recommend that you add the
+  /// <code>Key: AmazonFSx; Value: ManagedByAmazonFSx</code> tag manually.
+  /// </note>
   final List<String>? routeTableIds;
+
+  /// Sets the throughput capacity for the file system that you're creating in
+  /// megabytes per second (MBps). For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-throughput-capacity.html">Managing
+  /// throughput capacity</a> in the FSx for ONTAP User Guide.
+  ///
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The value of <code>ThroughputCapacity</code> and
+  /// <code>ThroughputCapacityPerHAPair</code> are not the same value.
+  /// </li>
+  /// <li>
+  /// The value of <code>ThroughputCapacity</code> when divided by the value of
+  /// <code>HAPairs</code> is outside of the valid range for
+  /// <code>ThroughputCapacity</code>.
+  /// </li>
+  /// </ul>
+  final int? throughputCapacity;
+
+  /// Use to choose the throughput capacity per HA pair, rather than the total
+  /// throughput for the file system.
+  ///
+  /// You can define either the <code>ThroughputCapacityPerHAPair</code> or the
+  /// <code>ThroughputCapacity</code> when creating a file system, but not both.
+  ///
+  /// This field and <code>ThroughputCapacity</code> are the same for file systems
+  /// powered by one HA pair.
+  ///
+  /// <ul>
+  /// <li>
+  /// For <code>SINGLE_AZ_1</code> and <code>MULTI_AZ_1</code> file systems, valid
+  /// values are 128, 256, 512, 1024, 2048, or 4096 MBps.
+  /// </li>
+  /// <li>
+  /// For <code>SINGLE_AZ_2</code>, valid values are 1536, 3072, or 6144 MBps.
+  /// </li>
+  /// <li>
+  /// For <code>MULTI_AZ_2</code>, valid values are 384, 768, 1536, 3072, or 6144
+  /// MBps.
+  /// </li>
+  /// </ul>
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The value of <code>ThroughputCapacity</code> and
+  /// <code>ThroughputCapacityPerHAPair</code> are not the same value for file
+  /// systems with one HA pair.
+  /// </li>
+  /// <li>
+  /// The value of deployment type is <code>SINGLE_AZ_2</code> and
+  /// <code>ThroughputCapacity</code> / <code>ThroughputCapacityPerHAPair</code>
+  /// is not a valid HA pair (a value between 1 and 12).
+  /// </li>
+  /// <li>
+  /// The value of <code>ThroughputCapacityPerHAPair</code> is not a valid value.
+  /// </li>
+  /// </ul>
+  final int? throughputCapacityPerHAPair;
   final String? weeklyMaintenanceStartTime;
 
   CreateFileSystemOntapConfiguration({
     required this.deploymentType,
-    required this.throughputCapacity,
     this.automaticBackupRetentionDays,
     this.dailyAutomaticBackupStartTime,
     this.diskIopsConfiguration,
     this.endpointIpAddressRange,
     this.fsxAdminPassword,
+    this.hAPairs,
     this.preferredSubnetId,
     this.routeTableIds,
+    this.throughputCapacity,
+    this.throughputCapacityPerHAPair,
     this.weeklyMaintenanceStartTime,
   });
 
   Map<String, dynamic> toJson() {
     final deploymentType = this.deploymentType;
-    final throughputCapacity = this.throughputCapacity;
     final automaticBackupRetentionDays = this.automaticBackupRetentionDays;
     final dailyAutomaticBackupStartTime = this.dailyAutomaticBackupStartTime;
     final diskIopsConfiguration = this.diskIopsConfiguration;
     final endpointIpAddressRange = this.endpointIpAddressRange;
     final fsxAdminPassword = this.fsxAdminPassword;
+    final hAPairs = this.hAPairs;
     final preferredSubnetId = this.preferredSubnetId;
     final routeTableIds = this.routeTableIds;
+    final throughputCapacity = this.throughputCapacity;
+    final throughputCapacityPerHAPair = this.throughputCapacityPerHAPair;
     final weeklyMaintenanceStartTime = this.weeklyMaintenanceStartTime;
     return {
-      'DeploymentType': deploymentType.toValue(),
-      'ThroughputCapacity': throughputCapacity,
+      'DeploymentType': deploymentType.value,
       if (automaticBackupRetentionDays != null)
         'AutomaticBackupRetentionDays': automaticBackupRetentionDays,
       if (dailyAutomaticBackupStartTime != null)
@@ -4681,8 +5322,12 @@ class CreateFileSystemOntapConfiguration {
       if (endpointIpAddressRange != null)
         'EndpointIpAddressRange': endpointIpAddressRange,
       if (fsxAdminPassword != null) 'FsxAdminPassword': fsxAdminPassword,
+      if (hAPairs != null) 'HAPairs': hAPairs,
       if (preferredSubnetId != null) 'PreferredSubnetId': preferredSubnetId,
       if (routeTableIds != null) 'RouteTableIds': routeTableIds,
+      if (throughputCapacity != null) 'ThroughputCapacity': throughputCapacity,
+      if (throughputCapacityPerHAPair != null)
+        'ThroughputCapacityPerHAPair': throughputCapacityPerHAPair,
       if (weeklyMaintenanceStartTime != null)
         'WeeklyMaintenanceStartTime': weeklyMaintenanceStartTime,
     };
@@ -4692,43 +5337,56 @@ class CreateFileSystemOntapConfiguration {
 /// The Amazon FSx for OpenZFS configuration properties for the file system that
 /// you are creating.
 class CreateFileSystemOpenZFSConfiguration {
-  /// Specifies the file system deployment type. Single AZ deployment types are
-  /// configured for redundancy within a single Availability Zone in an Amazon Web
-  /// Services Region . Valid values are the following:
+  /// Specifies the file system deployment type. Valid values are the following:
   ///
   /// <ul>
   /// <li>
-  /// <code>SINGLE_AZ_1</code>- (Default) Creates file systems with throughput
-  /// capacities of 64 - 4,096 MB/s. <code>Single_AZ_1</code> is available in all
-  /// Amazon Web Services Regions where Amazon FSx for OpenZFS is available,
-  /// except US West (Oregon).
+  /// <code>MULTI_AZ_1</code>- Creates file systems with high availability and
+  /// durability by replicating your data and supporting failover across multiple
+  /// Availability Zones in the same Amazon Web Services Region.
+  /// </li>
+  /// <li>
+  /// <code>SINGLE_AZ_HA_2</code>- Creates file systems with high availability and
+  /// throughput capacities of 160 - 10,240 MB/s using an NVMe L2ARC cache by
+  /// deploying a primary and standby file system within the same Availability
+  /// Zone.
+  /// </li>
+  /// <li>
+  /// <code>SINGLE_AZ_HA_1</code>- Creates file systems with high availability and
+  /// throughput capacities of 64 - 4,096 MB/s by deploying a primary and standby
+  /// file system within the same Availability Zone.
   /// </li>
   /// <li>
   /// <code>SINGLE_AZ_2</code>- Creates file systems with throughput capacities of
-  /// 160 - 10,240 MB/s using an NVMe L2ARC cache. <code>Single_AZ_2</code> is
-  /// available only in the US East (N. Virginia), US East (Ohio), US West
-  /// (Oregon), and Europe (Ireland) Amazon Web Services Regions.
+  /// 160 - 10,240 MB/s using an NVMe L2ARC cache that automatically recover
+  /// within a single Availability Zone.
+  /// </li>
+  /// <li>
+  /// <code>SINGLE_AZ_1</code>- Creates file systems with throughput capacities of
+  /// 64 - 4,096 MBs that automatically recover within a single Availability Zone.
   /// </li>
   /// </ul>
-  /// For more information, see: <a
+  /// For a list of which Amazon Web Services Regions each deployment type is
+  /// available in, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/availability-durability.html#available-aws-regions">Deployment
-  /// type availability</a> and <a
+  /// type availability</a>. For more information on the differences in
+  /// performance between deployment types, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/performance.html#zfs-fs-performance">File
   /// system performance</a> in the <i>Amazon FSx for OpenZFS User Guide</i>.
   final OpenZFSDeploymentType deploymentType;
 
   /// Specifies the throughput of an Amazon FSx for OpenZFS file system, measured
-  /// in megabytes per second (MB/s). Valid values depend on the DeploymentType
+  /// in megabytes per second (MBps). Valid values depend on the DeploymentType
   /// you choose, as follows:
   ///
   /// <ul>
   /// <li>
-  /// For <code>SINGLE_AZ_1</code>, valid values are 64, 128, 256, 512, 1024,
-  /// 2048, 3072, or 4096 MB/s.
+  /// For <code>MULTI_AZ_1</code> and <code>SINGLE_AZ_2</code>, valid values are
+  /// 160, 320, 640, 1280, 2560, 3840, 5120, 7680, or 10240 MBps.
   /// </li>
   /// <li>
-  /// For <code>SINGLE_AZ_2</code>, valid values are 160, 320, 640, 1280, 2560,
-  /// 3840, 5120, 7680, or 10240 MB/s.
+  /// For <code>SINGLE_AZ_1</code>, valid values are 64, 128, 256, 512, 1024,
+  /// 2048, 3072, or 4096 MBps.
   /// </li>
   /// </ul>
   /// You pay for additional throughput capacity that you provision.
@@ -4756,9 +5414,28 @@ class CreateFileSystemOpenZFSConfiguration {
   final String? dailyAutomaticBackupStartTime;
   final DiskIopsConfiguration? diskIopsConfiguration;
 
+  /// (Multi-AZ only) Specifies the IP address range in which the endpoints to
+  /// access your file system will be created. By default in the Amazon FSx API
+  /// and Amazon FSx console, Amazon FSx selects an available /28 IP address range
+  /// for you from one of the VPC's CIDR ranges. You can have overlapping endpoint
+  /// IP addresses for file systems deployed in the same VPC/route tables.
+  final String? endpointIpAddressRange;
+
+  /// Required when <code>DeploymentType</code> is set to <code>MULTI_AZ_1</code>.
+  /// This specifies the subnet in which you want the preferred file server to be
+  /// located.
+  final String? preferredSubnetId;
+
   /// The configuration Amazon FSx uses when creating the root value of the Amazon
   /// FSx for OpenZFS file system. All volumes are children of the root volume.
   final OpenZFSCreateRootVolumeConfiguration? rootVolumeConfiguration;
+
+  /// (Multi-AZ only) Specifies the route tables in which Amazon FSx creates the
+  /// rules for routing traffic to the correct file server. You should specify all
+  /// virtual private cloud (VPC) route tables associated with the subnets in
+  /// which your clients are located. By default, Amazon FSx selects your VPC's
+  /// default route table.
+  final List<String>? routeTableIds;
   final String? weeklyMaintenanceStartTime;
 
   CreateFileSystemOpenZFSConfiguration({
@@ -4769,7 +5446,10 @@ class CreateFileSystemOpenZFSConfiguration {
     this.copyTagsToVolumes,
     this.dailyAutomaticBackupStartTime,
     this.diskIopsConfiguration,
+    this.endpointIpAddressRange,
+    this.preferredSubnetId,
     this.rootVolumeConfiguration,
+    this.routeTableIds,
     this.weeklyMaintenanceStartTime,
   });
 
@@ -4781,10 +5461,13 @@ class CreateFileSystemOpenZFSConfiguration {
     final copyTagsToVolumes = this.copyTagsToVolumes;
     final dailyAutomaticBackupStartTime = this.dailyAutomaticBackupStartTime;
     final diskIopsConfiguration = this.diskIopsConfiguration;
+    final endpointIpAddressRange = this.endpointIpAddressRange;
+    final preferredSubnetId = this.preferredSubnetId;
     final rootVolumeConfiguration = this.rootVolumeConfiguration;
+    final routeTableIds = this.routeTableIds;
     final weeklyMaintenanceStartTime = this.weeklyMaintenanceStartTime;
     return {
-      'DeploymentType': deploymentType.toValue(),
+      'DeploymentType': deploymentType.value,
       'ThroughputCapacity': throughputCapacity,
       if (automaticBackupRetentionDays != null)
         'AutomaticBackupRetentionDays': automaticBackupRetentionDays,
@@ -4794,8 +5477,12 @@ class CreateFileSystemOpenZFSConfiguration {
         'DailyAutomaticBackupStartTime': dailyAutomaticBackupStartTime,
       if (diskIopsConfiguration != null)
         'DiskIopsConfiguration': diskIopsConfiguration,
+      if (endpointIpAddressRange != null)
+        'EndpointIpAddressRange': endpointIpAddressRange,
+      if (preferredSubnetId != null) 'PreferredSubnetId': preferredSubnetId,
       if (rootVolumeConfiguration != null)
         'RootVolumeConfiguration': rootVolumeConfiguration,
+      if (routeTableIds != null) 'RouteTableIds': routeTableIds,
       if (weeklyMaintenanceStartTime != null)
         'WeeklyMaintenanceStartTime': weeklyMaintenanceStartTime,
     };
@@ -4877,9 +5564,9 @@ class CreateFileSystemWindowsConfiguration {
   /// Windows File Server file system.
   final WindowsAuditLogCreateConfiguration? auditLogConfiguration;
 
-  /// The number of days to retain automatic backups. The default is to retain
-  /// backups for 7 days. Setting this value to 0 disables the creation of
-  /// automatic backups. The maximum retention period for backups is 90 days.
+  /// The number of days to retain automatic backups. Setting this property to
+  /// <code>0</code> disables automatic backups. You can retain automatic backups
+  /// for a maximum of 90 days. The default is <code>30</code>.
   final int? automaticBackupRetentionDays;
 
   /// A boolean flag indicating whether tags for the file system should be copied
@@ -4920,6 +5607,13 @@ class CreateFileSystemWindowsConfiguration {
   /// Availability and Durability: Single-AZ and Multi-AZ File Systems</a>.
   final WindowsDeploymentType? deploymentType;
 
+  /// The SSD IOPS (input/output operations per second) configuration for an
+  /// Amazon FSx for Windows file system. By default, Amazon FSx automatically
+  /// provisions 3 IOPS per GiB of storage capacity. You can provision additional
+  /// IOPS per GiB of storage, up to the maximum limit associated with your chosen
+  /// throughput capacity.
+  final DiskIopsConfiguration? diskIopsConfiguration;
+
   /// Required when <code>DeploymentType</code> is set to <code>MULTI_AZ_1</code>.
   /// This specifies the subnet in which you want the preferred file server to be
   /// located. For in-Amazon Web Services applications, we recommend that you
@@ -4943,6 +5637,7 @@ class CreateFileSystemWindowsConfiguration {
     this.copyTagsToBackups,
     this.dailyAutomaticBackupStartTime,
     this.deploymentType,
+    this.diskIopsConfiguration,
     this.preferredSubnetId,
     this.selfManagedActiveDirectoryConfiguration,
     this.weeklyMaintenanceStartTime,
@@ -4957,6 +5652,7 @@ class CreateFileSystemWindowsConfiguration {
     final copyTagsToBackups = this.copyTagsToBackups;
     final dailyAutomaticBackupStartTime = this.dailyAutomaticBackupStartTime;
     final deploymentType = this.deploymentType;
+    final diskIopsConfiguration = this.diskIopsConfiguration;
     final preferredSubnetId = this.preferredSubnetId;
     final selfManagedActiveDirectoryConfiguration =
         this.selfManagedActiveDirectoryConfiguration;
@@ -4972,7 +5668,9 @@ class CreateFileSystemWindowsConfiguration {
       if (copyTagsToBackups != null) 'CopyTagsToBackups': copyTagsToBackups,
       if (dailyAutomaticBackupStartTime != null)
         'DailyAutomaticBackupStartTime': dailyAutomaticBackupStartTime,
-      if (deploymentType != null) 'DeploymentType': deploymentType.toValue(),
+      if (deploymentType != null) 'DeploymentType': deploymentType.value,
+      if (diskIopsConfiguration != null)
+        'DiskIopsConfiguration': diskIopsConfiguration,
       if (preferredSubnetId != null) 'PreferredSubnetId': preferredSubnetId,
       if (selfManagedActiveDirectoryConfiguration != null)
         'SelfManagedActiveDirectoryConfiguration':
@@ -4985,13 +5683,12 @@ class CreateFileSystemWindowsConfiguration {
 
 /// Specifies the configuration of the ONTAP volume that you are creating.
 class CreateOntapVolumeConfiguration {
-  /// Specifies the size of the volume, in megabytes (MB), that you are creating.
-  /// Provide any whole number in the range of 20–104857600 to specify the size of
-  /// the volume.
-  final int sizeInMegabytes;
-
   /// Specifies the ONTAP SVM in which to create the volume.
   final String storageVirtualMachineId;
+
+  /// Use to specify configuration options for a volume’s storage aggregate or
+  /// aggregates.
+  final CreateAggregateConfiguration? aggregateConfiguration;
 
   /// A boolean flag indicating whether tags for the volume should be copied to
   /// backups. This value defaults to false. If it's set to true, all tags for the
@@ -5022,17 +5719,14 @@ class CreateOntapVolumeConfiguration {
   /// </li>
   /// </ul>
   /// For more information, see <a
-  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/volume-types">Volume
-  /// types</a> in the <i>Amazon FSx for NetApp ONTAP User Guide</i>.
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-volumes.html#volume-types">Volume
+  /// types</a> in the Amazon FSx for NetApp ONTAP User Guide.
   final InputOntapVolumeType? ontapVolumeType;
 
   /// Specifies the security style for the volume. If a volume's security style is
   /// not specified, it is automatically set to the root volume's security style.
   /// The security style determines the type of permissions that FSx for ONTAP
-  /// uses to control data access. For more information, see <a
-  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-volumes.html#volume-security-style">Volume
-  /// security style</a> in the <i>Amazon FSx for NetApp ONTAP User Guide</i>.
-  /// Specify one of the following values:
+  /// uses to control data access. Specify one of the following values:
   ///
   /// <ul>
   /// <li>
@@ -5046,11 +5740,27 @@ class CreateOntapVolumeConfiguration {
   /// uses a Windows user as the service account.
   /// </li>
   /// <li>
-  /// <code>MIXED</code> if the file system is managed by both UNIX and Windows
-  /// administrators and users consist of both NFS and SMB clients.
+  /// <code>MIXED</code> This is an advanced setting. For more information, see
+  /// the topic <a
+  /// href="https://docs.netapp.com/us-en/ontap/nfs-admin/security-styles-their-effects-concept.html">What
+  /// the security styles and their effects are</a> in the NetApp Documentation
+  /// Center.
   /// </li>
   /// </ul>
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-volumes.html#volume-security-style">Volume
+  /// security style</a> in the FSx for ONTAP User Guide.
   final SecurityStyle? securityStyle;
+
+  /// Specifies the configured size of the volume, in bytes.
+  final int? sizeInBytes;
+
+  /// Use <code>SizeInBytes</code> instead. Specifies the size of the volume, in
+  /// megabytes (MB), that you are creating.
+  final int? sizeInMegabytes;
+
+  /// Specifies the SnapLock configuration for an FSx for ONTAP volume.
+  final CreateSnaplockConfiguration? snaplockConfiguration;
 
   /// Specifies the snapshot policy for the volume. There are three built-in
   /// snapshot policies:
@@ -5077,56 +5787,81 @@ class CreateOntapVolumeConfiguration {
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snapshots-ontap.html#snapshot-policies">Snapshot
-  /// policies</a> in the <i>Amazon FSx for NetApp ONTAP User Guide</i>.
+  /// policies</a> in the Amazon FSx for NetApp ONTAP User Guide.
   final String? snapshotPolicy;
 
   /// Set to true to enable deduplication, compression, and compaction storage
-  /// efficiency features on the volume, or set to false to disable them. This
-  /// parameter is required.
+  /// efficiency features on the volume, or set to false to disable them.
+  ///
+  /// <code>StorageEfficiencyEnabled</code> is required when creating a
+  /// <code>RW</code> volume (<code>OntapVolumeType</code> set to
+  /// <code>RW</code>).
   final bool? storageEfficiencyEnabled;
   final TieringPolicy? tieringPolicy;
 
+  /// Use to specify the style of an ONTAP volume. FSx for ONTAP offers two styles
+  /// of volumes that you can use for different purposes, FlexVol and FlexGroup
+  /// volumes. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-volumes.html#volume-styles">Volume
+  /// styles</a> in the Amazon FSx for NetApp ONTAP User Guide.
+  final VolumeStyle? volumeStyle;
+
   CreateOntapVolumeConfiguration({
-    required this.sizeInMegabytes,
     required this.storageVirtualMachineId,
+    this.aggregateConfiguration,
     this.copyTagsToBackups,
     this.junctionPath,
     this.ontapVolumeType,
     this.securityStyle,
+    this.sizeInBytes,
+    this.sizeInMegabytes,
+    this.snaplockConfiguration,
     this.snapshotPolicy,
     this.storageEfficiencyEnabled,
     this.tieringPolicy,
+    this.volumeStyle,
   });
 
   Map<String, dynamic> toJson() {
-    final sizeInMegabytes = this.sizeInMegabytes;
     final storageVirtualMachineId = this.storageVirtualMachineId;
+    final aggregateConfiguration = this.aggregateConfiguration;
     final copyTagsToBackups = this.copyTagsToBackups;
     final junctionPath = this.junctionPath;
     final ontapVolumeType = this.ontapVolumeType;
     final securityStyle = this.securityStyle;
+    final sizeInBytes = this.sizeInBytes;
+    final sizeInMegabytes = this.sizeInMegabytes;
+    final snaplockConfiguration = this.snaplockConfiguration;
     final snapshotPolicy = this.snapshotPolicy;
     final storageEfficiencyEnabled = this.storageEfficiencyEnabled;
     final tieringPolicy = this.tieringPolicy;
+    final volumeStyle = this.volumeStyle;
     return {
-      'SizeInMegabytes': sizeInMegabytes,
       'StorageVirtualMachineId': storageVirtualMachineId,
+      if (aggregateConfiguration != null)
+        'AggregateConfiguration': aggregateConfiguration,
       if (copyTagsToBackups != null) 'CopyTagsToBackups': copyTagsToBackups,
       if (junctionPath != null) 'JunctionPath': junctionPath,
-      if (ontapVolumeType != null) 'OntapVolumeType': ontapVolumeType.toValue(),
-      if (securityStyle != null) 'SecurityStyle': securityStyle.toValue(),
+      if (ontapVolumeType != null) 'OntapVolumeType': ontapVolumeType.value,
+      if (securityStyle != null) 'SecurityStyle': securityStyle.value,
+      if (sizeInBytes != null) 'SizeInBytes': sizeInBytes,
+      if (sizeInMegabytes != null) 'SizeInMegabytes': sizeInMegabytes,
+      if (snaplockConfiguration != null)
+        'SnaplockConfiguration': snaplockConfiguration,
       if (snapshotPolicy != null) 'SnapshotPolicy': snapshotPolicy,
       if (storageEfficiencyEnabled != null)
         'StorageEfficiencyEnabled': storageEfficiencyEnabled,
       if (tieringPolicy != null) 'TieringPolicy': tieringPolicy,
+      if (volumeStyle != null) 'VolumeStyle': volumeStyle.value,
     };
   }
 }
 
-/// The snapshot configuration to use when creating an OpenZFS volume from a
-/// snapshot.
+/// The snapshot configuration to use when creating an Amazon FSx for OpenZFS
+/// volume from a snapshot.
 class CreateOpenZFSOriginSnapshotConfiguration {
-  /// The strategy used when copying data from the snapshot to the new volume.
+  /// Specifies the strategy used when copying data from the snapshot to the new
+  /// volume.
   ///
   /// <ul>
   /// <li>
@@ -5138,8 +5873,16 @@ class CreateOpenZFSOriginSnapshotConfiguration {
   /// <li>
   /// <code>FULL_COPY</code> - Copies all data from the snapshot to the new
   /// volume.
+  ///
+  /// Specify this option to create the volume from a snapshot on another FSx for
+  /// OpenZFS file system.
   /// </li>
-  /// </ul>
+  /// </ul> <note>
+  /// The <code>INCREMENTAL_COPY</code> option is only for updating an existing
+  /// volume by using a snapshot from another FSx for OpenZFS file system. For
+  /// more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CopySnapshotAndUpdateVolume.html">CopySnapshotAndUpdateVolume</a>.
+  /// </note>
   final OpenZFSCopyStrategy copyStrategy;
   final String snapshotARN;
 
@@ -5152,7 +5895,7 @@ class CreateOpenZFSOriginSnapshotConfiguration {
     final copyStrategy = this.copyStrategy;
     final snapshotARN = this.snapshotARN;
     return {
-      'CopyStrategy': copyStrategy.toValue(),
+      'CopyStrategy': copyStrategy.value,
       'SnapshotARN': snapshotARN,
     };
   }
@@ -5247,7 +5990,7 @@ class CreateOpenZFSVolumeConfiguration {
   /// properties</a> in the <i>Amazon FSx for OpenZFS User Guide</i>.
   final int? storageCapacityReservationGiB;
 
-  /// An object specifying how much storage users or groups can use on the volume.
+  /// Configures how much storage users and groups can use on the volume.
   final List<OpenZFSUserOrGroupQuota>? userAndGroupQuotas;
 
   CreateOpenZFSVolumeConfiguration({
@@ -5279,7 +6022,7 @@ class CreateOpenZFSVolumeConfiguration {
       if (copyTagsToSnapshots != null)
         'CopyTagsToSnapshots': copyTagsToSnapshots,
       if (dataCompressionType != null)
-        'DataCompressionType': dataCompressionType.toValue(),
+        'DataCompressionType': dataCompressionType.value,
       if (nfsExports != null) 'NfsExports': nfsExports,
       if (originSnapshot != null) 'OriginSnapshot': originSnapshot,
       if (readOnly != null) 'ReadOnly': readOnly,
@@ -5289,6 +6032,102 @@ class CreateOpenZFSVolumeConfiguration {
       if (storageCapacityReservationGiB != null)
         'StorageCapacityReservationGiB': storageCapacityReservationGiB,
       if (userAndGroupQuotas != null) 'UserAndGroupQuotas': userAndGroupQuotas,
+    };
+  }
+}
+
+/// Defines the SnapLock configuration when creating an FSx for ONTAP SnapLock
+/// volume.
+class CreateSnaplockConfiguration {
+  /// Specifies the retention mode of an FSx for ONTAP SnapLock volume. After it
+  /// is set, it can't be changed. You can choose one of the following retention
+  /// modes:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>COMPLIANCE</code>: Files transitioned to write once, read many (WORM)
+  /// on a Compliance volume can't be deleted until their retention periods
+  /// expire. This retention mode is used to address government or
+  /// industry-specific mandates or to protect against ransomware attacks. For
+  /// more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-compliance.html">SnapLock
+  /// Compliance</a>.
+  /// </li>
+  /// <li>
+  /// <code>ENTERPRISE</code>: Files transitioned to WORM on an Enterprise volume
+  /// can be deleted by authorized users before their retention periods expire
+  /// using privileged delete. This retention mode is used to advance an
+  /// organization's data integrity and internal compliance or to test retention
+  /// settings before using SnapLock Compliance. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-enterprise.html">SnapLock
+  /// Enterprise</a>.
+  /// </li>
+  /// </ul>
+  final SnaplockType snaplockType;
+
+  /// Enables or disables the audit log volume for an FSx for ONTAP SnapLock
+  /// volume. The default value is <code>false</code>. If you set
+  /// <code>AuditLogVolume</code> to <code>true</code>, the SnapLock volume is
+  /// created as an audit log volume. The minimum retention period for an audit
+  /// log volume is six months.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/how-snaplock-works.html#snaplock-audit-log-volume">
+  /// SnapLock audit log volumes</a>.
+  final bool? auditLogVolume;
+
+  /// The configuration object for setting the autocommit period of files in an
+  /// FSx for ONTAP SnapLock volume.
+  final AutocommitPeriod? autocommitPeriod;
+
+  /// Enables, disables, or permanently disables privileged delete on an FSx for
+  /// ONTAP SnapLock Enterprise volume. Enabling privileged delete allows SnapLock
+  /// administrators to delete WORM files even if they have active retention
+  /// periods. <code>PERMANENTLY_DISABLED</code> is a terminal state. If
+  /// privileged delete is permanently disabled on a SnapLock volume, you can't
+  /// re-enable it. The default value is <code>DISABLED</code>.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-enterprise.html#privileged-delete">Privileged
+  /// delete</a>.
+  final PrivilegedDelete? privilegedDelete;
+
+  /// Specifies the retention period of an FSx for ONTAP SnapLock volume.
+  final SnaplockRetentionPeriod? retentionPeriod;
+
+  /// Enables or disables volume-append mode on an FSx for ONTAP SnapLock volume.
+  /// Volume-append mode allows you to create WORM-appendable files and write data
+  /// to them incrementally. The default value is <code>false</code>.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/worm-state.html#worm-state-append">Volume-append
+  /// mode</a>.
+  final bool? volumeAppendModeEnabled;
+
+  CreateSnaplockConfiguration({
+    required this.snaplockType,
+    this.auditLogVolume,
+    this.autocommitPeriod,
+    this.privilegedDelete,
+    this.retentionPeriod,
+    this.volumeAppendModeEnabled,
+  });
+
+  Map<String, dynamic> toJson() {
+    final snaplockType = this.snaplockType;
+    final auditLogVolume = this.auditLogVolume;
+    final autocommitPeriod = this.autocommitPeriod;
+    final privilegedDelete = this.privilegedDelete;
+    final retentionPeriod = this.retentionPeriod;
+    final volumeAppendModeEnabled = this.volumeAppendModeEnabled;
+    return {
+      'SnaplockType': snaplockType.value,
+      if (auditLogVolume != null) 'AuditLogVolume': auditLogVolume,
+      if (autocommitPeriod != null) 'AutocommitPeriod': autocommitPeriod,
+      if (privilegedDelete != null) 'PrivilegedDelete': privilegedDelete.value,
+      if (retentionPeriod != null) 'RetentionPeriod': retentionPeriod,
+      if (volumeAppendModeEnabled != null)
+        'VolumeAppendModeEnabled': volumeAppendModeEnabled,
     };
   }
 }
@@ -5332,7 +6171,7 @@ class CreateStorageVirtualMachineResponse {
 
 /// The configuration that Amazon FSx uses to join the ONTAP storage virtual
 /// machine (SVM) to your self-managed (including on-premises) Microsoft Active
-/// Directory (AD) directory.
+/// Directory directory.
 class CreateSvmActiveDirectoryConfiguration {
   /// The NetBIOS name of the Active Directory computer object that will be
   /// created for your SVM.
@@ -5395,31 +6234,18 @@ class CreateVolumeResponse {
 }
 
 enum DataCompressionType {
-  none,
-  lz4,
-}
+  none('NONE'),
+  lz4('LZ4'),
+  ;
 
-extension DataCompressionTypeValueExtension on DataCompressionType {
-  String toValue() {
-    switch (this) {
-      case DataCompressionType.none:
-        return 'NONE';
-      case DataCompressionType.lz4:
-        return 'LZ4';
-    }
-  }
-}
+  final String value;
 
-extension DataCompressionTypeFromString on String {
-  DataCompressionType toDataCompressionType() {
-    switch (this) {
-      case 'NONE':
-        return DataCompressionType.none;
-      case 'LZ4':
-        return DataCompressionType.lz4;
-    }
-    throw Exception('$this is not known in enum DataCompressionType');
-  }
+  const DataCompressionType(this.value);
+
+  static DataCompressionType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum DataCompressionType'));
 }
 
 /// The configuration of a data repository association that links an Amazon FSx
@@ -5440,8 +6266,8 @@ extension DataCompressionTypeFromString on String {
 /// </li>
 /// </ul>
 /// Data repository associations are supported on Amazon File Cache resources
-/// and all Amazon FSx for Lustre file systems excluding <code>Scratch_1</code>
-/// deployment types.
+/// and all FSx for Lustre 2.12 and 2.15 file systems, excluding
+/// <code>scratch_1</code> deployment type.
 class DataRepositoryAssociation {
   /// The system-generated, unique ID of the data repository association.
   final String? associationId;
@@ -5626,7 +6452,7 @@ class DataRepositoryAssociation {
       dataRepositoryPath: json['DataRepositoryPath'] as String?,
       dataRepositorySubdirectories:
           (json['DataRepositorySubdirectories'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => e as String)
               .toList(),
       failureDetails: json['FailureDetails'] != null
@@ -5638,7 +6464,8 @@ class DataRepositoryAssociation {
       fileSystemId: json['FileSystemId'] as String?,
       fileSystemPath: json['FileSystemPath'] as String?,
       importedFileChunkSize: json['ImportedFileChunkSize'] as int?,
-      lifecycle: (json['Lifecycle'] as String?)?.toDataRepositoryLifecycle(),
+      lifecycle: (json['Lifecycle'] as String?)
+          ?.let(DataRepositoryLifecycle.fromString),
       nfs: json['NFS'] != null
           ? NFSDataRepositoryConfiguration.fromJson(
               json['NFS'] as Map<String, dynamic>)
@@ -5649,7 +6476,7 @@ class DataRepositoryAssociation {
               json['S3'] as Map<String, dynamic>)
           : null,
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -5758,8 +6585,8 @@ class DataRepositoryConfiguration {
 
   factory DataRepositoryConfiguration.fromJson(Map<String, dynamic> json) {
     return DataRepositoryConfiguration(
-      autoImportPolicy:
-          (json['AutoImportPolicy'] as String?)?.toAutoImportPolicyType(),
+      autoImportPolicy: (json['AutoImportPolicy'] as String?)
+          ?.let(AutoImportPolicyType.fromString),
       exportPath: json['ExportPath'] as String?,
       failureDetails: json['FailureDetails'] != null
           ? DataRepositoryFailureDetails.fromJson(
@@ -5767,7 +6594,8 @@ class DataRepositoryConfiguration {
           : null,
       importPath: json['ImportPath'] as String?,
       importedFileChunkSize: json['ImportedFileChunkSize'] as int?,
-      lifecycle: (json['Lifecycle'] as String?)?.toDataRepositoryLifecycle(),
+      lifecycle: (json['Lifecycle'] as String?)
+          ?.let(DataRepositoryLifecycle.fromString),
     );
   }
 }
@@ -5790,57 +6618,44 @@ class DataRepositoryFailureDetails {
 }
 
 enum DataRepositoryLifecycle {
-  creating,
-  available,
-  misconfigured,
-  updating,
-  deleting,
-  failed,
+  creating('CREATING'),
+  available('AVAILABLE'),
+  misconfigured('MISCONFIGURED'),
+  updating('UPDATING'),
+  deleting('DELETING'),
+  failed('FAILED'),
+  ;
+
+  final String value;
+
+  const DataRepositoryLifecycle(this.value);
+
+  static DataRepositoryLifecycle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DataRepositoryLifecycle'));
 }
 
-extension DataRepositoryLifecycleValueExtension on DataRepositoryLifecycle {
-  String toValue() {
-    switch (this) {
-      case DataRepositoryLifecycle.creating:
-        return 'CREATING';
-      case DataRepositoryLifecycle.available:
-        return 'AVAILABLE';
-      case DataRepositoryLifecycle.misconfigured:
-        return 'MISCONFIGURED';
-      case DataRepositoryLifecycle.updating:
-        return 'UPDATING';
-      case DataRepositoryLifecycle.deleting:
-        return 'DELETING';
-      case DataRepositoryLifecycle.failed:
-        return 'FAILED';
-    }
-  }
-}
-
-extension DataRepositoryLifecycleFromString on String {
-  DataRepositoryLifecycle toDataRepositoryLifecycle() {
-    switch (this) {
-      case 'CREATING':
-        return DataRepositoryLifecycle.creating;
-      case 'AVAILABLE':
-        return DataRepositoryLifecycle.available;
-      case 'MISCONFIGURED':
-        return DataRepositoryLifecycle.misconfigured;
-      case 'UPDATING':
-        return DataRepositoryLifecycle.updating;
-      case 'DELETING':
-        return DataRepositoryLifecycle.deleting;
-      case 'FAILED':
-        return DataRepositoryLifecycle.failed;
-    }
-    throw Exception('$this is not known in enum DataRepositoryLifecycle');
-  }
-}
-
-/// A description of the data repository task. You use data repository tasks to
-/// perform bulk transfer operations between an Amazon FSx for Lustre file
-/// system and a linked data repository. An Amazon File Cache resource uses a
-/// task to automatically release files from the cache.
+/// A description of the data repository task.
+///
+/// <ul>
+/// <li>
+/// You use import and export data repository tasks to perform bulk transfer
+/// operations between an Amazon FSx for Lustre file system and a linked data
+/// repository.
+/// </li>
+/// <li>
+/// You use release data repository tasks to release files that have been
+/// exported to a linked S3 bucket from your Amazon FSx for Lustre file system.
+/// </li>
+/// <li>
+/// An Amazon File Cache resource uses a task to automatically release files
+/// from the cache.
+/// </li>
+/// </ul>
+/// To learn more about data repository tasks, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/data-repository-tasks.html">Data
+/// Repository Tasks</a>.
 class DataRepositoryTask {
   final DateTime creationTime;
 
@@ -5894,11 +6709,13 @@ class DataRepositoryTask {
   /// from a linked S3 bucket to your Amazon FSx for Lustre file system.
   /// </li>
   /// <li>
-  /// <code>AUTO_RELEASE_DATA</code> tasks automatically release files from an
-  /// Amazon File Cache resource.
+  /// <code>RELEASE_DATA_FROM_FILESYSTEM</code> tasks release files in your Amazon
+  /// FSx for Lustre file system that have been exported to a linked S3 bucket and
+  /// that meet your specified release criteria.
   /// </li>
   /// <li>
-  /// <code>RELEASE_DATA_FROM_FILESYSTEM</code> tasks are not supported.
+  /// <code>AUTO_RELEASE_DATA</code> tasks automatically release files from an
+  /// Amazon File Cache resource.
   /// </li>
   /// </ul>
   final DataRepositoryTaskType type;
@@ -5928,6 +6745,10 @@ class DataRepositoryTask {
   /// (Default) If <code>Paths</code> is not specified, Amazon FSx uses the file
   /// system root directory.
   final List<String>? paths;
+
+  /// The configuration that specifies the last accessed time criteria for files
+  /// that will be released from an Amazon FSx for Lustre file system.
+  final ReleaseConfiguration? releaseConfiguration;
   final CompletionReport? report;
   final String? resourceARN;
 
@@ -5950,6 +6771,7 @@ class DataRepositoryTask {
     this.fileCacheId,
     this.fileSystemId,
     this.paths,
+    this.releaseConfiguration,
     this.report,
     this.resourceARN,
     this.startTime,
@@ -5961,9 +6783,10 @@ class DataRepositoryTask {
     return DataRepositoryTask(
       creationTime:
           nonNullableTimeStampFromJson(json['CreationTime'] as Object),
-      lifecycle: (json['Lifecycle'] as String).toDataRepositoryTaskLifecycle(),
+      lifecycle:
+          DataRepositoryTaskLifecycle.fromString((json['Lifecycle'] as String)),
       taskId: json['TaskId'] as String,
-      type: (json['Type'] as String).toDataRepositoryTaskType(),
+      type: DataRepositoryTaskType.fromString((json['Type'] as String)),
       capacityToRelease: json['CapacityToRelease'] as int?,
       endTime: timeStampFromJson(json['EndTime']),
       failureDetails: json['FailureDetails'] != null
@@ -5972,10 +6795,12 @@ class DataRepositoryTask {
           : null,
       fileCacheId: json['FileCacheId'] as String?,
       fileSystemId: json['FileSystemId'] as String?,
-      paths: (json['Paths'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      paths:
+          (json['Paths'] as List?)?.nonNulls.map((e) => e as String).toList(),
+      releaseConfiguration: json['ReleaseConfiguration'] != null
+          ? ReleaseConfiguration.fromJson(
+              json['ReleaseConfiguration'] as Map<String, dynamic>)
+          : null,
       report: json['Report'] != null
           ? CompletionReport.fromJson(json['Report'] as Map<String, dynamic>)
           : null,
@@ -5986,7 +6811,7 @@ class DataRepositoryTask {
               json['Status'] as Map<String, dynamic>)
           : null,
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6044,98 +6869,46 @@ class DataRepositoryTaskFilter {
     final name = this.name;
     final values = this.values;
     return {
-      if (name != null) 'Name': name.toValue(),
+      if (name != null) 'Name': name.value,
       if (values != null) 'Values': values,
     };
   }
 }
 
 enum DataRepositoryTaskFilterName {
-  fileSystemId,
-  taskLifecycle,
-  dataRepositoryAssociationId,
-  fileCacheId,
-}
+  fileSystemId('file-system-id'),
+  taskLifecycle('task-lifecycle'),
+  dataRepositoryAssociationId('data-repository-association-id'),
+  fileCacheId('file-cache-id'),
+  ;
 
-extension DataRepositoryTaskFilterNameValueExtension
-    on DataRepositoryTaskFilterName {
-  String toValue() {
-    switch (this) {
-      case DataRepositoryTaskFilterName.fileSystemId:
-        return 'file-system-id';
-      case DataRepositoryTaskFilterName.taskLifecycle:
-        return 'task-lifecycle';
-      case DataRepositoryTaskFilterName.dataRepositoryAssociationId:
-        return 'data-repository-association-id';
-      case DataRepositoryTaskFilterName.fileCacheId:
-        return 'file-cache-id';
-    }
-  }
-}
+  final String value;
 
-extension DataRepositoryTaskFilterNameFromString on String {
-  DataRepositoryTaskFilterName toDataRepositoryTaskFilterName() {
-    switch (this) {
-      case 'file-system-id':
-        return DataRepositoryTaskFilterName.fileSystemId;
-      case 'task-lifecycle':
-        return DataRepositoryTaskFilterName.taskLifecycle;
-      case 'data-repository-association-id':
-        return DataRepositoryTaskFilterName.dataRepositoryAssociationId;
-      case 'file-cache-id':
-        return DataRepositoryTaskFilterName.fileCacheId;
-    }
-    throw Exception('$this is not known in enum DataRepositoryTaskFilterName');
-  }
+  const DataRepositoryTaskFilterName(this.value);
+
+  static DataRepositoryTaskFilterName fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DataRepositoryTaskFilterName'));
 }
 
 enum DataRepositoryTaskLifecycle {
-  pending,
-  executing,
-  failed,
-  succeeded,
-  canceled,
-  canceling,
-}
+  pending('PENDING'),
+  executing('EXECUTING'),
+  failed('FAILED'),
+  succeeded('SUCCEEDED'),
+  canceled('CANCELED'),
+  canceling('CANCELING'),
+  ;
 
-extension DataRepositoryTaskLifecycleValueExtension
-    on DataRepositoryTaskLifecycle {
-  String toValue() {
-    switch (this) {
-      case DataRepositoryTaskLifecycle.pending:
-        return 'PENDING';
-      case DataRepositoryTaskLifecycle.executing:
-        return 'EXECUTING';
-      case DataRepositoryTaskLifecycle.failed:
-        return 'FAILED';
-      case DataRepositoryTaskLifecycle.succeeded:
-        return 'SUCCEEDED';
-      case DataRepositoryTaskLifecycle.canceled:
-        return 'CANCELED';
-      case DataRepositoryTaskLifecycle.canceling:
-        return 'CANCELING';
-    }
-  }
-}
+  final String value;
 
-extension DataRepositoryTaskLifecycleFromString on String {
-  DataRepositoryTaskLifecycle toDataRepositoryTaskLifecycle() {
-    switch (this) {
-      case 'PENDING':
-        return DataRepositoryTaskLifecycle.pending;
-      case 'EXECUTING':
-        return DataRepositoryTaskLifecycle.executing;
-      case 'FAILED':
-        return DataRepositoryTaskLifecycle.failed;
-      case 'SUCCEEDED':
-        return DataRepositoryTaskLifecycle.succeeded;
-      case 'CANCELED':
-        return DataRepositoryTaskLifecycle.canceled;
-      case 'CANCELING':
-        return DataRepositoryTaskLifecycle.canceling;
-    }
-    throw Exception('$this is not known in enum DataRepositoryTaskLifecycle');
-  }
+  const DataRepositoryTaskLifecycle(this.value);
+
+  static DataRepositoryTaskLifecycle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DataRepositoryTaskLifecycle'));
 }
 
 /// Provides the task status showing a running total of the total number of
@@ -6183,41 +6956,20 @@ class DataRepositoryTaskStatus {
 }
 
 enum DataRepositoryTaskType {
-  exportToRepository,
-  importMetadataFromRepository,
-  releaseDataFromFilesystem,
-  autoReleaseData,
-}
+  exportToRepository('EXPORT_TO_REPOSITORY'),
+  importMetadataFromRepository('IMPORT_METADATA_FROM_REPOSITORY'),
+  releaseDataFromFilesystem('RELEASE_DATA_FROM_FILESYSTEM'),
+  autoReleaseData('AUTO_RELEASE_DATA'),
+  ;
 
-extension DataRepositoryTaskTypeValueExtension on DataRepositoryTaskType {
-  String toValue() {
-    switch (this) {
-      case DataRepositoryTaskType.exportToRepository:
-        return 'EXPORT_TO_REPOSITORY';
-      case DataRepositoryTaskType.importMetadataFromRepository:
-        return 'IMPORT_METADATA_FROM_REPOSITORY';
-      case DataRepositoryTaskType.releaseDataFromFilesystem:
-        return 'RELEASE_DATA_FROM_FILESYSTEM';
-      case DataRepositoryTaskType.autoReleaseData:
-        return 'AUTO_RELEASE_DATA';
-    }
-  }
-}
+  final String value;
 
-extension DataRepositoryTaskTypeFromString on String {
-  DataRepositoryTaskType toDataRepositoryTaskType() {
-    switch (this) {
-      case 'EXPORT_TO_REPOSITORY':
-        return DataRepositoryTaskType.exportToRepository;
-      case 'IMPORT_METADATA_FROM_REPOSITORY':
-        return DataRepositoryTaskType.importMetadataFromRepository;
-      case 'RELEASE_DATA_FROM_FILESYSTEM':
-        return DataRepositoryTaskType.releaseDataFromFilesystem;
-      case 'AUTO_RELEASE_DATA':
-        return DataRepositoryTaskType.autoReleaseData;
-    }
-    throw Exception('$this is not known in enum DataRepositoryTaskType');
-  }
+  const DataRepositoryTaskType(this.value);
+
+  static DataRepositoryTaskType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DataRepositoryTaskType'));
 }
 
 /// The response object for the <code>DeleteBackup</code> operation.
@@ -6237,7 +6989,8 @@ class DeleteBackupResponse {
   factory DeleteBackupResponse.fromJson(Map<String, dynamic> json) {
     return DeleteBackupResponse(
       backupId: json['BackupId'] as String?,
-      lifecycle: (json['Lifecycle'] as String?)?.toBackupLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(BackupLifecycle.fromString),
     );
   }
 }
@@ -6265,7 +7018,8 @@ class DeleteDataRepositoryAssociationResponse {
     return DeleteDataRepositoryAssociationResponse(
       associationId: json['AssociationId'] as String?,
       deleteDataInFileSystem: json['DeleteDataInFileSystem'] as bool?,
-      lifecycle: (json['Lifecycle'] as String?)?.toDataRepositoryLifecycle(),
+      lifecycle: (json['Lifecycle'] as String?)
+          ?.let(DataRepositoryLifecycle.fromString),
     );
   }
 }
@@ -6287,7 +7041,8 @@ class DeleteFileCacheResponse {
   factory DeleteFileCacheResponse.fromJson(Map<String, dynamic> json) {
     return DeleteFileCacheResponse(
       fileCacheId: json['FileCacheId'] as String?,
-      lifecycle: (json['Lifecycle'] as String?)?.toFileCacheLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(FileCacheLifecycle.fromString),
     );
   }
 }
@@ -6346,7 +7101,7 @@ class DeleteFileSystemLustreResponse {
     return DeleteFileSystemLustreResponse(
       finalBackupId: json['FinalBackupId'] as String?,
       finalBackupTags: (json['FinalBackupTags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6384,34 +7139,24 @@ class DeleteFileSystemOpenZFSConfiguration {
     final skipFinalBackup = this.skipFinalBackup;
     return {
       if (finalBackupTags != null) 'FinalBackupTags': finalBackupTags,
-      if (options != null) 'Options': options.map((e) => e.toValue()).toList(),
+      if (options != null) 'Options': options.map((e) => e.value).toList(),
       if (skipFinalBackup != null) 'SkipFinalBackup': skipFinalBackup,
     };
   }
 }
 
 enum DeleteFileSystemOpenZFSOption {
-  deleteChildVolumesAndSnapshots,
-}
+  deleteChildVolumesAndSnapshots('DELETE_CHILD_VOLUMES_AND_SNAPSHOTS'),
+  ;
 
-extension DeleteFileSystemOpenZFSOptionValueExtension
-    on DeleteFileSystemOpenZFSOption {
-  String toValue() {
-    switch (this) {
-      case DeleteFileSystemOpenZFSOption.deleteChildVolumesAndSnapshots:
-        return 'DELETE_CHILD_VOLUMES_AND_SNAPSHOTS';
-    }
-  }
-}
+  final String value;
 
-extension DeleteFileSystemOpenZFSOptionFromString on String {
-  DeleteFileSystemOpenZFSOption toDeleteFileSystemOpenZFSOption() {
-    switch (this) {
-      case 'DELETE_CHILD_VOLUMES_AND_SNAPSHOTS':
-        return DeleteFileSystemOpenZFSOption.deleteChildVolumesAndSnapshots;
-    }
-    throw Exception('$this is not known in enum DeleteFileSystemOpenZFSOption');
-  }
+  const DeleteFileSystemOpenZFSOption(this.value);
+
+  static DeleteFileSystemOpenZFSOption fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DeleteFileSystemOpenZFSOption'));
 }
 
 /// The response object for the Amazon FSx for OpenZFS file system that's being
@@ -6429,7 +7174,7 @@ class DeleteFileSystemOpenZFSResponse {
     return DeleteFileSystemOpenZFSResponse(
       finalBackupId: json['FinalBackupId'] as String?,
       finalBackupTags: (json['FinalBackupTags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6463,7 +7208,8 @@ class DeleteFileSystemResponse {
   factory DeleteFileSystemResponse.fromJson(Map<String, dynamic> json) {
     return DeleteFileSystemResponse(
       fileSystemId: json['FileSystemId'] as String?,
-      lifecycle: (json['Lifecycle'] as String?)?.toFileSystemLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(FileSystemLifecycle.fromString),
       lustreResponse: json['LustreResponse'] != null
           ? DeleteFileSystemLustreResponse.fromJson(
               json['LustreResponse'] as Map<String, dynamic>)
@@ -6525,7 +7271,7 @@ class DeleteFileSystemWindowsResponse {
     return DeleteFileSystemWindowsResponse(
       finalBackupId: json['FinalBackupId'] as String?,
       finalBackupTags: (json['FinalBackupTags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6533,26 +7279,17 @@ class DeleteFileSystemWindowsResponse {
 }
 
 enum DeleteOpenZFSVolumeOption {
-  deleteChildVolumesAndSnapshots,
-}
+  deleteChildVolumesAndSnapshots('DELETE_CHILD_VOLUMES_AND_SNAPSHOTS'),
+  ;
 
-extension DeleteOpenZFSVolumeOptionValueExtension on DeleteOpenZFSVolumeOption {
-  String toValue() {
-    switch (this) {
-      case DeleteOpenZFSVolumeOption.deleteChildVolumesAndSnapshots:
-        return 'DELETE_CHILD_VOLUMES_AND_SNAPSHOTS';
-    }
-  }
-}
+  final String value;
 
-extension DeleteOpenZFSVolumeOptionFromString on String {
-  DeleteOpenZFSVolumeOption toDeleteOpenZFSVolumeOption() {
-    switch (this) {
-      case 'DELETE_CHILD_VOLUMES_AND_SNAPSHOTS':
-        return DeleteOpenZFSVolumeOption.deleteChildVolumesAndSnapshots;
-    }
-    throw Exception('$this is not known in enum DeleteOpenZFSVolumeOption');
-  }
+  const DeleteOpenZFSVolumeOption(this.value);
+
+  static DeleteOpenZFSVolumeOption fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DeleteOpenZFSVolumeOption'));
 }
 
 class DeleteSnapshotResponse {
@@ -6570,7 +7307,8 @@ class DeleteSnapshotResponse {
 
   factory DeleteSnapshotResponse.fromJson(Map<String, dynamic> json) {
     return DeleteSnapshotResponse(
-      lifecycle: (json['Lifecycle'] as String?)?.toSnapshotLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(SnapshotLifecycle.fromString),
       snapshotId: json['SnapshotId'] as String?,
     );
   }
@@ -6591,15 +7329,28 @@ class DeleteStorageVirtualMachineResponse {
   factory DeleteStorageVirtualMachineResponse.fromJson(
       Map<String, dynamic> json) {
     return DeleteStorageVirtualMachineResponse(
-      lifecycle:
-          (json['Lifecycle'] as String?)?.toStorageVirtualMachineLifecycle(),
+      lifecycle: (json['Lifecycle'] as String?)
+          ?.let(StorageVirtualMachineLifecycle.fromString),
       storageVirtualMachineId: json['StorageVirtualMachineId'] as String?,
     );
   }
 }
 
-/// Use to specify skipping a final backup, or to add tags to a final backup.
+/// Use to specify skipping a final backup, adding tags to a final backup, or
+/// bypassing the retention period of an FSx for ONTAP SnapLock Enterprise
+/// volume when deleting an FSx for ONTAP volume.
 class DeleteVolumeOntapConfiguration {
+  /// Setting this to <code>true</code> allows a SnapLock administrator to delete
+  /// an FSx for ONTAP SnapLock Enterprise volume with unexpired write once, read
+  /// many (WORM) files. The IAM permission
+  /// <code>fsx:BypassSnaplockEnterpriseRetention</code> is also required to
+  /// delete SnapLock Enterprise volumes with unexpired WORM files. The default
+  /// value is <code>false</code>.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-delete-volume.html">
+  /// Deleting a SnapLock volume</a>.
+  final bool? bypassSnaplockEnterpriseRetention;
   final List<Tag>? finalBackupTags;
 
   /// Set to true if you want to skip taking a final backup of the volume you are
@@ -6607,14 +7358,19 @@ class DeleteVolumeOntapConfiguration {
   final bool? skipFinalBackup;
 
   DeleteVolumeOntapConfiguration({
+    this.bypassSnaplockEnterpriseRetention,
     this.finalBackupTags,
     this.skipFinalBackup,
   });
 
   Map<String, dynamic> toJson() {
+    final bypassSnaplockEnterpriseRetention =
+        this.bypassSnaplockEnterpriseRetention;
     final finalBackupTags = this.finalBackupTags;
     final skipFinalBackup = this.skipFinalBackup;
     return {
+      if (bypassSnaplockEnterpriseRetention != null)
+        'BypassSnaplockEnterpriseRetention': bypassSnaplockEnterpriseRetention,
       if (finalBackupTags != null) 'FinalBackupTags': finalBackupTags,
       if (skipFinalBackup != null) 'SkipFinalBackup': skipFinalBackup,
     };
@@ -6636,7 +7392,7 @@ class DeleteVolumeOntapResponse {
     return DeleteVolumeOntapResponse(
       finalBackupId: json['FinalBackupId'] as String?,
       finalBackupTags: (json['FinalBackupTags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6656,7 +7412,7 @@ class DeleteVolumeOpenZFSConfiguration {
   Map<String, dynamic> toJson() {
     final options = this.options;
     return {
-      if (options != null) 'Options': options.map((e) => e.toValue()).toList(),
+      if (options != null) 'Options': options.map((e) => e.value).toList(),
     };
   }
 }
@@ -6682,7 +7438,8 @@ class DeleteVolumeResponse {
 
   factory DeleteVolumeResponse.fromJson(Map<String, dynamic> json) {
     return DeleteVolumeResponse(
-      lifecycle: (json['Lifecycle'] as String?)?.toVolumeLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(VolumeLifecycle.fromString),
       ontapResponse: json['OntapResponse'] != null
           ? DeleteVolumeOntapResponse.fromJson(
               json['OntapResponse'] as Map<String, dynamic>)
@@ -6710,7 +7467,7 @@ class DescribeBackupsResponse {
   factory DescribeBackupsResponse.fromJson(Map<String, dynamic> json) {
     return DescribeBackupsResponse(
       backups: (json['Backups'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Backup.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -6732,7 +7489,7 @@ class DescribeDataRepositoryAssociationsResponse {
       Map<String, dynamic> json) {
     return DescribeDataRepositoryAssociationsResponse(
       associations: (json['Associations'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               DataRepositoryAssociation.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -6755,7 +7512,7 @@ class DescribeDataRepositoryTasksResponse {
       Map<String, dynamic> json) {
     return DescribeDataRepositoryTasksResponse(
       dataRepositoryTasks: (json['DataRepositoryTasks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => DataRepositoryTask.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -6776,7 +7533,7 @@ class DescribeFileCachesResponse {
   factory DescribeFileCachesResponse.fromJson(Map<String, dynamic> json) {
     return DescribeFileCachesResponse(
       fileCaches: (json['FileCaches'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => FileCache.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -6804,7 +7561,7 @@ class DescribeFileSystemAliasesResponse {
       Map<String, dynamic> json) {
     return DescribeFileSystemAliasesResponse(
       aliases: (json['Aliases'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Alias.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -6830,10 +7587,28 @@ class DescribeFileSystemsResponse {
   factory DescribeFileSystemsResponse.fromJson(Map<String, dynamic> json) {
     return DescribeFileSystemsResponse(
       fileSystems: (json['FileSystems'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => FileSystem.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
+    );
+  }
+}
+
+class DescribeSharedVpcConfigurationResponse {
+  /// Indicates whether participant accounts can create FSx for ONTAP Multi-AZ
+  /// file systems in shared subnets.
+  final String? enableFsxRouteTableUpdatesFromParticipantAccounts;
+
+  DescribeSharedVpcConfigurationResponse({
+    this.enableFsxRouteTableUpdatesFromParticipantAccounts,
+  });
+
+  factory DescribeSharedVpcConfigurationResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DescribeSharedVpcConfigurationResponse(
+      enableFsxRouteTableUpdatesFromParticipantAccounts:
+          json['EnableFsxRouteTableUpdatesFromParticipantAccounts'] as String?,
     );
   }
 }
@@ -6853,7 +7628,7 @@ class DescribeSnapshotsResponse {
     return DescribeSnapshotsResponse(
       nextToken: json['NextToken'] as String?,
       snapshots: (json['Snapshots'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Snapshot.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6877,7 +7652,7 @@ class DescribeStorageVirtualMachinesResponse {
     return DescribeStorageVirtualMachinesResponse(
       nextToken: json['NextToken'] as String?,
       storageVirtualMachines: (json['StorageVirtualMachines'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => StorageVirtualMachine.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6900,7 +7675,7 @@ class DescribeVolumesResponse {
     return DescribeVolumesResponse(
       nextToken: json['NextToken'] as String?,
       volumes: (json['Volumes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Volume.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6924,7 +7699,7 @@ class DisassociateFileSystemAliasesResponse {
       Map<String, dynamic> json) {
     return DisassociateFileSystemAliasesResponse(
       aliases: (json['Aliases'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Alias.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -6932,18 +7707,28 @@ class DisassociateFileSystemAliasesResponse {
 }
 
 /// The SSD IOPS (input/output operations per second) configuration for an
-/// Amazon FSx for NetApp ONTAP or Amazon FSx for OpenZFS file system. The
-/// default is 3 IOPS per GB of storage capacity, but you can provision
-/// additional IOPS per GB of storage. The configuration consists of the total
-/// number of provisioned SSD IOPS and how the amount was provisioned (by the
-/// customer or by the system).
+/// Amazon FSx for NetApp ONTAP, Amazon FSx for Windows File Server, or FSx for
+/// OpenZFS file system. By default, Amazon FSx automatically provisions 3 IOPS
+/// per GB of storage capacity. You can provision additional IOPS per GB of
+/// storage. The configuration consists of the total number of provisioned SSD
+/// IOPS and how it is was provisioned, or the mode (by the customer or by
+/// Amazon FSx).
 class DiskIopsConfiguration {
   /// The total number of SSD IOPS provisioned for the file system.
+  ///
+  /// The minimum and maximum values for this property depend on the value of
+  /// <code>HAPairs</code> and <code>StorageCapacity</code>. The minimum value is
+  /// calculated as <code>StorageCapacity</code> * 3 * <code>HAPairs</code> (3
+  /// IOPS per GB of <code>StorageCapacity</code>). The maximum value is
+  /// calculated as 200,000 * <code>HAPairs</code>.
+  ///
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) if the value
+  /// of <code>Iops</code> is outside of the minimum or maximum values.
   final int? iops;
 
-  /// Specifies whether the number of IOPS for the file system is using the system
-  /// default (<code>AUTOMATIC</code>) or was provisioned by the customer
-  /// (<code>USER_PROVISIONED</code>).
+  /// Specifies whether the file system is using the <code>AUTOMATIC</code>
+  /// setting of SSD IOPS of 3 IOPS per GB of storage capacity, or if it using a
+  /// <code>USER_PROVISIONED</code> value.
   final DiskIopsConfigurationMode? mode;
 
   DiskIopsConfiguration({
@@ -6954,7 +7739,8 @@ class DiskIopsConfiguration {
   factory DiskIopsConfiguration.fromJson(Map<String, dynamic> json) {
     return DiskIopsConfiguration(
       iops: json['Iops'] as int?,
-      mode: (json['Mode'] as String?)?.toDiskIopsConfigurationMode(),
+      mode:
+          (json['Mode'] as String?)?.let(DiskIopsConfigurationMode.fromString),
     );
   }
 
@@ -6963,98 +7749,99 @@ class DiskIopsConfiguration {
     final mode = this.mode;
     return {
       if (iops != null) 'Iops': iops,
-      if (mode != null) 'Mode': mode.toValue(),
+      if (mode != null) 'Mode': mode.value,
     };
   }
 }
 
 enum DiskIopsConfigurationMode {
-  automatic,
-  userProvisioned,
-}
+  automatic('AUTOMATIC'),
+  userProvisioned('USER_PROVISIONED'),
+  ;
 
-extension DiskIopsConfigurationModeValueExtension on DiskIopsConfigurationMode {
-  String toValue() {
-    switch (this) {
-      case DiskIopsConfigurationMode.automatic:
-        return 'AUTOMATIC';
-      case DiskIopsConfigurationMode.userProvisioned:
-        return 'USER_PROVISIONED';
-    }
-  }
-}
+  final String value;
 
-extension DiskIopsConfigurationModeFromString on String {
-  DiskIopsConfigurationMode toDiskIopsConfigurationMode() {
-    switch (this) {
-      case 'AUTOMATIC':
-        return DiskIopsConfigurationMode.automatic;
-      case 'USER_PROVISIONED':
-        return DiskIopsConfigurationMode.userProvisioned;
-    }
-    throw Exception('$this is not known in enum DiskIopsConfigurationMode');
-  }
+  const DiskIopsConfigurationMode(this.value);
+
+  static DiskIopsConfigurationMode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DiskIopsConfigurationMode'));
 }
 
 enum DriveCacheType {
-  none,
-  read,
+  none('NONE'),
+  read('READ'),
+  ;
+
+  final String value;
+
+  const DriveCacheType(this.value);
+
+  static DriveCacheType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum DriveCacheType'));
 }
 
-extension DriveCacheTypeValueExtension on DriveCacheType {
-  String toValue() {
-    switch (this) {
-      case DriveCacheType.none:
-        return 'NONE';
-      case DriveCacheType.read:
-        return 'READ';
-    }
+/// Defines the minimum amount of time since last access for a file to be
+/// eligible for release. Only files that have been exported to S3 and that were
+/// last accessed or modified before this point-in-time are eligible to be
+/// released from the Amazon FSx for Lustre file system.
+class DurationSinceLastAccess {
+  /// The unit of time used by the <code>Value</code> parameter to determine if a
+  /// file can be released, based on when it was last accessed. <code>DAYS</code>
+  /// is the only supported value. This is a required parameter.
+  final Unit? unit;
+
+  /// An integer that represents the minimum amount of time (in days) since a file
+  /// was last accessed in the file system. Only exported files with a
+  /// <code>MAX(atime, ctime, mtime)</code> timestamp that is more than this
+  /// amount of time in the past (relative to the task create time) will be
+  /// released. The default of <code>Value</code> is <code>0</code>. This is a
+  /// required parameter.
+  /// <note>
+  /// If an exported file meets the last accessed time criteria, its file or
+  /// directory path must also be specified in the <code>Paths</code> parameter of
+  /// the operation in order for the file to be released.
+  /// </note>
+  final int? value;
+
+  DurationSinceLastAccess({
+    this.unit,
+    this.value,
+  });
+
+  factory DurationSinceLastAccess.fromJson(Map<String, dynamic> json) {
+    return DurationSinceLastAccess(
+      unit: (json['Unit'] as String?)?.let(Unit.fromString),
+      value: json['Value'] as int?,
+    );
   }
-}
 
-extension DriveCacheTypeFromString on String {
-  DriveCacheType toDriveCacheType() {
-    switch (this) {
-      case 'NONE':
-        return DriveCacheType.none;
-      case 'READ':
-        return DriveCacheType.read;
-    }
-    throw Exception('$this is not known in enum DriveCacheType');
+  Map<String, dynamic> toJson() {
+    final unit = this.unit;
+    final value = this.value;
+    return {
+      if (unit != null) 'Unit': unit.value,
+      if (value != null) 'Value': value,
+    };
   }
 }
 
 enum EventType {
-  $new,
-  changed,
-  deleted,
-}
+  $new('NEW'),
+  changed('CHANGED'),
+  deleted('DELETED'),
+  ;
 
-extension EventTypeValueExtension on EventType {
-  String toValue() {
-    switch (this) {
-      case EventType.$new:
-        return 'NEW';
-      case EventType.changed:
-        return 'CHANGED';
-      case EventType.deleted:
-        return 'DELETED';
-    }
-  }
-}
+  final String value;
 
-extension EventTypeFromString on String {
-  EventType toEventType() {
-    switch (this) {
-      case 'NEW':
-        return EventType.$new;
-      case 'CHANGED':
-        return EventType.changed;
-      case 'DELETED':
-        return EventType.deleted;
-    }
-    throw Exception('$this is not known in enum EventType');
-  }
+  const EventType(this.value);
+
+  static EventType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum EventType'));
 }
 
 /// A description of a specific Amazon File Cache resource, which is a response
@@ -7149,7 +7936,7 @@ class FileCache {
       dNSName: json['DNSName'] as String?,
       dataRepositoryAssociationIds:
           (json['DataRepositoryAssociationIds'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => e as String)
               .toList(),
       failureDetails: json['FailureDetails'] != null
@@ -7157,23 +7944,25 @@ class FileCache {
               json['FailureDetails'] as Map<String, dynamic>)
           : null,
       fileCacheId: json['FileCacheId'] as String?,
-      fileCacheType: (json['FileCacheType'] as String?)?.toFileCacheType(),
+      fileCacheType:
+          (json['FileCacheType'] as String?)?.let(FileCacheType.fromString),
       fileCacheTypeVersion: json['FileCacheTypeVersion'] as String?,
       kmsKeyId: json['KmsKeyId'] as String?,
-      lifecycle: (json['Lifecycle'] as String?)?.toFileCacheLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(FileCacheLifecycle.fromString),
       lustreConfiguration: json['LustreConfiguration'] != null
           ? FileCacheLustreConfiguration.fromJson(
               json['LustreConfiguration'] as Map<String, dynamic>)
           : null,
       networkInterfaceIds: (json['NetworkInterfaceIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       ownerId: json['OwnerId'] as String?,
       resourceARN: json['ResourceARN'] as String?,
       storageCapacity: json['StorageCapacity'] as int?,
       subnetIds: (json['SubnetIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       vpcId: json['VpcId'] as String?,
@@ -7196,7 +7985,8 @@ class FileCacheCreating {
   /// cache.
   final List<String>? dataRepositoryAssociationIds;
 
-  /// A structure providing details of any failures that occurred.
+  /// A structure providing details of any failures that occurred in creating a
+  /// cache.
   final FileCacheFailureDetails? failureDetails;
 
   /// The system-generated, unique ID of the cache.
@@ -7281,7 +8071,7 @@ class FileCacheCreating {
       dNSName: json['DNSName'] as String?,
       dataRepositoryAssociationIds:
           (json['DataRepositoryAssociationIds'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => e as String)
               .toList(),
       failureDetails: json['FailureDetails'] != null
@@ -7289,27 +8079,29 @@ class FileCacheCreating {
               json['FailureDetails'] as Map<String, dynamic>)
           : null,
       fileCacheId: json['FileCacheId'] as String?,
-      fileCacheType: (json['FileCacheType'] as String?)?.toFileCacheType(),
+      fileCacheType:
+          (json['FileCacheType'] as String?)?.let(FileCacheType.fromString),
       fileCacheTypeVersion: json['FileCacheTypeVersion'] as String?,
       kmsKeyId: json['KmsKeyId'] as String?,
-      lifecycle: (json['Lifecycle'] as String?)?.toFileCacheLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(FileCacheLifecycle.fromString),
       lustreConfiguration: json['LustreConfiguration'] != null
           ? FileCacheLustreConfiguration.fromJson(
               json['LustreConfiguration'] as Map<String, dynamic>)
           : null,
       networkInterfaceIds: (json['NetworkInterfaceIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       ownerId: json['OwnerId'] as String?,
       resourceARN: json['ResourceARN'] as String?,
       storageCapacity: json['StorageCapacity'] as int?,
       subnetIds: (json['SubnetIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       vpcId: json['VpcId'] as String?,
@@ -7336,7 +8128,7 @@ class FileCacheDataRepositoryAssociation {
   /// <li>
   /// If you are not using the <code>DataRepositorySubdirectories</code>
   /// parameter, the path is to an NFS Export directory (or one of its
-  /// subdirectories) in the format <code>nsf://nfs-domain-name/exportpath</code>.
+  /// subdirectories) in the format <code>nfs://nfs-domain-name/exportpath</code>.
   /// You can therefore link a single NFS Export to a single data repository
   /// association.
   /// </li>
@@ -7427,46 +8219,21 @@ class FileCacheFailureDetails {
 }
 
 enum FileCacheLifecycle {
-  available,
-  creating,
-  deleting,
-  updating,
-  failed,
-}
+  available('AVAILABLE'),
+  creating('CREATING'),
+  deleting('DELETING'),
+  updating('UPDATING'),
+  failed('FAILED'),
+  ;
 
-extension FileCacheLifecycleValueExtension on FileCacheLifecycle {
-  String toValue() {
-    switch (this) {
-      case FileCacheLifecycle.available:
-        return 'AVAILABLE';
-      case FileCacheLifecycle.creating:
-        return 'CREATING';
-      case FileCacheLifecycle.deleting:
-        return 'DELETING';
-      case FileCacheLifecycle.updating:
-        return 'UPDATING';
-      case FileCacheLifecycle.failed:
-        return 'FAILED';
-    }
-  }
-}
+  final String value;
 
-extension FileCacheLifecycleFromString on String {
-  FileCacheLifecycle toFileCacheLifecycle() {
-    switch (this) {
-      case 'AVAILABLE':
-        return FileCacheLifecycle.available;
-      case 'CREATING':
-        return FileCacheLifecycle.creating;
-      case 'DELETING':
-        return FileCacheLifecycle.deleting;
-      case 'UPDATING':
-        return FileCacheLifecycle.updating;
-      case 'FAILED':
-        return FileCacheLifecycle.failed;
-    }
-    throw Exception('$this is not known in enum FileCacheLifecycle');
-  }
+  const FileCacheLifecycle(this.value);
+
+  static FileCacheLifecycle fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum FileCacheLifecycle'));
 }
 
 /// The configuration for the Amazon File Cache resource.
@@ -7506,7 +8273,7 @@ class FileCacheLustreConfiguration {
   factory FileCacheLustreConfiguration.fromJson(Map<String, dynamic> json) {
     return FileCacheLustreConfiguration(
       deploymentType: (json['DeploymentType'] as String?)
-          ?.toFileCacheLustreDeploymentType(),
+          ?.let(FileCacheLustreDeploymentType.fromString),
       logConfiguration: json['LogConfiguration'] != null
           ? LustreLogConfiguration.fromJson(
               json['LogConfiguration'] as Map<String, dynamic>)
@@ -7523,27 +8290,17 @@ class FileCacheLustreConfiguration {
 }
 
 enum FileCacheLustreDeploymentType {
-  cache_1,
-}
+  cache_1('CACHE_1'),
+  ;
 
-extension FileCacheLustreDeploymentTypeValueExtension
-    on FileCacheLustreDeploymentType {
-  String toValue() {
-    switch (this) {
-      case FileCacheLustreDeploymentType.cache_1:
-        return 'CACHE_1';
-    }
-  }
-}
+  final String value;
 
-extension FileCacheLustreDeploymentTypeFromString on String {
-  FileCacheLustreDeploymentType toFileCacheLustreDeploymentType() {
-    switch (this) {
-      case 'CACHE_1':
-        return FileCacheLustreDeploymentType.cache_1;
-    }
-    throw Exception('$this is not known in enum FileCacheLustreDeploymentType');
-  }
+  const FileCacheLustreDeploymentType(this.value);
+
+  static FileCacheLustreDeploymentType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum FileCacheLustreDeploymentType'));
 }
 
 /// The configuration for a Lustre MDT (Metadata Target) storage volume. The
@@ -7596,33 +8353,24 @@ class FileCacheNFSConfiguration {
     final version = this.version;
     final dnsIps = this.dnsIps;
     return {
-      'Version': version.toValue(),
+      'Version': version.value,
       if (dnsIps != null) 'DnsIps': dnsIps,
     };
   }
 }
 
 enum FileCacheType {
-  lustre,
-}
+  lustre('LUSTRE'),
+  ;
 
-extension FileCacheTypeValueExtension on FileCacheType {
-  String toValue() {
-    switch (this) {
-      case FileCacheType.lustre:
-        return 'LUSTRE';
-    }
-  }
-}
+  final String value;
 
-extension FileCacheTypeFromString on String {
-  FileCacheType toFileCacheType() {
-    switch (this) {
-      case 'LUSTRE':
-        return FileCacheType.lustre;
-    }
-    throw Exception('$this is not known in enum FileCacheType');
-  }
+  const FileCacheType(this.value);
+
+  static FileCacheType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum FileCacheType'));
 }
 
 /// A description of a specific Amazon FSx file system.
@@ -7648,8 +8396,8 @@ class FileSystem {
   /// <code>WINDOWS</code>, <code>ONTAP</code>, or <code>OPENZFS</code>.
   final FileSystemType? fileSystemType;
 
-  /// The Lustre version of the Amazon FSx for Lustre file system, either
-  /// <code>2.10</code> or <code>2.12</code>.
+  /// The Lustre version of the Amazon FSx for Lustre file system, which can be
+  /// <code>2.10</code>, <code>2.12</code>, or <code>2.15</code>.
   final String? fileSystemTypeVersion;
 
   /// The ID of the Key Management Service (KMS) key used to encrypt Amazon FSx
@@ -7738,6 +8486,9 @@ class FileSystem {
   final String? resourceARN;
 
   /// The storage capacity of the file system in gibibytes (GiB).
+  ///
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) if the value
+  /// of <code>StorageCapacity</code> is outside of the minimum or maximum values.
   final int? storageCapacity;
 
   /// The type of storage the file system is using. If set to <code>SSD</code>,
@@ -7759,8 +8510,9 @@ class FileSystem {
   final List<String>? subnetIds;
 
   /// The tags to associate with the file system. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/Using_Tags.html">Tagging
-  /// your Amazon EC2 resources</a> in the <i>Amazon EC2 User Guide</i>.
+  /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/tag-resources.html">Tagging
+  /// your Amazon FSx resources</a> in the <i>Amazon FSx for Lustre User
+  /// Guide</i>.
   final List<Tag>? tags;
 
   /// The ID of the primary virtual private cloud (VPC) for the file system.
@@ -7796,7 +8548,7 @@ class FileSystem {
   factory FileSystem.fromJson(Map<String, dynamic> json) {
     return FileSystem(
       administrativeActions: (json['AdministrativeActions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => AdministrativeAction.fromJson(e as Map<String, dynamic>))
           .toList(),
       creationTime: timeStampFromJson(json['CreationTime']),
@@ -7806,16 +8558,18 @@ class FileSystem {
               json['FailureDetails'] as Map<String, dynamic>)
           : null,
       fileSystemId: json['FileSystemId'] as String?,
-      fileSystemType: (json['FileSystemType'] as String?)?.toFileSystemType(),
+      fileSystemType:
+          (json['FileSystemType'] as String?)?.let(FileSystemType.fromString),
       fileSystemTypeVersion: json['FileSystemTypeVersion'] as String?,
       kmsKeyId: json['KmsKeyId'] as String?,
-      lifecycle: (json['Lifecycle'] as String?)?.toFileSystemLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(FileSystemLifecycle.fromString),
       lustreConfiguration: json['LustreConfiguration'] != null
           ? LustreFileSystemConfiguration.fromJson(
               json['LustreConfiguration'] as Map<String, dynamic>)
           : null,
       networkInterfaceIds: (json['NetworkInterfaceIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       ontapConfiguration: json['OntapConfiguration'] != null
@@ -7829,13 +8583,14 @@ class FileSystem {
       ownerId: json['OwnerId'] as String?,
       resourceARN: json['ResourceARN'] as String?,
       storageCapacity: json['StorageCapacity'] as int?,
-      storageType: (json['StorageType'] as String?)?.toStorageType(),
+      storageType:
+          (json['StorageType'] as String?)?.let(StorageType.fromString),
       subnetIds: (json['SubnetIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       vpcId: json['VpcId'] as String?,
@@ -7866,7 +8621,7 @@ class FileSystemEndpoint {
     return FileSystemEndpoint(
       dNSName: json['DNSName'] as String?,
       ipAddresses: (json['IpAddresses'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -7922,126 +8677,98 @@ class FileSystemFailureDetails {
 
 /// The lifecycle status of the file system.
 enum FileSystemLifecycle {
-  available,
-  creating,
-  failed,
-  deleting,
-  misconfigured,
-  updating,
-  misconfiguredUnavailable,
+  available('AVAILABLE'),
+  creating('CREATING'),
+  failed('FAILED'),
+  deleting('DELETING'),
+  misconfigured('MISCONFIGURED'),
+  updating('UPDATING'),
+  misconfiguredUnavailable('MISCONFIGURED_UNAVAILABLE'),
+  ;
+
+  final String value;
+
+  const FileSystemLifecycle(this.value);
+
+  static FileSystemLifecycle fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum FileSystemLifecycle'));
 }
 
-extension FileSystemLifecycleValueExtension on FileSystemLifecycle {
-  String toValue() {
-    switch (this) {
-      case FileSystemLifecycle.available:
-        return 'AVAILABLE';
-      case FileSystemLifecycle.creating:
-        return 'CREATING';
-      case FileSystemLifecycle.failed:
-        return 'FAILED';
-      case FileSystemLifecycle.deleting:
-        return 'DELETING';
-      case FileSystemLifecycle.misconfigured:
-        return 'MISCONFIGURED';
-      case FileSystemLifecycle.updating:
-        return 'UPDATING';
-      case FileSystemLifecycle.misconfiguredUnavailable:
-        return 'MISCONFIGURED_UNAVAILABLE';
-    }
-  }
-}
+/// The Lustre metadata performance configuration of an Amazon FSx for Lustre
+/// file system using a <code>PERSISTENT_2</code> deployment type. The
+/// configuration enables the file system to support increasing metadata
+/// performance.
+class FileSystemLustreMetadataConfiguration {
+  /// The metadata configuration mode for provisioning Metadata IOPS for the file
+  /// system.
+  ///
+  /// <ul>
+  /// <li>
+  /// In AUTOMATIC mode, FSx for Lustre automatically provisions and scales the
+  /// number of Metadata IOPS on your file system based on your file system
+  /// storage capacity.
+  /// </li>
+  /// <li>
+  /// In USER_PROVISIONED mode, you can choose to specify the number of Metadata
+  /// IOPS to provision for your file system.
+  /// </li>
+  /// </ul>
+  final MetadataConfigurationMode mode;
 
-extension FileSystemLifecycleFromString on String {
-  FileSystemLifecycle toFileSystemLifecycle() {
-    switch (this) {
-      case 'AVAILABLE':
-        return FileSystemLifecycle.available;
-      case 'CREATING':
-        return FileSystemLifecycle.creating;
-      case 'FAILED':
-        return FileSystemLifecycle.failed;
-      case 'DELETING':
-        return FileSystemLifecycle.deleting;
-      case 'MISCONFIGURED':
-        return FileSystemLifecycle.misconfigured;
-      case 'UPDATING':
-        return FileSystemLifecycle.updating;
-      case 'MISCONFIGURED_UNAVAILABLE':
-        return FileSystemLifecycle.misconfiguredUnavailable;
-    }
-    throw Exception('$this is not known in enum FileSystemLifecycle');
+  /// The number of Metadata IOPS provisioned for the file system. Valid values
+  /// are <code>1500</code>, <code>3000</code>, <code>6000</code>,
+  /// <code>12000</code>, and multiples of <code>12000</code> up to a maximum of
+  /// <code>192000</code>.
+  final int? iops;
+
+  FileSystemLustreMetadataConfiguration({
+    required this.mode,
+    this.iops,
+  });
+
+  factory FileSystemLustreMetadataConfiguration.fromJson(
+      Map<String, dynamic> json) {
+    return FileSystemLustreMetadataConfiguration(
+      mode: MetadataConfigurationMode.fromString((json['Mode'] as String)),
+      iops: json['Iops'] as int?,
+    );
   }
 }
 
 /// An enumeration specifying the currently ongoing maintenance operation.
 enum FileSystemMaintenanceOperation {
-  patching,
-  backingUp,
-}
+  patching('PATCHING'),
+  backingUp('BACKING_UP'),
+  ;
 
-extension FileSystemMaintenanceOperationValueExtension
-    on FileSystemMaintenanceOperation {
-  String toValue() {
-    switch (this) {
-      case FileSystemMaintenanceOperation.patching:
-        return 'PATCHING';
-      case FileSystemMaintenanceOperation.backingUp:
-        return 'BACKING_UP';
-    }
-  }
-}
+  final String value;
 
-extension FileSystemMaintenanceOperationFromString on String {
-  FileSystemMaintenanceOperation toFileSystemMaintenanceOperation() {
-    switch (this) {
-      case 'PATCHING':
-        return FileSystemMaintenanceOperation.patching;
-      case 'BACKING_UP':
-        return FileSystemMaintenanceOperation.backingUp;
-    }
-    throw Exception(
-        '$this is not known in enum FileSystemMaintenanceOperation');
-  }
+  const FileSystemMaintenanceOperation(this.value);
+
+  static FileSystemMaintenanceOperation fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum FileSystemMaintenanceOperation'));
 }
 
 /// The type of file system.
 enum FileSystemType {
-  windows,
-  lustre,
-  ontap,
-  openzfs,
-}
+  windows('WINDOWS'),
+  lustre('LUSTRE'),
+  ontap('ONTAP'),
+  openzfs('OPENZFS'),
+  ;
 
-extension FileSystemTypeValueExtension on FileSystemType {
-  String toValue() {
-    switch (this) {
-      case FileSystemType.windows:
-        return 'WINDOWS';
-      case FileSystemType.lustre:
-        return 'LUSTRE';
-      case FileSystemType.ontap:
-        return 'ONTAP';
-      case FileSystemType.openzfs:
-        return 'OPENZFS';
-    }
-  }
-}
+  final String value;
 
-extension FileSystemTypeFromString on String {
-  FileSystemType toFileSystemType() {
-    switch (this) {
-      case 'WINDOWS':
-        return FileSystemType.windows;
-      case 'LUSTRE':
-        return FileSystemType.lustre;
-      case 'ONTAP':
-        return FileSystemType.ontap;
-      case 'OPENZFS':
-        return FileSystemType.openzfs;
-    }
-    throw Exception('$this is not known in enum FileSystemType');
-  }
+  const FileSystemType(this.value);
+
+  static FileSystemType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum FileSystemType'));
 }
 
 /// A filter used to restrict the results of describe calls. You can use
@@ -8064,7 +8791,7 @@ class Filter {
     final name = this.name;
     final values = this.values;
     return {
-      if (name != null) 'Name': name.toValue(),
+      if (name != null) 'Name': name.value,
       if (values != null) 'Values': values,
     };
   }
@@ -8072,117 +8799,53 @@ class Filter {
 
 /// The name for a filter.
 enum FilterName {
-  fileSystemId,
-  backupType,
-  fileSystemType,
-  volumeId,
-  dataRepositoryType,
-  fileCacheId,
-  fileCacheType,
-}
+  fileSystemId('file-system-id'),
+  backupType('backup-type'),
+  fileSystemType('file-system-type'),
+  volumeId('volume-id'),
+  dataRepositoryType('data-repository-type'),
+  fileCacheId('file-cache-id'),
+  fileCacheType('file-cache-type'),
+  ;
 
-extension FilterNameValueExtension on FilterName {
-  String toValue() {
-    switch (this) {
-      case FilterName.fileSystemId:
-        return 'file-system-id';
-      case FilterName.backupType:
-        return 'backup-type';
-      case FilterName.fileSystemType:
-        return 'file-system-type';
-      case FilterName.volumeId:
-        return 'volume-id';
-      case FilterName.dataRepositoryType:
-        return 'data-repository-type';
-      case FilterName.fileCacheId:
-        return 'file-cache-id';
-      case FilterName.fileCacheType:
-        return 'file-cache-type';
-    }
-  }
-}
+  final String value;
 
-extension FilterNameFromString on String {
-  FilterName toFilterName() {
-    switch (this) {
-      case 'file-system-id':
-        return FilterName.fileSystemId;
-      case 'backup-type':
-        return FilterName.backupType;
-      case 'file-system-type':
-        return FilterName.fileSystemType;
-      case 'volume-id':
-        return FilterName.volumeId;
-      case 'data-repository-type':
-        return FilterName.dataRepositoryType;
-      case 'file-cache-id':
-        return FilterName.fileCacheId;
-      case 'file-cache-type':
-        return FilterName.fileCacheType;
-    }
-    throw Exception('$this is not known in enum FilterName');
-  }
+  const FilterName(this.value);
+
+  static FilterName fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum FilterName'));
 }
 
 enum FlexCacheEndpointType {
-  none,
-  origin,
-  cache,
-}
+  none('NONE'),
+  origin('ORIGIN'),
+  cache('CACHE'),
+  ;
 
-extension FlexCacheEndpointTypeValueExtension on FlexCacheEndpointType {
-  String toValue() {
-    switch (this) {
-      case FlexCacheEndpointType.none:
-        return 'NONE';
-      case FlexCacheEndpointType.origin:
-        return 'ORIGIN';
-      case FlexCacheEndpointType.cache:
-        return 'CACHE';
-    }
-  }
-}
+  final String value;
 
-extension FlexCacheEndpointTypeFromString on String {
-  FlexCacheEndpointType toFlexCacheEndpointType() {
-    switch (this) {
-      case 'NONE':
-        return FlexCacheEndpointType.none;
-      case 'ORIGIN':
-        return FlexCacheEndpointType.origin;
-      case 'CACHE':
-        return FlexCacheEndpointType.cache;
-    }
-    throw Exception('$this is not known in enum FlexCacheEndpointType');
-  }
+  const FlexCacheEndpointType(this.value);
+
+  static FlexCacheEndpointType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum FlexCacheEndpointType'));
 }
 
 enum InputOntapVolumeType {
-  rw,
-  dp,
-}
+  rw('RW'),
+  dp('DP'),
+  ;
 
-extension InputOntapVolumeTypeValueExtension on InputOntapVolumeType {
-  String toValue() {
-    switch (this) {
-      case InputOntapVolumeType.rw:
-        return 'RW';
-      case InputOntapVolumeType.dp:
-        return 'DP';
-    }
-  }
-}
+  final String value;
 
-extension InputOntapVolumeTypeFromString on String {
-  InputOntapVolumeType toInputOntapVolumeType() {
-    switch (this) {
-      case 'RW':
-        return InputOntapVolumeType.rw;
-      case 'DP':
-        return InputOntapVolumeType.dp;
-    }
-    throw Exception('$this is not known in enum InputOntapVolumeType');
-  }
+  const InputOntapVolumeType(this.value);
+
+  static InputOntapVolumeType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum InputOntapVolumeType'));
 }
 
 /// Describes why a resource lifecycle state changed.
@@ -8219,7 +8882,7 @@ class ListTagsForResourceResponse {
     return ListTagsForResourceResponse(
       nextToken: json['NextToken'] as String?,
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -8227,79 +8890,37 @@ class ListTagsForResourceResponse {
 }
 
 enum LustreAccessAuditLogLevel {
-  disabled,
-  warnOnly,
-  errorOnly,
-  warnError,
-}
+  disabled('DISABLED'),
+  warnOnly('WARN_ONLY'),
+  errorOnly('ERROR_ONLY'),
+  warnError('WARN_ERROR'),
+  ;
 
-extension LustreAccessAuditLogLevelValueExtension on LustreAccessAuditLogLevel {
-  String toValue() {
-    switch (this) {
-      case LustreAccessAuditLogLevel.disabled:
-        return 'DISABLED';
-      case LustreAccessAuditLogLevel.warnOnly:
-        return 'WARN_ONLY';
-      case LustreAccessAuditLogLevel.errorOnly:
-        return 'ERROR_ONLY';
-      case LustreAccessAuditLogLevel.warnError:
-        return 'WARN_ERROR';
-    }
-  }
-}
+  final String value;
 
-extension LustreAccessAuditLogLevelFromString on String {
-  LustreAccessAuditLogLevel toLustreAccessAuditLogLevel() {
-    switch (this) {
-      case 'DISABLED':
-        return LustreAccessAuditLogLevel.disabled;
-      case 'WARN_ONLY':
-        return LustreAccessAuditLogLevel.warnOnly;
-      case 'ERROR_ONLY':
-        return LustreAccessAuditLogLevel.errorOnly;
-      case 'WARN_ERROR':
-        return LustreAccessAuditLogLevel.warnError;
-    }
-    throw Exception('$this is not known in enum LustreAccessAuditLogLevel');
-  }
+  const LustreAccessAuditLogLevel(this.value);
+
+  static LustreAccessAuditLogLevel fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum LustreAccessAuditLogLevel'));
 }
 
 enum LustreDeploymentType {
-  scratch_1,
-  scratch_2,
-  persistent_1,
-  persistent_2,
-}
+  scratch_1('SCRATCH_1'),
+  scratch_2('SCRATCH_2'),
+  persistent_1('PERSISTENT_1'),
+  persistent_2('PERSISTENT_2'),
+  ;
 
-extension LustreDeploymentTypeValueExtension on LustreDeploymentType {
-  String toValue() {
-    switch (this) {
-      case LustreDeploymentType.scratch_1:
-        return 'SCRATCH_1';
-      case LustreDeploymentType.scratch_2:
-        return 'SCRATCH_2';
-      case LustreDeploymentType.persistent_1:
-        return 'PERSISTENT_1';
-      case LustreDeploymentType.persistent_2:
-        return 'PERSISTENT_2';
-    }
-  }
-}
+  final String value;
 
-extension LustreDeploymentTypeFromString on String {
-  LustreDeploymentType toLustreDeploymentType() {
-    switch (this) {
-      case 'SCRATCH_1':
-        return LustreDeploymentType.scratch_1;
-      case 'SCRATCH_2':
-        return LustreDeploymentType.scratch_2;
-      case 'PERSISTENT_1':
-        return LustreDeploymentType.persistent_1;
-      case 'PERSISTENT_2':
-        return LustreDeploymentType.persistent_2;
-    }
-    throw Exception('$this is not known in enum LustreDeploymentType');
-  }
+  const LustreDeploymentType(this.value);
+
+  static LustreDeploymentType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum LustreDeploymentType'));
 }
 
 /// The configuration for the Amazon FSx for Lustre file system.
@@ -8345,10 +8966,10 @@ class LustreFileSystemConfiguration {
   ///
   /// The <code>PERSISTENT_1</code> and <code>PERSISTENT_2</code> deployment type
   /// is used for longer-term storage and workloads and encryption of data in
-  /// transit. <code>PERSISTENT_2</code> is built on Lustre v2.12 and offers
-  /// higher <code>PerUnitStorageThroughput</code> (up to 1000 MB/s/TiB) along
-  /// with a lower minimum storage capacity requirement (600 GiB). To learn more
-  /// about FSx for Lustre deployment types, see <a
+  /// transit. <code>PERSISTENT_2</code> offers higher
+  /// <code>PerUnitStorageThroughput</code> (up to 1000 MB/s/TiB) along with a
+  /// lower minimum storage capacity requirement (600 GiB). To learn more about
+  /// FSx for Lustre deployment types, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/lustre-deployment-types.html">
   /// FSx for Lustre deployment options</a>.
   ///
@@ -8368,6 +8989,10 @@ class LustreFileSystemConfiguration {
   /// The Lustre logging configuration. Lustre logging writes the enabled log
   /// events for your file system to Amazon CloudWatch Logs.
   final LustreLogConfiguration? logConfiguration;
+
+  /// The Lustre metadata performance configuration for an Amazon FSx for Lustre
+  /// file system using a <code>PERSISTENT_2</code> deployment type.
+  final FileSystemLustreMetadataConfiguration? metadataConfiguration;
 
   /// You use the <code>MountName</code> value when mounting the file system.
   ///
@@ -8417,6 +9042,7 @@ class LustreFileSystemConfiguration {
     this.deploymentType,
     this.driveCacheType,
     this.logConfiguration,
+    this.metadataConfiguration,
     this.mountName,
     this.perUnitStorageThroughput,
     this.rootSquashConfiguration,
@@ -8430,18 +9056,23 @@ class LustreFileSystemConfiguration {
       copyTagsToBackups: json['CopyTagsToBackups'] as bool?,
       dailyAutomaticBackupStartTime:
           json['DailyAutomaticBackupStartTime'] as String?,
-      dataCompressionType:
-          (json['DataCompressionType'] as String?)?.toDataCompressionType(),
+      dataCompressionType: (json['DataCompressionType'] as String?)
+          ?.let(DataCompressionType.fromString),
       dataRepositoryConfiguration: json['DataRepositoryConfiguration'] != null
           ? DataRepositoryConfiguration.fromJson(
               json['DataRepositoryConfiguration'] as Map<String, dynamic>)
           : null,
-      deploymentType:
-          (json['DeploymentType'] as String?)?.toLustreDeploymentType(),
-      driveCacheType: (json['DriveCacheType'] as String?)?.toDriveCacheType(),
+      deploymentType: (json['DeploymentType'] as String?)
+          ?.let(LustreDeploymentType.fromString),
+      driveCacheType:
+          (json['DriveCacheType'] as String?)?.let(DriveCacheType.fromString),
       logConfiguration: json['LogConfiguration'] != null
           ? LustreLogConfiguration.fromJson(
               json['LogConfiguration'] as Map<String, dynamic>)
+          : null,
+      metadataConfiguration: json['MetadataConfiguration'] != null
+          ? FileSystemLustreMetadataConfiguration.fromJson(
+              json['MetadataConfiguration'] as Map<String, dynamic>)
           : null,
       mountName: json['MountName'] as String?,
       perUnitStorageThroughput: json['PerUnitStorageThroughput'] as int?,
@@ -8492,7 +9123,7 @@ class LustreLogConfiguration {
 
   factory LustreLogConfiguration.fromJson(Map<String, dynamic> json) {
     return LustreLogConfiguration(
-      level: (json['Level'] as String).toLustreAccessAuditLogLevel(),
+      level: LustreAccessAuditLogLevel.fromString((json['Level'] as String)),
       destination: json['Destination'] as String?,
     );
   }
@@ -8565,7 +9196,7 @@ class LustreLogCreateConfiguration {
     final level = this.level;
     final destination = this.destination;
     return {
-      'Level': level.toValue(),
+      'Level': level.value,
       if (destination != null) 'Destination': destination,
     };
   }
@@ -8627,7 +9258,7 @@ class LustreRootSquashConfiguration {
   factory LustreRootSquashConfiguration.fromJson(Map<String, dynamic> json) {
     return LustreRootSquashConfiguration(
       noSquashNids: (json['NoSquashNids'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       rootSquash: json['RootSquash'] as String?,
@@ -8642,6 +9273,21 @@ class LustreRootSquashConfiguration {
       if (rootSquash != null) 'RootSquash': rootSquash,
     };
   }
+}
+
+enum MetadataConfigurationMode {
+  automatic('AUTOMATIC'),
+  userProvisioned('USER_PROVISIONED'),
+  ;
+
+  final String value;
+
+  const MetadataConfigurationMode(this.value);
+
+  static MetadataConfigurationMode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum MetadataConfigurationMode'));
 }
 
 /// The configuration for a data repository association that links an Amazon
@@ -8669,68 +9315,45 @@ class NFSDataRepositoryConfiguration {
 
   factory NFSDataRepositoryConfiguration.fromJson(Map<String, dynamic> json) {
     return NFSDataRepositoryConfiguration(
-      version: (json['Version'] as String).toNfsVersion(),
+      version: NfsVersion.fromString((json['Version'] as String)),
       autoExportPolicy: json['AutoExportPolicy'] != null
           ? AutoExportPolicy.fromJson(
               json['AutoExportPolicy'] as Map<String, dynamic>)
           : null,
-      dnsIps: (json['DnsIps'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      dnsIps:
+          (json['DnsIps'] as List?)?.nonNulls.map((e) => e as String).toList(),
     );
   }
 }
 
 enum NfsVersion {
-  nfs3,
-}
+  nfs3('NFS3'),
+  ;
 
-extension NfsVersionValueExtension on NfsVersion {
-  String toValue() {
-    switch (this) {
-      case NfsVersion.nfs3:
-        return 'NFS3';
-    }
-  }
-}
+  final String value;
 
-extension NfsVersionFromString on String {
-  NfsVersion toNfsVersion() {
-    switch (this) {
-      case 'NFS3':
-        return NfsVersion.nfs3;
-    }
-    throw Exception('$this is not known in enum NfsVersion');
-  }
+  const NfsVersion(this.value);
+
+  static NfsVersion fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum NfsVersion'));
 }
 
 enum OntapDeploymentType {
-  multiAz_1,
-  singleAz_1,
-}
+  multiAz_1('MULTI_AZ_1'),
+  singleAz_1('SINGLE_AZ_1'),
+  singleAz_2('SINGLE_AZ_2'),
+  multiAz_2('MULTI_AZ_2'),
+  ;
 
-extension OntapDeploymentTypeValueExtension on OntapDeploymentType {
-  String toValue() {
-    switch (this) {
-      case OntapDeploymentType.multiAz_1:
-        return 'MULTI_AZ_1';
-      case OntapDeploymentType.singleAz_1:
-        return 'SINGLE_AZ_1';
-    }
-  }
-}
+  final String value;
 
-extension OntapDeploymentTypeFromString on String {
-  OntapDeploymentType toOntapDeploymentType() {
-    switch (this) {
-      case 'MULTI_AZ_1':
-        return OntapDeploymentType.multiAz_1;
-      case 'SINGLE_AZ_1':
-        return OntapDeploymentType.singleAz_1;
-    }
-    throw Exception('$this is not known in enum OntapDeploymentType');
-  }
+  const OntapDeploymentType(this.value);
+
+  static OntapDeploymentType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum OntapDeploymentType'));
 }
 
 /// Configuration for the FSx for NetApp ONTAP file system.
@@ -8743,13 +9366,23 @@ class OntapFileSystemConfiguration {
   ///
   /// <ul>
   /// <li>
-  /// <code>MULTI_AZ_1</code> - (Default) A high availability file system
-  /// configured for Multi-AZ redundancy to tolerate temporary Availability Zone
-  /// (AZ) unavailability.
+  /// <code>MULTI_AZ_1</code> - A high availability file system configured for
+  /// Multi-AZ redundancy to tolerate temporary Availability Zone (AZ)
+  /// unavailability. This is a first-generation FSx for ONTAP file system.
+  /// </li>
+  /// <li>
+  /// <code>MULTI_AZ_2</code> - A high availability file system configured for
+  /// Multi-AZ redundancy to tolerate temporary AZ unavailability. This is a
+  /// second-generation FSx for ONTAP file system.
   /// </li>
   /// <li>
   /// <code>SINGLE_AZ_1</code> - A file system configured for Single-AZ
-  /// redundancy.
+  /// redundancy. This is a first-generation FSx for ONTAP file system.
+  /// </li>
+  /// <li>
+  /// <code>SINGLE_AZ_2</code> - A file system configured with multiple
+  /// high-availability (HA) pairs for Single-AZ redundancy. This is a
+  /// second-generation FSx for ONTAP file system.
   /// </li>
   /// </ul>
   /// For information about the use cases for Multi-AZ and Single-AZ deployments,
@@ -8775,12 +9408,82 @@ class OntapFileSystemConfiguration {
   /// used to access data or to manage the file system using the NetApp ONTAP CLI,
   /// REST API, or NetApp SnapMirror.
   final FileSystemEndpoints? endpoints;
+
+  /// You can use the <code>fsxadmin</code> user account to access the NetApp
+  /// ONTAP CLI and REST API. The password value is always redacted in the
+  /// response.
+  final String? fsxAdminPassword;
+
+  /// Specifies how many high-availability (HA) file server pairs the file system
+  /// will have. The default value is 1. The value of this property affects the
+  /// values of <code>StorageCapacity</code>, <code>Iops</code>, and
+  /// <code>ThroughputCapacity</code>. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/HA-pairs.html">High-availability
+  /// (HA) pairs</a> in the FSx for ONTAP user guide.
+  ///
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The value of <code>HAPairs</code> is less than 1 or greater than 12.
+  /// </li>
+  /// <li>
+  /// The value of <code>HAPairs</code> is greater than 1 and the value of
+  /// <code>DeploymentType</code> is <code>SINGLE_AZ_1</code>,
+  /// <code>MULTI_AZ_1</code>, or <code>MULTI_AZ_2</code>.
+  /// </li>
+  /// </ul>
+  final int? hAPairs;
   final String? preferredSubnetId;
 
   /// (Multi-AZ only) The VPC route tables in which your file system's endpoints
   /// are created.
   final List<String>? routeTableIds;
   final int? throughputCapacity;
+
+  /// Use to choose the throughput capacity per HA pair. When the value of
+  /// <code>HAPairs</code> is equal to 1, the value of
+  /// <code>ThroughputCapacityPerHAPair</code> is the total throughput for the
+  /// file system.
+  ///
+  /// This field and <code>ThroughputCapacity</code> cannot be defined in the same
+  /// API call, but one is required.
+  ///
+  /// This field and <code>ThroughputCapacity</code> are the same for file systems
+  /// with one HA pair.
+  ///
+  /// <ul>
+  /// <li>
+  /// For <code>SINGLE_AZ_1</code> and <code>MULTI_AZ_1</code> file systems, valid
+  /// values are 128, 256, 512, 1024, 2048, or 4096 MBps.
+  /// </li>
+  /// <li>
+  /// For <code>SINGLE_AZ_2</code>, valid values are 1536, 3072, or 6144 MBps.
+  /// </li>
+  /// <li>
+  /// For <code>MULTI_AZ_2</code>, valid values are 384, 768, 1536, 3072, or 6144
+  /// MBps.
+  /// </li>
+  /// </ul>
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The value of <code>ThroughputCapacity</code> and
+  /// <code>ThroughputCapacityPerHAPair</code> are not the same value.
+  /// </li>
+  /// <li>
+  /// The value of deployment type is <code>SINGLE_AZ_2</code> and
+  /// <code>ThroughputCapacity</code> / <code>ThroughputCapacityPerHAPair</code>
+  /// is not a valid HA pair (a value between 1 and 12).
+  /// </li>
+  /// <li>
+  /// The value of <code>ThroughputCapacityPerHAPair</code> is not a valid value.
+  /// </li>
+  /// </ul>
+  final int? throughputCapacityPerHAPair;
   final String? weeklyMaintenanceStartTime;
 
   OntapFileSystemConfiguration({
@@ -8790,9 +9493,12 @@ class OntapFileSystemConfiguration {
     this.diskIopsConfiguration,
     this.endpointIpAddressRange,
     this.endpoints,
+    this.fsxAdminPassword,
+    this.hAPairs,
     this.preferredSubnetId,
     this.routeTableIds,
     this.throughputCapacity,
+    this.throughputCapacityPerHAPair,
     this.weeklyMaintenanceStartTime,
   });
 
@@ -8802,8 +9508,8 @@ class OntapFileSystemConfiguration {
           json['AutomaticBackupRetentionDays'] as int?,
       dailyAutomaticBackupStartTime:
           json['DailyAutomaticBackupStartTime'] as String?,
-      deploymentType:
-          (json['DeploymentType'] as String?)?.toOntapDeploymentType(),
+      deploymentType: (json['DeploymentType'] as String?)
+          ?.let(OntapDeploymentType.fromString),
       diskIopsConfiguration: json['DiskIopsConfiguration'] != null
           ? DiskIopsConfiguration.fromJson(
               json['DiskIopsConfiguration'] as Map<String, dynamic>)
@@ -8813,12 +9519,15 @@ class OntapFileSystemConfiguration {
           ? FileSystemEndpoints.fromJson(
               json['Endpoints'] as Map<String, dynamic>)
           : null,
+      fsxAdminPassword: json['FsxAdminPassword'] as String?,
+      hAPairs: json['HAPairs'] as int?,
       preferredSubnetId: json['PreferredSubnetId'] as String?,
       routeTableIds: (json['RouteTableIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       throughputCapacity: json['ThroughputCapacity'] as int?,
+      throughputCapacityPerHAPair: json['ThroughputCapacityPerHAPair'] as int?,
       weeklyMaintenanceStartTime: json['WeeklyMaintenanceStartTime'] as String?,
     );
   }
@@ -8826,6 +9535,10 @@ class OntapFileSystemConfiguration {
 
 /// The configuration of an Amazon FSx for NetApp ONTAP volume.
 class OntapVolumeConfiguration {
+  /// This structure specifies configuration options for a volume’s storage
+  /// aggregate or aggregates.
+  final AggregateConfiguration? aggregateConfiguration;
+
   /// A boolean flag indicating whether tags for the volume should be copied to
   /// backups. This value defaults to false. If it's set to true, all tags for the
   /// volume are copied to all automatic and user-initiated backups where the user
@@ -8886,8 +9599,14 @@ class OntapVolumeConfiguration {
   /// <code>NTFS</code>, or <code>MIXED</code>.
   final SecurityStyle? securityStyle;
 
+  /// The configured size of the volume, in bytes.
+  final int? sizeInBytes;
+
   /// The configured size of the volume, in megabytes (MBs).
   final int? sizeInMegabytes;
+
+  /// The SnapLock configuration object for an FSx for ONTAP SnapLock volume.
+  final SnaplockConfiguration? snaplockConfiguration;
 
   /// Specifies the snapshot policy for the volume. There are three built-in
   /// snapshot policies:
@@ -8914,7 +9633,7 @@ class OntapVolumeConfiguration {
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snapshots-ontap.html#snapshot-policies">Snapshot
-  /// policies</a> in the <i>Amazon FSx for NetApp ONTAP User Guide</i>.
+  /// policies</a> in the Amazon FSx for NetApp ONTAP User Guide.
   final String? snapshotPolicy;
 
   /// The volume's storage efficiency setting.
@@ -8939,31 +9658,51 @@ class OntapVolumeConfiguration {
   /// The volume's universally unique identifier (UUID).
   final String? uuid;
 
+  /// Use to specify the style of an ONTAP volume. For more information about
+  /// FlexVols and FlexGroups, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/volume-types.html">Volume
+  /// types</a> in Amazon FSx for NetApp ONTAP User Guide.
+  final VolumeStyle? volumeStyle;
+
   OntapVolumeConfiguration({
+    this.aggregateConfiguration,
     this.copyTagsToBackups,
     this.flexCacheEndpointType,
     this.junctionPath,
     this.ontapVolumeType,
     this.securityStyle,
+    this.sizeInBytes,
     this.sizeInMegabytes,
+    this.snaplockConfiguration,
     this.snapshotPolicy,
     this.storageEfficiencyEnabled,
     this.storageVirtualMachineId,
     this.storageVirtualMachineRoot,
     this.tieringPolicy,
     this.uuid,
+    this.volumeStyle,
   });
 
   factory OntapVolumeConfiguration.fromJson(Map<String, dynamic> json) {
     return OntapVolumeConfiguration(
+      aggregateConfiguration: json['AggregateConfiguration'] != null
+          ? AggregateConfiguration.fromJson(
+              json['AggregateConfiguration'] as Map<String, dynamic>)
+          : null,
       copyTagsToBackups: json['CopyTagsToBackups'] as bool?,
-      flexCacheEndpointType:
-          (json['FlexCacheEndpointType'] as String?)?.toFlexCacheEndpointType(),
+      flexCacheEndpointType: (json['FlexCacheEndpointType'] as String?)
+          ?.let(FlexCacheEndpointType.fromString),
       junctionPath: json['JunctionPath'] as String?,
       ontapVolumeType:
-          (json['OntapVolumeType'] as String?)?.toOntapVolumeType(),
-      securityStyle: (json['SecurityStyle'] as String?)?.toSecurityStyle(),
+          (json['OntapVolumeType'] as String?)?.let(OntapVolumeType.fromString),
+      securityStyle:
+          (json['SecurityStyle'] as String?)?.let(SecurityStyle.fromString),
+      sizeInBytes: json['SizeInBytes'] as int?,
       sizeInMegabytes: json['SizeInMegabytes'] as int?,
+      snaplockConfiguration: json['SnaplockConfiguration'] != null
+          ? SnaplockConfiguration.fromJson(
+              json['SnaplockConfiguration'] as Map<String, dynamic>)
+          : null,
       snapshotPolicy: json['SnapshotPolicy'] as String?,
       storageEfficiencyEnabled: json['StorageEfficiencyEnabled'] as bool?,
       storageVirtualMachineId: json['StorageVirtualMachineId'] as String?,
@@ -8973,41 +9712,26 @@ class OntapVolumeConfiguration {
               json['TieringPolicy'] as Map<String, dynamic>)
           : null,
       uuid: json['UUID'] as String?,
+      volumeStyle:
+          (json['VolumeStyle'] as String?)?.let(VolumeStyle.fromString),
     );
   }
 }
 
 enum OntapVolumeType {
-  rw,
-  dp,
-  ls,
-}
+  rw('RW'),
+  dp('DP'),
+  ls('LS'),
+  ;
 
-extension OntapVolumeTypeValueExtension on OntapVolumeType {
-  String toValue() {
-    switch (this) {
-      case OntapVolumeType.rw:
-        return 'RW';
-      case OntapVolumeType.dp:
-        return 'DP';
-      case OntapVolumeType.ls:
-        return 'LS';
-    }
-  }
-}
+  final String value;
 
-extension OntapVolumeTypeFromString on String {
-  OntapVolumeType toOntapVolumeType() {
-    switch (this) {
-      case 'RW':
-        return OntapVolumeType.rw;
-      case 'DP':
-        return OntapVolumeType.dp;
-      case 'LS':
-        return OntapVolumeType.ls;
-    }
-    throw Exception('$this is not known in enum OntapVolumeType');
-  }
+  const OntapVolumeType(this.value);
+
+  static OntapVolumeType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum OntapVolumeType'));
 }
 
 /// Specifies who can mount an OpenZFS file system and the options available
@@ -9047,10 +9771,8 @@ class OpenZFSClientConfiguration {
   factory OpenZFSClientConfiguration.fromJson(Map<String, dynamic> json) {
     return OpenZFSClientConfiguration(
       clients: json['Clients'] as String,
-      options: (json['Options'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      options:
+          (json['Options'] as List).nonNulls.map((e) => e as String).toList(),
     );
   }
 
@@ -9065,31 +9787,19 @@ class OpenZFSClientConfiguration {
 }
 
 enum OpenZFSCopyStrategy {
-  clone,
-  fullCopy,
-}
+  clone('CLONE'),
+  fullCopy('FULL_COPY'),
+  incrementalCopy('INCREMENTAL_COPY'),
+  ;
 
-extension OpenZFSCopyStrategyValueExtension on OpenZFSCopyStrategy {
-  String toValue() {
-    switch (this) {
-      case OpenZFSCopyStrategy.clone:
-        return 'CLONE';
-      case OpenZFSCopyStrategy.fullCopy:
-        return 'FULL_COPY';
-    }
-  }
-}
+  final String value;
 
-extension OpenZFSCopyStrategyFromString on String {
-  OpenZFSCopyStrategy toOpenZFSCopyStrategy() {
-    switch (this) {
-      case 'CLONE':
-        return OpenZFSCopyStrategy.clone;
-      case 'FULL_COPY':
-        return OpenZFSCopyStrategy.fullCopy;
-    }
-    throw Exception('$this is not known in enum OpenZFSCopyStrategy');
-  }
+  const OpenZFSCopyStrategy(this.value);
+
+  static OpenZFSCopyStrategy fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum OpenZFSCopyStrategy'));
 }
 
 /// The configuration of an Amazon FSx for OpenZFS root volume.
@@ -9166,7 +9876,7 @@ class OpenZFSCreateRootVolumeConfiguration {
       if (copyTagsToSnapshots != null)
         'CopyTagsToSnapshots': copyTagsToSnapshots,
       if (dataCompressionType != null)
-        'DataCompressionType': dataCompressionType.toValue(),
+        'DataCompressionType': dataCompressionType.value,
       if (nfsExports != null) 'NfsExports': nfsExports,
       if (readOnly != null) 'ReadOnly': readOnly,
       if (recordSizeKiB != null) 'RecordSizeKiB': recordSizeKiB,
@@ -9176,65 +9886,37 @@ class OpenZFSCreateRootVolumeConfiguration {
 }
 
 enum OpenZFSDataCompressionType {
-  none,
-  zstd,
-  lz4,
-}
+  none('NONE'),
+  zstd('ZSTD'),
+  lz4('LZ4'),
+  ;
 
-extension OpenZFSDataCompressionTypeValueExtension
-    on OpenZFSDataCompressionType {
-  String toValue() {
-    switch (this) {
-      case OpenZFSDataCompressionType.none:
-        return 'NONE';
-      case OpenZFSDataCompressionType.zstd:
-        return 'ZSTD';
-      case OpenZFSDataCompressionType.lz4:
-        return 'LZ4';
-    }
-  }
-}
+  final String value;
 
-extension OpenZFSDataCompressionTypeFromString on String {
-  OpenZFSDataCompressionType toOpenZFSDataCompressionType() {
-    switch (this) {
-      case 'NONE':
-        return OpenZFSDataCompressionType.none;
-      case 'ZSTD':
-        return OpenZFSDataCompressionType.zstd;
-      case 'LZ4':
-        return OpenZFSDataCompressionType.lz4;
-    }
-    throw Exception('$this is not known in enum OpenZFSDataCompressionType');
-  }
+  const OpenZFSDataCompressionType(this.value);
+
+  static OpenZFSDataCompressionType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum OpenZFSDataCompressionType'));
 }
 
 enum OpenZFSDeploymentType {
-  singleAz_1,
-  singleAz_2,
-}
+  singleAz_1('SINGLE_AZ_1'),
+  singleAz_2('SINGLE_AZ_2'),
+  singleAzHa_1('SINGLE_AZ_HA_1'),
+  singleAzHa_2('SINGLE_AZ_HA_2'),
+  multiAz_1('MULTI_AZ_1'),
+  ;
 
-extension OpenZFSDeploymentTypeValueExtension on OpenZFSDeploymentType {
-  String toValue() {
-    switch (this) {
-      case OpenZFSDeploymentType.singleAz_1:
-        return 'SINGLE_AZ_1';
-      case OpenZFSDeploymentType.singleAz_2:
-        return 'SINGLE_AZ_2';
-    }
-  }
-}
+  final String value;
 
-extension OpenZFSDeploymentTypeFromString on String {
-  OpenZFSDeploymentType toOpenZFSDeploymentType() {
-    switch (this) {
-      case 'SINGLE_AZ_1':
-        return OpenZFSDeploymentType.singleAz_1;
-      case 'SINGLE_AZ_2':
-        return OpenZFSDeploymentType.singleAz_2;
-    }
-    throw Exception('$this is not known in enum OpenZFSDeploymentType');
-  }
+  const OpenZFSDeploymentType(this.value);
+
+  static OpenZFSDeploymentType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum OpenZFSDeploymentType'));
 }
 
 /// The configuration for the Amazon FSx for OpenZFS file system.
@@ -9261,12 +9943,34 @@ class OpenZFSFileSystemConfiguration {
   final String? dailyAutomaticBackupStartTime;
 
   /// Specifies the file-system deployment type. Amazon FSx for OpenZFS
-  /// supports&#x2028; <code>SINGLE_AZ_1</code> and <code>SINGLE_AZ_2</code>.
+  /// supports&#x2028; <code>MULTI_AZ_1</code>, <code>SINGLE_AZ_HA_2</code>,
+  /// <code>SINGLE_AZ_HA_1</code>, <code>SINGLE_AZ_2</code>, and
+  /// <code>SINGLE_AZ_1</code>.
   final OpenZFSDeploymentType? deploymentType;
   final DiskIopsConfiguration? diskIopsConfiguration;
 
+  /// The IP address of the endpoint that is used to access data or to manage the
+  /// file system.
+  final String? endpointIpAddress;
+
+  /// (Multi-AZ only) Specifies the IP address range in which the endpoints to
+  /// access your file system will be created. By default in the Amazon FSx API
+  /// and Amazon FSx console, Amazon FSx selects an available /28 IP address range
+  /// for you from one of the VPC's CIDR ranges. You can have overlapping endpoint
+  /// IP addresses for file systems deployed in the same VPC/route tables.
+  final String? endpointIpAddressRange;
+
+  /// Required when <code>DeploymentType</code> is set to <code>MULTI_AZ_1</code>.
+  /// This specifies the subnet in which you want the preferred file server to be
+  /// located.
+  final String? preferredSubnetId;
+
   /// The ID of the root volume of the OpenZFS file system.
   final String? rootVolumeId;
+
+  /// (Multi-AZ only) The VPC route tables in which your file system's endpoints
+  /// are created.
+  final List<String>? routeTableIds;
 
   /// The throughput of an Amazon FSx file system, measured in megabytes per
   /// second (MBps).
@@ -9280,7 +9984,11 @@ class OpenZFSFileSystemConfiguration {
     this.dailyAutomaticBackupStartTime,
     this.deploymentType,
     this.diskIopsConfiguration,
+    this.endpointIpAddress,
+    this.endpointIpAddressRange,
+    this.preferredSubnetId,
     this.rootVolumeId,
+    this.routeTableIds,
     this.throughputCapacity,
     this.weeklyMaintenanceStartTime,
   });
@@ -9293,13 +10001,20 @@ class OpenZFSFileSystemConfiguration {
       copyTagsToVolumes: json['CopyTagsToVolumes'] as bool?,
       dailyAutomaticBackupStartTime:
           json['DailyAutomaticBackupStartTime'] as String?,
-      deploymentType:
-          (json['DeploymentType'] as String?)?.toOpenZFSDeploymentType(),
+      deploymentType: (json['DeploymentType'] as String?)
+          ?.let(OpenZFSDeploymentType.fromString),
       diskIopsConfiguration: json['DiskIopsConfiguration'] != null
           ? DiskIopsConfiguration.fromJson(
               json['DiskIopsConfiguration'] as Map<String, dynamic>)
           : null,
+      endpointIpAddress: json['EndpointIpAddress'] as String?,
+      endpointIpAddressRange: json['EndpointIpAddressRange'] as String?,
+      preferredSubnetId: json['PreferredSubnetId'] as String?,
       rootVolumeId: json['RootVolumeId'] as String?,
+      routeTableIds: (json['RouteTableIds'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       throughputCapacity: json['ThroughputCapacity'] as int?,
       weeklyMaintenanceStartTime: json['WeeklyMaintenanceStartTime'] as String?,
     );
@@ -9320,7 +10035,7 @@ class OpenZFSNfsExport {
   factory OpenZFSNfsExport.fromJson(Map<String, dynamic> json) {
     return OpenZFSNfsExport(
       clientConfigurations: (json['ClientConfigurations'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               OpenZFSClientConfiguration.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -9335,8 +10050,8 @@ class OpenZFSNfsExport {
   }
 }
 
-/// The snapshot configuration to use when creating an OpenZFS volume from a
-/// snapshot.
+/// The snapshot configuration used when creating an Amazon FSx for OpenZFS
+/// volume from a snapshot.
 class OpenZFSOriginSnapshotConfiguration {
   /// The strategy used when copying data from the snapshot to the new volume.
   ///
@@ -9351,7 +10066,12 @@ class OpenZFSOriginSnapshotConfiguration {
   /// <code>FULL_COPY</code> - Copies all data from the snapshot to the new
   /// volume.
   /// </li>
-  /// </ul>
+  /// </ul> <note>
+  /// The <code>INCREMENTAL_COPY</code> option is only for updating an existing
+  /// volume by using a snapshot from another FSx for OpenZFS file system. For
+  /// more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CopySnapshotAndUpdateVolume.html">CopySnapshotAndUpdateVolume</a>.
+  /// </note>
   final OpenZFSCopyStrategy? copyStrategy;
   final String? snapshotARN;
 
@@ -9363,50 +10083,40 @@ class OpenZFSOriginSnapshotConfiguration {
   factory OpenZFSOriginSnapshotConfiguration.fromJson(
       Map<String, dynamic> json) {
     return OpenZFSOriginSnapshotConfiguration(
-      copyStrategy: (json['CopyStrategy'] as String?)?.toOpenZFSCopyStrategy(),
+      copyStrategy: (json['CopyStrategy'] as String?)
+          ?.let(OpenZFSCopyStrategy.fromString),
       snapshotARN: json['SnapshotARN'] as String?,
     );
   }
 }
 
 enum OpenZFSQuotaType {
-  user,
-  group,
+  user('USER'),
+  group('GROUP'),
+  ;
+
+  final String value;
+
+  const OpenZFSQuotaType(this.value);
+
+  static OpenZFSQuotaType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum OpenZFSQuotaType'));
 }
 
-extension OpenZFSQuotaTypeValueExtension on OpenZFSQuotaType {
-  String toValue() {
-    switch (this) {
-      case OpenZFSQuotaType.user:
-        return 'USER';
-      case OpenZFSQuotaType.group:
-        return 'GROUP';
-    }
-  }
-}
-
-extension OpenZFSQuotaTypeFromString on String {
-  OpenZFSQuotaType toOpenZFSQuotaType() {
-    switch (this) {
-      case 'USER':
-        return OpenZFSQuotaType.user;
-      case 'GROUP':
-        return OpenZFSQuotaType.group;
-    }
-    throw Exception('$this is not known in enum OpenZFSQuotaType');
-  }
-}
-
-/// The configuration for how much storage a user or group can use on the
-/// volume.
+/// Used to configure quotas that define how much storage a user or group can
+/// use on an FSx for OpenZFS volume. For more information, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/OpenZFSGuide/managing-volumes.html#volume-properties">Volume
+/// properties</a> in the FSx for OpenZFS User Guide.
 class OpenZFSUserOrGroupQuota {
-  /// The ID of the user or group.
+  /// The ID of the user or group that the quota applies to.
   final int id;
 
-  /// The amount of storage that the user or group can use in gibibytes (GiB).
+  /// The user or group's storage quota, in gibibytes (GiB).
   final int storageCapacityQuotaGiB;
 
-  /// A value that specifies whether the quota applies to a user or group.
+  /// Specifies whether the quota applies to a user or group.
   final OpenZFSQuotaType type;
 
   OpenZFSUserOrGroupQuota({
@@ -9419,7 +10129,7 @@ class OpenZFSUserOrGroupQuota {
     return OpenZFSUserOrGroupQuota(
       id: json['Id'] as int,
       storageCapacityQuotaGiB: json['StorageCapacityQuotaGiB'] as int,
-      type: (json['Type'] as String).toOpenZFSQuotaType(),
+      type: OpenZFSQuotaType.fromString((json['Type'] as String)),
     );
   }
 
@@ -9430,13 +10140,38 @@ class OpenZFSUserOrGroupQuota {
     return {
       'Id': id,
       'StorageCapacityQuotaGiB': storageCapacityQuotaGiB,
-      'Type': type.toValue(),
+      'Type': type.value,
     };
   }
 }
 
 /// The configuration of an Amazon FSx for OpenZFS volume.
 class OpenZFSVolumeConfiguration {
+  /// Specifies the strategy used when copying data from the snapshot to the new
+  /// volume.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>CLONE</code> - The new volume references the data in the origin
+  /// snapshot. Cloning a snapshot is faster than copying data from the snapshot
+  /// to a new volume and doesn't consume disk throughput. However, the origin
+  /// snapshot can't be deleted if there is a volume using its copied data.
+  /// </li>
+  /// <li>
+  /// <code>FULL_COPY</code> - Copies all data from the snapshot to the new
+  /// volume.
+  ///
+  /// Specify this option to create the volume from a snapshot on another FSx for
+  /// OpenZFS file system.
+  /// </li>
+  /// </ul> <note>
+  /// The <code>INCREMENTAL_COPY</code> option is only for updating an existing
+  /// volume by using a snapshot from another FSx for OpenZFS file system. For
+  /// more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/APIReference/API_CopySnapshotAndUpdateVolume.html">CopySnapshotAndUpdateVolume</a>.
+  /// </note>
+  final OpenZFSCopyStrategy? copyStrategy;
+
   /// A Boolean value indicating whether tags for the volume should be copied to
   /// snapshots. This value defaults to <code>false</code>. If it's set to
   /// <code>true</code>, all tags for the volume are copied to snapshots where the
@@ -9472,10 +10207,19 @@ class OpenZFSVolumeConfiguration {
   /// snapshot.
   final bool? deleteClonedVolumes;
 
+  /// A Boolean value indicating whether snapshot data that differs between the
+  /// current state and the specified snapshot should be overwritten when a volume
+  /// is restored from a snapshot.
+  final bool? deleteIntermediateData;
+
   /// A Boolean value indicating whether snapshots between the current state and
   /// the specified snapshot should be deleted when a volume is restored from
   /// snapshot.
   final bool? deleteIntermediateSnaphots;
+
+  /// The ID of the snapshot that's being copied or was most recently copied to
+  /// the destination volume.
+  final String? destinationSnapshot;
 
   /// The configuration object for mounting a Network File System (NFS) file
   /// system.
@@ -9499,6 +10243,7 @@ class OpenZFSVolumeConfiguration {
 
   /// Specifies the ID of the snapshot to which the volume was restored.
   final String? restoreToSnapshot;
+  final String? sourceSnapshotARN;
 
   /// The maximum amount of storage in gibibtyes (GiB) that the volume can use
   /// from its parent. You can specify a quota larger than the storage on the
@@ -9517,16 +10262,20 @@ class OpenZFSVolumeConfiguration {
   final String? volumePath;
 
   OpenZFSVolumeConfiguration({
+    this.copyStrategy,
     this.copyTagsToSnapshots,
     this.dataCompressionType,
     this.deleteClonedVolumes,
+    this.deleteIntermediateData,
     this.deleteIntermediateSnaphots,
+    this.destinationSnapshot,
     this.nfsExports,
     this.originSnapshot,
     this.parentVolumeId,
     this.readOnly,
     this.recordSizeKiB,
     this.restoreToSnapshot,
+    this.sourceSnapshotARN,
     this.storageCapacityQuotaGiB,
     this.storageCapacityReservationGiB,
     this.userAndGroupQuotas,
@@ -9535,13 +10284,17 @@ class OpenZFSVolumeConfiguration {
 
   factory OpenZFSVolumeConfiguration.fromJson(Map<String, dynamic> json) {
     return OpenZFSVolumeConfiguration(
+      copyStrategy: (json['CopyStrategy'] as String?)
+          ?.let(OpenZFSCopyStrategy.fromString),
       copyTagsToSnapshots: json['CopyTagsToSnapshots'] as bool?,
       dataCompressionType: (json['DataCompressionType'] as String?)
-          ?.toOpenZFSDataCompressionType(),
+          ?.let(OpenZFSDataCompressionType.fromString),
       deleteClonedVolumes: json['DeleteClonedVolumes'] as bool?,
+      deleteIntermediateData: json['DeleteIntermediateData'] as bool?,
       deleteIntermediateSnaphots: json['DeleteIntermediateSnaphots'] as bool?,
+      destinationSnapshot: json['DestinationSnapshot'] as String?,
       nfsExports: (json['NfsExports'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => OpenZFSNfsExport.fromJson(e as Map<String, dynamic>))
           .toList(),
       originSnapshot: json['OriginSnapshot'] != null
@@ -9552,16 +10305,79 @@ class OpenZFSVolumeConfiguration {
       readOnly: json['ReadOnly'] as bool?,
       recordSizeKiB: json['RecordSizeKiB'] as int?,
       restoreToSnapshot: json['RestoreToSnapshot'] as String?,
+      sourceSnapshotARN: json['SourceSnapshotARN'] as String?,
       storageCapacityQuotaGiB: json['StorageCapacityQuotaGiB'] as int?,
       storageCapacityReservationGiB:
           json['StorageCapacityReservationGiB'] as int?,
       userAndGroupQuotas: (json['UserAndGroupQuotas'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               OpenZFSUserOrGroupQuota.fromJson(e as Map<String, dynamic>))
           .toList(),
       volumePath: json['VolumePath'] as String?,
     );
+  }
+}
+
+enum PrivilegedDelete {
+  disabled('DISABLED'),
+  enabled('ENABLED'),
+  permanentlyDisabled('PERMANENTLY_DISABLED'),
+  ;
+
+  final String value;
+
+  const PrivilegedDelete(this.value);
+
+  static PrivilegedDelete fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum PrivilegedDelete'));
+}
+
+/// The configuration that specifies a minimum amount of time since last access
+/// for an exported file to be eligible for release from an Amazon FSx for
+/// Lustre file system. Only files that were last accessed before this
+/// point-in-time can be released. For example, if you specify a last accessed
+/// time criteria of 9 days, only files that were last accessed 9.00001 or more
+/// days ago can be released.
+///
+/// Only file data that has been exported to S3 can be released. Files that have
+/// not yet been exported to S3, such as new or changed files that have not been
+/// exported, are not eligible for release. When files are released, their
+/// metadata stays on the file system, so they can still be accessed later.
+/// Users and applications can access a released file by reading the file again,
+/// which restores data from Amazon S3 to the FSx for Lustre file system.
+/// <note>
+/// If a file meets the last accessed time criteria, its file or directory path
+/// must also be specified with the <code>Paths</code> parameter of the
+/// operation in order for the file to be released.
+/// </note>
+class ReleaseConfiguration {
+  /// Defines the point-in-time since an exported file was last accessed, in order
+  /// for that file to be eligible for release. Only files that were last accessed
+  /// before this point-in-time are eligible to be released from the file system.
+  final DurationSinceLastAccess? durationSinceLastAccess;
+
+  ReleaseConfiguration({
+    this.durationSinceLastAccess,
+  });
+
+  factory ReleaseConfiguration.fromJson(Map<String, dynamic> json) {
+    return ReleaseConfiguration(
+      durationSinceLastAccess: json['DurationSinceLastAccess'] != null
+          ? DurationSinceLastAccess.fromJson(
+              json['DurationSinceLastAccess'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final durationSinceLastAccess = this.durationSinceLastAccess;
+    return {
+      if (durationSinceLastAccess != null)
+        'DurationSinceLastAccess': durationSinceLastAccess,
+    };
   }
 }
 
@@ -9583,106 +10399,60 @@ class ReleaseFileSystemNfsV3LocksResponse {
 }
 
 enum ReportFormat {
-  reportCsv_20191124,
-}
+  reportCsv_20191124('REPORT_CSV_20191124'),
+  ;
 
-extension ReportFormatValueExtension on ReportFormat {
-  String toValue() {
-    switch (this) {
-      case ReportFormat.reportCsv_20191124:
-        return 'REPORT_CSV_20191124';
-    }
-  }
-}
+  final String value;
 
-extension ReportFormatFromString on String {
-  ReportFormat toReportFormat() {
-    switch (this) {
-      case 'REPORT_CSV_20191124':
-        return ReportFormat.reportCsv_20191124;
-    }
-    throw Exception('$this is not known in enum ReportFormat');
-  }
+  const ReportFormat(this.value);
+
+  static ReportFormat fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ReportFormat'));
 }
 
 enum ReportScope {
-  failedFilesOnly,
-}
+  failedFilesOnly('FAILED_FILES_ONLY'),
+  ;
 
-extension ReportScopeValueExtension on ReportScope {
-  String toValue() {
-    switch (this) {
-      case ReportScope.failedFilesOnly:
-        return 'FAILED_FILES_ONLY';
-    }
-  }
-}
+  final String value;
 
-extension ReportScopeFromString on String {
-  ReportScope toReportScope() {
-    switch (this) {
-      case 'FAILED_FILES_ONLY':
-        return ReportScope.failedFilesOnly;
-    }
-    throw Exception('$this is not known in enum ReportScope');
-  }
+  const ReportScope(this.value);
+
+  static ReportScope fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum ReportScope'));
 }
 
 enum ResourceType {
-  fileSystem,
-  volume,
-}
+  fileSystem('FILE_SYSTEM'),
+  volume('VOLUME'),
+  ;
 
-extension ResourceTypeValueExtension on ResourceType {
-  String toValue() {
-    switch (this) {
-      case ResourceType.fileSystem:
-        return 'FILE_SYSTEM';
-      case ResourceType.volume:
-        return 'VOLUME';
-    }
-  }
-}
+  final String value;
 
-extension ResourceTypeFromString on String {
-  ResourceType toResourceType() {
-    switch (this) {
-      case 'FILE_SYSTEM':
-        return ResourceType.fileSystem;
-      case 'VOLUME':
-        return ResourceType.volume;
-    }
-    throw Exception('$this is not known in enum ResourceType');
-  }
+  const ResourceType(this.value);
+
+  static ResourceType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ResourceType'));
 }
 
 enum RestoreOpenZFSVolumeOption {
-  deleteIntermediateSnapshots,
-  deleteClonedVolumes,
-}
+  deleteIntermediateSnapshots('DELETE_INTERMEDIATE_SNAPSHOTS'),
+  deleteClonedVolumes('DELETE_CLONED_VOLUMES'),
+  ;
 
-extension RestoreOpenZFSVolumeOptionValueExtension
-    on RestoreOpenZFSVolumeOption {
-  String toValue() {
-    switch (this) {
-      case RestoreOpenZFSVolumeOption.deleteIntermediateSnapshots:
-        return 'DELETE_INTERMEDIATE_SNAPSHOTS';
-      case RestoreOpenZFSVolumeOption.deleteClonedVolumes:
-        return 'DELETE_CLONED_VOLUMES';
-    }
-  }
-}
+  final String value;
 
-extension RestoreOpenZFSVolumeOptionFromString on String {
-  RestoreOpenZFSVolumeOption toRestoreOpenZFSVolumeOption() {
-    switch (this) {
-      case 'DELETE_INTERMEDIATE_SNAPSHOTS':
-        return RestoreOpenZFSVolumeOption.deleteIntermediateSnapshots;
-      case 'DELETE_CLONED_VOLUMES':
-        return RestoreOpenZFSVolumeOption.deleteClonedVolumes;
-    }
-    throw Exception('$this is not known in enum RestoreOpenZFSVolumeOption');
-  }
+  const RestoreOpenZFSVolumeOption(this.value);
+
+  static RestoreOpenZFSVolumeOption fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum RestoreOpenZFSVolumeOption'));
 }
 
 class RestoreVolumeFromSnapshotResponse {
@@ -9707,13 +10477,99 @@ class RestoreVolumeFromSnapshotResponse {
       Map<String, dynamic> json) {
     return RestoreVolumeFromSnapshotResponse(
       administrativeActions: (json['AdministrativeActions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => AdministrativeAction.fromJson(e as Map<String, dynamic>))
           .toList(),
-      lifecycle: (json['Lifecycle'] as String?)?.toVolumeLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(VolumeLifecycle.fromString),
       volumeId: json['VolumeId'] as String?,
     );
   }
+}
+
+/// Specifies the retention period of an FSx for ONTAP SnapLock volume. After it
+/// is set, it can't be changed. Files can't be deleted or modified during the
+/// retention period.
+///
+/// For more information, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-retention.html">Working
+/// with the retention period in SnapLock</a>.
+class RetentionPeriod {
+  /// Defines the type of time for the retention period of an FSx for ONTAP
+  /// SnapLock volume. Set it to one of the valid types. If you set it to
+  /// <code>INFINITE</code>, the files are retained forever. If you set it to
+  /// <code>UNSPECIFIED</code>, the files are retained until you set an explicit
+  /// retention period.
+  final RetentionPeriodType type;
+
+  /// Defines the amount of time for the retention period of an FSx for ONTAP
+  /// SnapLock volume. You can't set a value for <code>INFINITE</code> or
+  /// <code>UNSPECIFIED</code>. For all other options, the following ranges are
+  /// valid:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>Seconds</code>: 0 - 65,535
+  /// </li>
+  /// <li>
+  /// <code>Minutes</code>: 0 - 65,535
+  /// </li>
+  /// <li>
+  /// <code>Hours</code>: 0 - 24
+  /// </li>
+  /// <li>
+  /// <code>Days</code>: 0 - 365
+  /// </li>
+  /// <li>
+  /// <code>Months</code>: 0 - 12
+  /// </li>
+  /// <li>
+  /// <code>Years</code>: 0 - 100
+  /// </li>
+  /// </ul>
+  final int? value;
+
+  RetentionPeriod({
+    required this.type,
+    this.value,
+  });
+
+  factory RetentionPeriod.fromJson(Map<String, dynamic> json) {
+    return RetentionPeriod(
+      type: RetentionPeriodType.fromString((json['Type'] as String)),
+      value: json['Value'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final type = this.type;
+    final value = this.value;
+    return {
+      'Type': type.value,
+      if (value != null) 'Value': value,
+    };
+  }
+}
+
+enum RetentionPeriodType {
+  seconds('SECONDS'),
+  minutes('MINUTES'),
+  hours('HOURS'),
+  days('DAYS'),
+  months('MONTHS'),
+  years('YEARS'),
+  infinite('INFINITE'),
+  unspecified('UNSPECIFIED'),
+  ;
+
+  final String value;
+
+  const RetentionPeriodType(this.value);
+
+  static RetentionPeriodType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum RetentionPeriodType'));
 }
 
 /// The configuration for an Amazon S3 data repository linked to an Amazon FSx
@@ -9767,36 +10623,19 @@ class S3DataRepositoryConfiguration {
 }
 
 enum SecurityStyle {
-  unix,
-  ntfs,
-  mixed,
-}
+  unix('UNIX'),
+  ntfs('NTFS'),
+  mixed('MIXED'),
+  ;
 
-extension SecurityStyleValueExtension on SecurityStyle {
-  String toValue() {
-    switch (this) {
-      case SecurityStyle.unix:
-        return 'UNIX';
-      case SecurityStyle.ntfs:
-        return 'NTFS';
-      case SecurityStyle.mixed:
-        return 'MIXED';
-    }
-  }
-}
+  final String value;
 
-extension SecurityStyleFromString on String {
-  SecurityStyle toSecurityStyle() {
-    switch (this) {
-      case 'UNIX':
-        return SecurityStyle.unix;
-      case 'NTFS':
-        return SecurityStyle.ntfs;
-      case 'MIXED':
-        return SecurityStyle.mixed;
-    }
-    throw Exception('$this is not known in enum SecurityStyle');
-  }
+  const SecurityStyle(this.value);
+
+  static SecurityStyle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum SecurityStyle'));
 }
 
 /// The configuration of the self-managed Microsoft Active Directory (AD)
@@ -9834,10 +10673,8 @@ class SelfManagedActiveDirectoryAttributes {
   factory SelfManagedActiveDirectoryAttributes.fromJson(
       Map<String, dynamic> json) {
     return SelfManagedActiveDirectoryAttributes(
-      dnsIps: (json['DnsIps'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      dnsIps:
+          (json['DnsIps'] as List?)?.nonNulls.map((e) => e as String).toList(),
       domainName: json['DomainName'] as String?,
       fileSystemAdministratorsGroup:
           json['FileSystemAdministratorsGroup'] as String?,
@@ -9849,13 +10686,14 @@ class SelfManagedActiveDirectoryAttributes {
 }
 
 /// The configuration that Amazon FSx uses to join a FSx for Windows File Server
-/// file system or an ONTAP storage virtual machine (SVM) to a self-managed
-/// (including on-premises) Microsoft Active Directory (AD) directory. For more
-/// information, see <a
+/// file system or an FSx for ONTAP storage virtual machine (SVM) to a
+/// self-managed (including on-premises) Microsoft Active Directory (AD)
+/// directory. For more information, see <a
 /// href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/self-managed-AD.html">
-/// Using Amazon FSx with your self-managed Microsoft Active Directory</a> or <a
+/// Using Amazon FSx for Windows with your self-managed Microsoft Active
+/// Directory</a> or <a
 /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-svms.html">Managing
-/// SVMs</a>.
+/// FSx for ONTAP SVMs</a>.
 class SelfManagedActiveDirectoryConfiguration {
   /// A list of up to three IP addresses of DNS servers or domain controllers in
   /// the self-managed AD directory.
@@ -9929,39 +10767,231 @@ class SelfManagedActiveDirectoryConfiguration {
   }
 }
 
-/// The configuration that Amazon FSx uses to join the Windows File Server
-/// instance to a self-managed Microsoft Active Directory (AD) directory.
+/// Specifies changes you are making to the self-managed Microsoft Active
+/// Directory configuration to which an FSx for Windows File Server file system
+/// or an FSx for ONTAP SVM is joined.
 class SelfManagedActiveDirectoryConfigurationUpdates {
-  /// A list of up to three IP addresses of DNS servers or domain controllers in
-  /// the self-managed AD directory.
+  /// A list of up to three DNS server or domain controller IP addresses in your
+  /// self-managed Active Directory domain.
   final List<String>? dnsIps;
 
-  /// The password for the service account on your self-managed AD domain that
-  /// Amazon FSx will use to join to your AD domain.
+  /// Specifies an updated fully qualified domain name of your self-managed Active
+  /// Directory configuration.
+  final String? domainName;
+
+  /// For FSx for ONTAP file systems only - Specifies the updated name of the
+  /// self-managed Active Directory domain group whose members are granted
+  /// administrative privileges for the Amazon FSx resource.
+  final String? fileSystemAdministratorsGroup;
+
+  /// Specifies an updated fully qualified distinguished name of the organization
+  /// unit within your self-managed Active Directory.
+  final String? organizationalUnitDistinguishedName;
+
+  /// Specifies the updated password for the service account on your self-managed
+  /// Active Directory domain. Amazon FSx uses this account to join to your
+  /// self-managed Active Directory domain.
   final String? password;
 
-  /// The user name for the service account on your self-managed AD domain that
-  /// Amazon FSx will use to join to your AD domain. This account must have the
-  /// permission to join computers to the domain in the organizational unit
-  /// provided in <code>OrganizationalUnitDistinguishedName</code>.
+  /// Specifies the updated user name for the service account on your self-managed
+  /// Active Directory domain. Amazon FSx uses this account to join to your
+  /// self-managed Active Directory domain.
+  ///
+  /// This account must have the permissions required to join computers to the
+  /// domain in the organizational unit provided in
+  /// <code>OrganizationalUnitDistinguishedName</code>.
   final String? userName;
 
   SelfManagedActiveDirectoryConfigurationUpdates({
     this.dnsIps,
+    this.domainName,
+    this.fileSystemAdministratorsGroup,
+    this.organizationalUnitDistinguishedName,
     this.password,
     this.userName,
   });
 
   Map<String, dynamic> toJson() {
     final dnsIps = this.dnsIps;
+    final domainName = this.domainName;
+    final fileSystemAdministratorsGroup = this.fileSystemAdministratorsGroup;
+    final organizationalUnitDistinguishedName =
+        this.organizationalUnitDistinguishedName;
     final password = this.password;
     final userName = this.userName;
     return {
       if (dnsIps != null) 'DnsIps': dnsIps,
+      if (domainName != null) 'DomainName': domainName,
+      if (fileSystemAdministratorsGroup != null)
+        'FileSystemAdministratorsGroup': fileSystemAdministratorsGroup,
+      if (organizationalUnitDistinguishedName != null)
+        'OrganizationalUnitDistinguishedName':
+            organizationalUnitDistinguishedName,
       if (password != null) 'Password': password,
       if (userName != null) 'UserName': userName,
     };
   }
+}
+
+/// Specifies the SnapLock configuration for an FSx for ONTAP SnapLock volume.
+class SnaplockConfiguration {
+  /// Enables or disables the audit log volume for an FSx for ONTAP SnapLock
+  /// volume. The default value is <code>false</code>. If you set
+  /// <code>AuditLogVolume</code> to <code>true</code>, the SnapLock volume is
+  /// created as an audit log volume. The minimum retention period for an audit
+  /// log volume is six months.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/how-snaplock-works.html#snaplock-audit-log-volume">
+  /// SnapLock audit log volumes</a>.
+  final bool? auditLogVolume;
+
+  /// The configuration object for setting the autocommit period of files in an
+  /// FSx for ONTAP SnapLock volume.
+  final AutocommitPeriod? autocommitPeriod;
+
+  /// Enables, disables, or permanently disables privileged delete on an FSx for
+  /// ONTAP SnapLock Enterprise volume. Enabling privileged delete allows SnapLock
+  /// administrators to delete write once, read many (WORM) files even if they
+  /// have active retention periods. <code>PERMANENTLY_DISABLED</code> is a
+  /// terminal state. If privileged delete is permanently disabled on a SnapLock
+  /// volume, you can't re-enable it. The default value is <code>DISABLED</code>.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-enterprise.html#privileged-delete">Privileged
+  /// delete</a>.
+  final PrivilegedDelete? privilegedDelete;
+
+  /// Specifies the retention period of an FSx for ONTAP SnapLock volume.
+  final SnaplockRetentionPeriod? retentionPeriod;
+
+  /// Specifies the retention mode of an FSx for ONTAP SnapLock volume. After it
+  /// is set, it can't be changed. You can choose one of the following retention
+  /// modes:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>COMPLIANCE</code>: Files transitioned to write once, read many (WORM)
+  /// on a Compliance volume can't be deleted until their retention periods
+  /// expire. This retention mode is used to address government or
+  /// industry-specific mandates or to protect against ransomware attacks. For
+  /// more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-compliance.html">SnapLock
+  /// Compliance</a>.
+  /// </li>
+  /// <li>
+  /// <code>ENTERPRISE</code>: Files transitioned to WORM on an Enterprise volume
+  /// can be deleted by authorized users before their retention periods expire
+  /// using privileged delete. This retention mode is used to advance an
+  /// organization's data integrity and internal compliance or to test retention
+  /// settings before using SnapLock Compliance. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-enterprise.html">SnapLock
+  /// Enterprise</a>.
+  /// </li>
+  /// </ul>
+  final SnaplockType? snaplockType;
+
+  /// Enables or disables volume-append mode on an FSx for ONTAP SnapLock volume.
+  /// Volume-append mode allows you to create WORM-appendable files and write data
+  /// to them incrementally. The default value is <code>false</code>.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/worm-state.html#worm-state-append">Volume-append
+  /// mode</a>.
+  final bool? volumeAppendModeEnabled;
+
+  SnaplockConfiguration({
+    this.auditLogVolume,
+    this.autocommitPeriod,
+    this.privilegedDelete,
+    this.retentionPeriod,
+    this.snaplockType,
+    this.volumeAppendModeEnabled,
+  });
+
+  factory SnaplockConfiguration.fromJson(Map<String, dynamic> json) {
+    return SnaplockConfiguration(
+      auditLogVolume: json['AuditLogVolume'] as bool?,
+      autocommitPeriod: json['AutocommitPeriod'] != null
+          ? AutocommitPeriod.fromJson(
+              json['AutocommitPeriod'] as Map<String, dynamic>)
+          : null,
+      privilegedDelete: (json['PrivilegedDelete'] as String?)
+          ?.let(PrivilegedDelete.fromString),
+      retentionPeriod: json['RetentionPeriod'] != null
+          ? SnaplockRetentionPeriod.fromJson(
+              json['RetentionPeriod'] as Map<String, dynamic>)
+          : null,
+      snaplockType:
+          (json['SnaplockType'] as String?)?.let(SnaplockType.fromString),
+      volumeAppendModeEnabled: json['VolumeAppendModeEnabled'] as bool?,
+    );
+  }
+}
+
+/// The configuration to set the retention period of an FSx for ONTAP SnapLock
+/// volume. The retention period includes default, maximum, and minimum
+/// settings. For more information, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-retention.html">Working
+/// with the retention period in SnapLock</a>.
+class SnaplockRetentionPeriod {
+  /// The retention period assigned to a write once, read many (WORM) file by
+  /// default if an explicit retention period is not set for an FSx for ONTAP
+  /// SnapLock volume. The default retention period must be greater than or equal
+  /// to the minimum retention period and less than or equal to the maximum
+  /// retention period.
+  final RetentionPeriod defaultRetention;
+
+  /// The longest retention period that can be assigned to a WORM file on an FSx
+  /// for ONTAP SnapLock volume.
+  final RetentionPeriod maximumRetention;
+
+  /// The shortest retention period that can be assigned to a WORM file on an FSx
+  /// for ONTAP SnapLock volume.
+  final RetentionPeriod minimumRetention;
+
+  SnaplockRetentionPeriod({
+    required this.defaultRetention,
+    required this.maximumRetention,
+    required this.minimumRetention,
+  });
+
+  factory SnaplockRetentionPeriod.fromJson(Map<String, dynamic> json) {
+    return SnaplockRetentionPeriod(
+      defaultRetention: RetentionPeriod.fromJson(
+          json['DefaultRetention'] as Map<String, dynamic>),
+      maximumRetention: RetentionPeriod.fromJson(
+          json['MaximumRetention'] as Map<String, dynamic>),
+      minimumRetention: RetentionPeriod.fromJson(
+          json['MinimumRetention'] as Map<String, dynamic>),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final defaultRetention = this.defaultRetention;
+    final maximumRetention = this.maximumRetention;
+    final minimumRetention = this.minimumRetention;
+    return {
+      'DefaultRetention': defaultRetention,
+      'MaximumRetention': maximumRetention,
+      'MinimumRetention': minimumRetention,
+    };
+  }
+}
+
+enum SnaplockType {
+  compliance('COMPLIANCE'),
+  enterprise('ENTERPRISE'),
+  ;
+
+  final String value;
+
+  const SnaplockType(this.value);
+
+  static SnaplockType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum SnaplockType'));
 }
 
 /// A snapshot of an Amazon FSx for OpenZFS volume.
@@ -10017,11 +11047,12 @@ class Snapshot {
   factory Snapshot.fromJson(Map<String, dynamic> json) {
     return Snapshot(
       administrativeActions: (json['AdministrativeActions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => AdministrativeAction.fromJson(e as Map<String, dynamic>))
           .toList(),
       creationTime: timeStampFromJson(json['CreationTime']),
-      lifecycle: (json['Lifecycle'] as String?)?.toSnapshotLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(SnapshotLifecycle.fromString),
       lifecycleTransitionReason: json['LifecycleTransitionReason'] != null
           ? LifecycleTransitionReason.fromJson(
               json['LifecycleTransitionReason'] as Map<String, dynamic>)
@@ -10030,7 +11061,7 @@ class Snapshot {
       resourceARN: json['ResourceARN'] as String?,
       snapshotId: json['SnapshotId'] as String?,
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       volumeId: json['VolumeId'] as String?,
@@ -10059,148 +11090,92 @@ class SnapshotFilter {
     final name = this.name;
     final values = this.values;
     return {
-      if (name != null) 'Name': name.toValue(),
+      if (name != null) 'Name': name.value,
       if (values != null) 'Values': values,
     };
   }
 }
 
 enum SnapshotFilterName {
-  fileSystemId,
-  volumeId,
-}
+  fileSystemId('file-system-id'),
+  volumeId('volume-id'),
+  ;
 
-extension SnapshotFilterNameValueExtension on SnapshotFilterName {
-  String toValue() {
-    switch (this) {
-      case SnapshotFilterName.fileSystemId:
-        return 'file-system-id';
-      case SnapshotFilterName.volumeId:
-        return 'volume-id';
-    }
-  }
-}
+  final String value;
 
-extension SnapshotFilterNameFromString on String {
-  SnapshotFilterName toSnapshotFilterName() {
-    switch (this) {
-      case 'file-system-id':
-        return SnapshotFilterName.fileSystemId;
-      case 'volume-id':
-        return SnapshotFilterName.volumeId;
-    }
-    throw Exception('$this is not known in enum SnapshotFilterName');
-  }
+  const SnapshotFilterName(this.value);
+
+  static SnapshotFilterName fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum SnapshotFilterName'));
 }
 
 enum SnapshotLifecycle {
-  pending,
-  creating,
-  deleting,
-  available,
+  pending('PENDING'),
+  creating('CREATING'),
+  deleting('DELETING'),
+  available('AVAILABLE'),
+  ;
+
+  final String value;
+
+  const SnapshotLifecycle(this.value);
+
+  static SnapshotLifecycle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum SnapshotLifecycle'));
 }
 
-extension SnapshotLifecycleValueExtension on SnapshotLifecycle {
-  String toValue() {
-    switch (this) {
-      case SnapshotLifecycle.pending:
-        return 'PENDING';
-      case SnapshotLifecycle.creating:
-        return 'CREATING';
-      case SnapshotLifecycle.deleting:
-        return 'DELETING';
-      case SnapshotLifecycle.available:
-        return 'AVAILABLE';
-    }
-  }
-}
+class StartMisconfiguredStateRecoveryResponse {
+  final FileSystem? fileSystem;
 
-extension SnapshotLifecycleFromString on String {
-  SnapshotLifecycle toSnapshotLifecycle() {
-    switch (this) {
-      case 'PENDING':
-        return SnapshotLifecycle.pending;
-      case 'CREATING':
-        return SnapshotLifecycle.creating;
-      case 'DELETING':
-        return SnapshotLifecycle.deleting;
-      case 'AVAILABLE':
-        return SnapshotLifecycle.available;
-    }
-    throw Exception('$this is not known in enum SnapshotLifecycle');
+  StartMisconfiguredStateRecoveryResponse({
+    this.fileSystem,
+  });
+
+  factory StartMisconfiguredStateRecoveryResponse.fromJson(
+      Map<String, dynamic> json) {
+    return StartMisconfiguredStateRecoveryResponse(
+      fileSystem: json['FileSystem'] != null
+          ? FileSystem.fromJson(json['FileSystem'] as Map<String, dynamic>)
+          : null,
+    );
   }
 }
 
 enum Status {
-  failed,
-  inProgress,
-  pending,
-  completed,
-  updatedOptimizing,
+  failed('FAILED'),
+  inProgress('IN_PROGRESS'),
+  pending('PENDING'),
+  completed('COMPLETED'),
+  updatedOptimizing('UPDATED_OPTIMIZING'),
+  optimizing('OPTIMIZING'),
+  ;
+
+  final String value;
+
+  const Status(this.value);
+
+  static Status fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum Status'));
 }
 
-extension StatusValueExtension on Status {
-  String toValue() {
-    switch (this) {
-      case Status.failed:
-        return 'FAILED';
-      case Status.inProgress:
-        return 'IN_PROGRESS';
-      case Status.pending:
-        return 'PENDING';
-      case Status.completed:
-        return 'COMPLETED';
-      case Status.updatedOptimizing:
-        return 'UPDATED_OPTIMIZING';
-    }
-  }
-}
-
-extension StatusFromString on String {
-  Status toStatus() {
-    switch (this) {
-      case 'FAILED':
-        return Status.failed;
-      case 'IN_PROGRESS':
-        return Status.inProgress;
-      case 'PENDING':
-        return Status.pending;
-      case 'COMPLETED':
-        return Status.completed;
-      case 'UPDATED_OPTIMIZING':
-        return Status.updatedOptimizing;
-    }
-    throw Exception('$this is not known in enum Status');
-  }
-}
-
-/// The storage type for your Amazon FSx file system.
+/// Specifies the file system's storage type.
 enum StorageType {
-  ssd,
-  hdd,
-}
+  ssd('SSD'),
+  hdd('HDD'),
+  ;
 
-extension StorageTypeValueExtension on StorageType {
-  String toValue() {
-    switch (this) {
-      case StorageType.ssd:
-        return 'SSD';
-      case StorageType.hdd:
-        return 'HDD';
-    }
-  }
-}
+  final String value;
 
-extension StorageTypeFromString on String {
-  StorageType toStorageType() {
-    switch (this) {
-      case 'SSD':
-        return StorageType.ssd;
-      case 'HDD':
-        return StorageType.hdd;
-    }
-    throw Exception('$this is not known in enum StorageType');
-  }
+  const StorageType(this.value);
+
+  static StorageType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum StorageType'));
 }
 
 /// Describes the Amazon FSx for NetApp ONTAP storage virtual machine (SVM)
@@ -10289,8 +11264,8 @@ class StorageVirtualMachine {
           ? SvmEndpoints.fromJson(json['Endpoints'] as Map<String, dynamic>)
           : null,
       fileSystemId: json['FileSystemId'] as String?,
-      lifecycle:
-          (json['Lifecycle'] as String?)?.toStorageVirtualMachineLifecycle(),
+      lifecycle: (json['Lifecycle'] as String?)
+          ?.let(StorageVirtualMachineLifecycle.fromString),
       lifecycleTransitionReason: json['LifecycleTransitionReason'] != null
           ? LifecycleTransitionReason.fromJson(
               json['LifecycleTransitionReason'] as Map<String, dynamic>)
@@ -10298,11 +11273,12 @@ class StorageVirtualMachine {
       name: json['Name'] as String?,
       resourceARN: json['ResourceARN'] as String?,
       rootVolumeSecurityStyle: (json['RootVolumeSecurityStyle'] as String?)
-          ?.toStorageVirtualMachineRootVolumeSecurityStyle(),
+          ?.let(StorageVirtualMachineRootVolumeSecurityStyle.fromString),
       storageVirtualMachineId: json['StorageVirtualMachineId'] as String?,
-      subtype: (json['Subtype'] as String?)?.toStorageVirtualMachineSubtype(),
+      subtype: (json['Subtype'] as String?)
+          ?.let(StorageVirtualMachineSubtype.fromString),
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       uuid: json['UUID'] as String?,
@@ -10330,168 +11306,84 @@ class StorageVirtualMachineFilter {
     final name = this.name;
     final values = this.values;
     return {
-      if (name != null) 'Name': name.toValue(),
+      if (name != null) 'Name': name.value,
       if (values != null) 'Values': values,
     };
   }
 }
 
 enum StorageVirtualMachineFilterName {
-  fileSystemId,
-}
+  fileSystemId('file-system-id'),
+  ;
 
-extension StorageVirtualMachineFilterNameValueExtension
-    on StorageVirtualMachineFilterName {
-  String toValue() {
-    switch (this) {
-      case StorageVirtualMachineFilterName.fileSystemId:
-        return 'file-system-id';
-    }
-  }
-}
+  final String value;
 
-extension StorageVirtualMachineFilterNameFromString on String {
-  StorageVirtualMachineFilterName toStorageVirtualMachineFilterName() {
-    switch (this) {
-      case 'file-system-id':
-        return StorageVirtualMachineFilterName.fileSystemId;
-    }
-    throw Exception(
-        '$this is not known in enum StorageVirtualMachineFilterName');
-  }
+  const StorageVirtualMachineFilterName(this.value);
+
+  static StorageVirtualMachineFilterName fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum StorageVirtualMachineFilterName'));
 }
 
 enum StorageVirtualMachineLifecycle {
-  created,
-  creating,
-  deleting,
-  failed,
-  misconfigured,
-  pending,
-}
+  created('CREATED'),
+  creating('CREATING'),
+  deleting('DELETING'),
+  failed('FAILED'),
+  misconfigured('MISCONFIGURED'),
+  pending('PENDING'),
+  ;
 
-extension StorageVirtualMachineLifecycleValueExtension
-    on StorageVirtualMachineLifecycle {
-  String toValue() {
-    switch (this) {
-      case StorageVirtualMachineLifecycle.created:
-        return 'CREATED';
-      case StorageVirtualMachineLifecycle.creating:
-        return 'CREATING';
-      case StorageVirtualMachineLifecycle.deleting:
-        return 'DELETING';
-      case StorageVirtualMachineLifecycle.failed:
-        return 'FAILED';
-      case StorageVirtualMachineLifecycle.misconfigured:
-        return 'MISCONFIGURED';
-      case StorageVirtualMachineLifecycle.pending:
-        return 'PENDING';
-    }
-  }
-}
+  final String value;
 
-extension StorageVirtualMachineLifecycleFromString on String {
-  StorageVirtualMachineLifecycle toStorageVirtualMachineLifecycle() {
-    switch (this) {
-      case 'CREATED':
-        return StorageVirtualMachineLifecycle.created;
-      case 'CREATING':
-        return StorageVirtualMachineLifecycle.creating;
-      case 'DELETING':
-        return StorageVirtualMachineLifecycle.deleting;
-      case 'FAILED':
-        return StorageVirtualMachineLifecycle.failed;
-      case 'MISCONFIGURED':
-        return StorageVirtualMachineLifecycle.misconfigured;
-      case 'PENDING':
-        return StorageVirtualMachineLifecycle.pending;
-    }
-    throw Exception(
-        '$this is not known in enum StorageVirtualMachineLifecycle');
-  }
+  const StorageVirtualMachineLifecycle(this.value);
+
+  static StorageVirtualMachineLifecycle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum StorageVirtualMachineLifecycle'));
 }
 
 enum StorageVirtualMachineRootVolumeSecurityStyle {
-  unix,
-  ntfs,
-  mixed,
-}
+  unix('UNIX'),
+  ntfs('NTFS'),
+  mixed('MIXED'),
+  ;
 
-extension StorageVirtualMachineRootVolumeSecurityStyleValueExtension
-    on StorageVirtualMachineRootVolumeSecurityStyle {
-  String toValue() {
-    switch (this) {
-      case StorageVirtualMachineRootVolumeSecurityStyle.unix:
-        return 'UNIX';
-      case StorageVirtualMachineRootVolumeSecurityStyle.ntfs:
-        return 'NTFS';
-      case StorageVirtualMachineRootVolumeSecurityStyle.mixed:
-        return 'MIXED';
-    }
-  }
-}
+  final String value;
 
-extension StorageVirtualMachineRootVolumeSecurityStyleFromString on String {
-  StorageVirtualMachineRootVolumeSecurityStyle
-      toStorageVirtualMachineRootVolumeSecurityStyle() {
-    switch (this) {
-      case 'UNIX':
-        return StorageVirtualMachineRootVolumeSecurityStyle.unix;
-      case 'NTFS':
-        return StorageVirtualMachineRootVolumeSecurityStyle.ntfs;
-      case 'MIXED':
-        return StorageVirtualMachineRootVolumeSecurityStyle.mixed;
-    }
-    throw Exception(
-        '$this is not known in enum StorageVirtualMachineRootVolumeSecurityStyle');
-  }
+  const StorageVirtualMachineRootVolumeSecurityStyle(this.value);
+
+  static StorageVirtualMachineRootVolumeSecurityStyle fromString(
+          String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum StorageVirtualMachineRootVolumeSecurityStyle'));
 }
 
 enum StorageVirtualMachineSubtype {
-  $default,
-  dpDestination,
-  syncDestination,
-  syncSource,
+  $default('DEFAULT'),
+  dpDestination('DP_DESTINATION'),
+  syncDestination('SYNC_DESTINATION'),
+  syncSource('SYNC_SOURCE'),
+  ;
+
+  final String value;
+
+  const StorageVirtualMachineSubtype(this.value);
+
+  static StorageVirtualMachineSubtype fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum StorageVirtualMachineSubtype'));
 }
 
-extension StorageVirtualMachineSubtypeValueExtension
-    on StorageVirtualMachineSubtype {
-  String toValue() {
-    switch (this) {
-      case StorageVirtualMachineSubtype.$default:
-        return 'DEFAULT';
-      case StorageVirtualMachineSubtype.dpDestination:
-        return 'DP_DESTINATION';
-      case StorageVirtualMachineSubtype.syncDestination:
-        return 'SYNC_DESTINATION';
-      case StorageVirtualMachineSubtype.syncSource:
-        return 'SYNC_SOURCE';
-    }
-  }
-}
-
-extension StorageVirtualMachineSubtypeFromString on String {
-  StorageVirtualMachineSubtype toStorageVirtualMachineSubtype() {
-    switch (this) {
-      case 'DEFAULT':
-        return StorageVirtualMachineSubtype.$default;
-      case 'DP_DESTINATION':
-        return StorageVirtualMachineSubtype.dpDestination;
-      case 'SYNC_DESTINATION':
-        return StorageVirtualMachineSubtype.syncDestination;
-      case 'SYNC_SOURCE':
-        return StorageVirtualMachineSubtype.syncSource;
-    }
-    throw Exception('$this is not known in enum StorageVirtualMachineSubtype');
-  }
-}
-
-/// Describes the configuration of the Microsoft Active Directory (AD) directory
-/// to which the Amazon FSx for ONTAP storage virtual machine (SVM) is joined.
-/// Pleae note, account credentials are not returned in the response payload.
+/// Describes the Microsoft Active Directory (AD) directory configuration to
+/// which the FSx for ONTAP storage virtual machine (SVM) is joined. Note that
+/// account credentials are not returned in the response payload.
 class SvmActiveDirectoryConfiguration {
-  /// The NetBIOS name of the Active Directory computer object that is joined to
-  /// your SVM.
+  /// The NetBIOS name of the AD computer object to which the SVM is joined.
   final String? netBiosName;
   final SelfManagedActiveDirectoryAttributes?
       selfManagedActiveDirectoryConfiguration;
@@ -10534,7 +11426,7 @@ class SvmEndpoint {
     return SvmEndpoint(
       dNSName: json['DNSName'] as String?,
       ipAddresses: (json['IpAddresses'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -10697,7 +11589,7 @@ class TieringPolicy {
   factory TieringPolicy.fromJson(Map<String, dynamic> json) {
     return TieringPolicy(
       coolingPeriod: json['CoolingPeriod'] as int?,
-      name: (json['Name'] as String?)?.toTieringPolicyName(),
+      name: (json['Name'] as String?)?.let(TieringPolicyName.fromString),
     );
   }
 
@@ -10706,47 +11598,39 @@ class TieringPolicy {
     final name = this.name;
     return {
       if (coolingPeriod != null) 'CoolingPeriod': coolingPeriod,
-      if (name != null) 'Name': name.toValue(),
+      if (name != null) 'Name': name.value,
     };
   }
 }
 
 enum TieringPolicyName {
-  snapshotOnly,
-  auto,
-  all,
-  none,
+  snapshotOnly('SNAPSHOT_ONLY'),
+  auto('AUTO'),
+  all('ALL'),
+  none('NONE'),
+  ;
+
+  final String value;
+
+  const TieringPolicyName(this.value);
+
+  static TieringPolicyName fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum TieringPolicyName'));
 }
 
-extension TieringPolicyNameValueExtension on TieringPolicyName {
-  String toValue() {
-    switch (this) {
-      case TieringPolicyName.snapshotOnly:
-        return 'SNAPSHOT_ONLY';
-      case TieringPolicyName.auto:
-        return 'AUTO';
-      case TieringPolicyName.all:
-        return 'ALL';
-      case TieringPolicyName.none:
-        return 'NONE';
-    }
-  }
-}
+enum Unit {
+  days('DAYS'),
+  ;
 
-extension TieringPolicyNameFromString on String {
-  TieringPolicyName toTieringPolicyName() {
-    switch (this) {
-      case 'SNAPSHOT_ONLY':
-        return TieringPolicyName.snapshotOnly;
-      case 'AUTO':
-        return TieringPolicyName.auto;
-      case 'ALL':
-        return TieringPolicyName.all;
-      case 'NONE':
-        return TieringPolicyName.none;
-    }
-    throw Exception('$this is not known in enum TieringPolicyName');
-  }
+  final String value;
+
+  const Unit(this.value);
+
+  static Unit fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum Unit'));
 }
 
 /// The response object for <code>UntagResource</code> action.
@@ -10849,6 +11733,10 @@ class UpdateFileSystemLustreConfiguration {
   /// This parameter is not supported for file systems with a data repository
   /// association.
   final AutoImportPolicyType? autoImportPolicy;
+
+  /// The number of days to retain automatic backups. Setting this property to
+  /// <code>0</code> disables automatic backups. You can retain automatic backups
+  /// for a maximum of 90 days. The default is <code>0</code>.
   final int? automaticBackupRetentionDays;
   final String? dailyAutomaticBackupStartTime;
 
@@ -10877,6 +11765,32 @@ class UpdateFileSystemLustreConfiguration {
   /// Logs.
   final LustreLogCreateConfiguration? logConfiguration;
 
+  /// The Lustre metadata performance configuration for an Amazon FSx for Lustre
+  /// file system using a <code>PERSISTENT_2</code> deployment type. When this
+  /// configuration is enabled, the file system supports increasing metadata
+  /// performance.
+  final UpdateFileSystemLustreMetadataConfiguration? metadataConfiguration;
+
+  /// The throughput of an Amazon FSx for Lustre Persistent SSD-based file system,
+  /// measured in megabytes per second per tebibyte (MB/s/TiB). You can increase
+  /// or decrease your file system's throughput. Valid values depend on the
+  /// deployment type of the file system, as follows:
+  ///
+  /// <ul>
+  /// <li>
+  /// For <code>PERSISTENT_1</code> SSD-based deployment types, valid values are
+  /// 50, 100, and 200 MB/s/TiB.
+  /// </li>
+  /// <li>
+  /// For <code>PERSISTENT_2</code> SSD-based deployment types, valid values are
+  /// 125, 250, 500, and 1000 MB/s/TiB.
+  /// </li>
+  /// </ul>
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/managing-throughput-capacity.html">
+  /// Managing throughput capacity</a>.
+  final int? perUnitStorageThroughput;
+
   /// The Lustre root squash configuration used when updating an Amazon FSx for
   /// Lustre file system. When enabled, root squash restricts root-level access
   /// from clients that try to access your file system as a root user.
@@ -10893,6 +11807,8 @@ class UpdateFileSystemLustreConfiguration {
     this.dailyAutomaticBackupStartTime,
     this.dataCompressionType,
     this.logConfiguration,
+    this.metadataConfiguration,
+    this.perUnitStorageThroughput,
     this.rootSquashConfiguration,
     this.weeklyMaintenanceStartTime,
   });
@@ -10903,22 +11819,81 @@ class UpdateFileSystemLustreConfiguration {
     final dailyAutomaticBackupStartTime = this.dailyAutomaticBackupStartTime;
     final dataCompressionType = this.dataCompressionType;
     final logConfiguration = this.logConfiguration;
+    final metadataConfiguration = this.metadataConfiguration;
+    final perUnitStorageThroughput = this.perUnitStorageThroughput;
     final rootSquashConfiguration = this.rootSquashConfiguration;
     final weeklyMaintenanceStartTime = this.weeklyMaintenanceStartTime;
     return {
-      if (autoImportPolicy != null)
-        'AutoImportPolicy': autoImportPolicy.toValue(),
+      if (autoImportPolicy != null) 'AutoImportPolicy': autoImportPolicy.value,
       if (automaticBackupRetentionDays != null)
         'AutomaticBackupRetentionDays': automaticBackupRetentionDays,
       if (dailyAutomaticBackupStartTime != null)
         'DailyAutomaticBackupStartTime': dailyAutomaticBackupStartTime,
       if (dataCompressionType != null)
-        'DataCompressionType': dataCompressionType.toValue(),
+        'DataCompressionType': dataCompressionType.value,
       if (logConfiguration != null) 'LogConfiguration': logConfiguration,
+      if (metadataConfiguration != null)
+        'MetadataConfiguration': metadataConfiguration,
+      if (perUnitStorageThroughput != null)
+        'PerUnitStorageThroughput': perUnitStorageThroughput,
       if (rootSquashConfiguration != null)
         'RootSquashConfiguration': rootSquashConfiguration,
       if (weeklyMaintenanceStartTime != null)
         'WeeklyMaintenanceStartTime': weeklyMaintenanceStartTime,
+    };
+  }
+}
+
+/// The Lustre metadata performance configuration update for an Amazon FSx for
+/// Lustre file system using a <code>PERSISTENT_2</code> deployment type. You
+/// can request an increase in your file system's Metadata IOPS and/or switch
+/// your file system's metadata configuration mode. For more information, see <a
+/// href="https://docs.aws.amazon.com/fsx/latest/LustreGuide/managing-metadata-performance.html">Managing
+/// metadata performance</a> in the <i>Amazon FSx for Lustre User Guide</i>.
+class UpdateFileSystemLustreMetadataConfiguration {
+  /// (USER_PROVISIONED mode only) Specifies the number of Metadata IOPS to
+  /// provision for your file system. Valid values are <code>1500</code>,
+  /// <code>3000</code>, <code>6000</code>, <code>12000</code>, and multiples of
+  /// <code>12000</code> up to a maximum of <code>192000</code>.
+  ///
+  /// The value you provide must be greater than or equal to the current number of
+  /// Metadata IOPS provisioned for the file system.
+  final int? iops;
+
+  /// The metadata configuration mode for provisioning Metadata IOPS for an FSx
+  /// for Lustre file system using a <code>PERSISTENT_2</code> deployment type.
+  ///
+  /// <ul>
+  /// <li>
+  /// To increase the Metadata IOPS or to switch from AUTOMATIC mode, specify
+  /// <code>USER_PROVISIONED</code> as the value for this parameter. Then use the
+  /// Iops parameter to provide a Metadata IOPS value that is greater than or
+  /// equal to the current number of Metadata IOPS provisioned for the file
+  /// system.
+  /// </li>
+  /// <li>
+  /// To switch from USER_PROVISIONED mode, specify <code>AUTOMATIC</code> as the
+  /// value for this parameter, but do not input a value for Iops.
+  /// <note>
+  /// If you request to switch from USER_PROVISIONED to AUTOMATIC mode and the
+  /// current Metadata IOPS value is greater than the automated default, FSx for
+  /// Lustre rejects the request because downscaling Metadata IOPS is not
+  /// supported.
+  /// </note> </li>
+  /// </ul>
+  final MetadataConfigurationMode? mode;
+
+  UpdateFileSystemLustreMetadataConfiguration({
+    this.iops,
+    this.mode,
+  });
+
+  Map<String, dynamic> toJson() {
+    final iops = this.iops;
+    final mode = this.mode;
+    return {
+      if (iops != null) 'Iops': iops,
+      if (mode != null) 'Mode': mode.value,
     };
   }
 }
@@ -10931,17 +11906,37 @@ class UpdateFileSystemOntapConfiguration {
   final int? automaticBackupRetentionDays;
   final String? dailyAutomaticBackupStartTime;
 
-  /// The SSD IOPS (input/output operations per second) configuration for an
+  /// The SSD IOPS (input output operations per second) configuration for an
   /// Amazon FSx for NetApp ONTAP file system. The default is 3 IOPS per GB of
   /// storage capacity, but you can provision additional IOPS per GB of storage.
   /// The configuration consists of an IOPS mode (<code>AUTOMATIC</code> or
   /// <code>USER_PROVISIONED</code>), and in the case of
   /// <code>USER_PROVISIONED</code> IOPS, the total number of SSD IOPS
-  /// provisioned.
+  /// provisioned. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/increase-primary-storage.html">Updating
+  /// SSD storage capacity and IOPS</a>.
   final DiskIopsConfiguration? diskIopsConfiguration;
 
-  /// The ONTAP administrative password for the <code>fsxadmin</code> user.
+  /// Update the password for the <code>fsxadmin</code> user by entering a new
+  /// password. You use the <code>fsxadmin</code> user to access the NetApp ONTAP
+  /// CLI and REST API to manage your file system resources. For more information,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-resources-ontap-apps.html">Managing
+  /// resources using NetApp Applicaton</a>.
   final String? fsxAdminPassword;
+
+  /// Use to update the number of high-availability (HA) pairs for a
+  /// second-generation single-AZ file system. If you increase the number of HA
+  /// pairs for your file system, you must specify proportional increases for
+  /// <code>StorageCapacity</code>, <code>Iops</code>, and
+  /// <code>ThroughputCapacity</code>. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/administering-file-systems.html#HA-pairs">High-availability
+  /// (HA) pairs</a> in the FSx for ONTAP user guide. Block storage protocol
+  /// support (iSCSI and NVMe over TCP) is disabled on file systems with more than
+  /// 6 HA pairs. For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/supported-fsx-clients.html#using-block-storage">Using
+  /// block storage protocols</a>.
+  final int? hAPairs;
 
   /// (Multi-AZ only) A list of IDs of existing virtual private cloud (VPC) route
   /// tables to disassociate (remove) from your Amazon FSx for NetApp ONTAP file
@@ -10949,10 +11944,68 @@ class UpdateFileSystemOntapConfiguration {
   /// table IDs for a file system.
   final List<String>? removeRouteTableIds;
 
-  /// Specifies the throughput of an FSx for NetApp ONTAP file system, measured in
-  /// megabytes per second (MBps). Valid values are 128, 256, 512, 1024, 2048, and
-  /// 4096 MBps.
+  /// Enter a new value to change the amount of throughput capacity for the file
+  /// system in megabytes per second (MBps). For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/managing-throughput-capacity.html">Managing
+  /// throughput capacity</a> in the FSx for ONTAP User Guide.
+  ///
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The value of <code>ThroughputCapacity</code> and
+  /// <code>ThroughputCapacityPerHAPair</code> are not the same value.
+  /// </li>
+  /// <li>
+  /// The value of <code>ThroughputCapacity</code> when divided by the value of
+  /// <code>HAPairs</code> is outside of the valid range for
+  /// <code>ThroughputCapacity</code>.
+  /// </li>
+  /// </ul>
   final int? throughputCapacity;
+
+  /// Use to choose the throughput capacity per HA pair, rather than the total
+  /// throughput for the file system.
+  ///
+  /// This field and <code>ThroughputCapacity</code> cannot be defined in the same
+  /// API call, but one is required.
+  ///
+  /// This field and <code>ThroughputCapacity</code> are the same for file systems
+  /// with one HA pair.
+  ///
+  /// <ul>
+  /// <li>
+  /// For <code>SINGLE_AZ_1</code> and <code>MULTI_AZ_1</code> file systems, valid
+  /// values are 128, 256, 512, 1024, 2048, or 4096 MBps.
+  /// </li>
+  /// <li>
+  /// For <code>SINGLE_AZ_2</code>, valid values are 1536, 3072, or 6144 MBps.
+  /// </li>
+  /// <li>
+  /// For <code>MULTI_AZ_2</code>, valid values are 384, 768, 1536, 3072, or 6144
+  /// MBps.
+  /// </li>
+  /// </ul>
+  /// Amazon FSx responds with an HTTP status code 400 (Bad Request) for the
+  /// following conditions:
+  ///
+  /// <ul>
+  /// <li>
+  /// The value of <code>ThroughputCapacity</code> and
+  /// <code>ThroughputCapacityPerHAPair</code> are not the same value for file
+  /// systems with one HA pair.
+  /// </li>
+  /// <li>
+  /// The value of deployment type is <code>SINGLE_AZ_2</code> and
+  /// <code>ThroughputCapacity</code> / <code>ThroughputCapacityPerHAPair</code>
+  /// is not a valid HA pair (a value between 1 and 12).
+  /// </li>
+  /// <li>
+  /// The value of <code>ThroughputCapacityPerHAPair</code> is not a valid value.
+  /// </li>
+  /// </ul>
+  final int? throughputCapacityPerHAPair;
   final String? weeklyMaintenanceStartTime;
 
   UpdateFileSystemOntapConfiguration({
@@ -10961,8 +12014,10 @@ class UpdateFileSystemOntapConfiguration {
     this.dailyAutomaticBackupStartTime,
     this.diskIopsConfiguration,
     this.fsxAdminPassword,
+    this.hAPairs,
     this.removeRouteTableIds,
     this.throughputCapacity,
+    this.throughputCapacityPerHAPair,
     this.weeklyMaintenanceStartTime,
   });
 
@@ -10972,8 +12027,10 @@ class UpdateFileSystemOntapConfiguration {
     final dailyAutomaticBackupStartTime = this.dailyAutomaticBackupStartTime;
     final diskIopsConfiguration = this.diskIopsConfiguration;
     final fsxAdminPassword = this.fsxAdminPassword;
+    final hAPairs = this.hAPairs;
     final removeRouteTableIds = this.removeRouteTableIds;
     final throughputCapacity = this.throughputCapacity;
+    final throughputCapacityPerHAPair = this.throughputCapacityPerHAPair;
     final weeklyMaintenanceStartTime = this.weeklyMaintenanceStartTime;
     return {
       if (addRouteTableIds != null) 'AddRouteTableIds': addRouteTableIds,
@@ -10984,9 +12041,12 @@ class UpdateFileSystemOntapConfiguration {
       if (diskIopsConfiguration != null)
         'DiskIopsConfiguration': diskIopsConfiguration,
       if (fsxAdminPassword != null) 'FsxAdminPassword': fsxAdminPassword,
+      if (hAPairs != null) 'HAPairs': hAPairs,
       if (removeRouteTableIds != null)
         'RemoveRouteTableIds': removeRouteTableIds,
       if (throughputCapacity != null) 'ThroughputCapacity': throughputCapacity,
+      if (throughputCapacityPerHAPair != null)
+        'ThroughputCapacityPerHAPair': throughputCapacityPerHAPair,
       if (weeklyMaintenanceStartTime != null)
         'WeeklyMaintenanceStartTime': weeklyMaintenanceStartTime,
     };
@@ -10995,6 +12055,9 @@ class UpdateFileSystemOntapConfiguration {
 
 /// The configuration updates for an Amazon FSx for OpenZFS file system.
 class UpdateFileSystemOpenZFSConfiguration {
+  /// (Multi-AZ only) A list of IDs of new virtual private cloud (VPC) route
+  /// tables to associate (add) with your Amazon FSx for OpenZFS file system.
+  final List<String>? addRouteTableIds;
   final int? automaticBackupRetentionDays;
 
   /// A Boolean value indicating whether tags for the file system should be copied
@@ -11018,42 +12081,53 @@ class UpdateFileSystemOpenZFSConfiguration {
   final String? dailyAutomaticBackupStartTime;
   final DiskIopsConfiguration? diskIopsConfiguration;
 
+  /// (Multi-AZ only) A list of IDs of existing virtual private cloud (VPC) route
+  /// tables to disassociate (remove) from your Amazon FSx for OpenZFS file
+  /// system. You can use the API operation to retrieve the list of VPC route
+  /// table IDs for a file system.
+  final List<String>? removeRouteTableIds;
+
   /// The throughput of an Amazon FSx for OpenZFS file system, measured in
   /// megabytes per second&#x2028; (MB/s). Valid values depend on the
   /// DeploymentType you choose, as follows:
   ///
   /// <ul>
   /// <li>
-  /// For <code>SINGLE_AZ_1</code>, valid values are 64, 128, 256, 512, 1024,
-  /// 2048, 3072, or 4096 MB/s.
+  /// For <code>MULTI_AZ_1</code> and <code>SINGLE_AZ_2</code>, valid values are
+  /// 160, 320, 640, 1280, 2560, 3840, 5120, 7680, or 10240 MB/s.
   /// </li>
   /// <li>
-  /// For <code>SINGLE_AZ_2</code>, valid values are 160, 320, 640, 1280, 2560,
-  /// 3840, 5120, 7680, or 10240 MB/s.
+  /// For <code>SINGLE_AZ_1</code>, valid values are 64, 128, 256, 512, 1024,
+  /// 2048, 3072, or 4096 MB/s.
   /// </li>
   /// </ul>
   final int? throughputCapacity;
   final String? weeklyMaintenanceStartTime;
 
   UpdateFileSystemOpenZFSConfiguration({
+    this.addRouteTableIds,
     this.automaticBackupRetentionDays,
     this.copyTagsToBackups,
     this.copyTagsToVolumes,
     this.dailyAutomaticBackupStartTime,
     this.diskIopsConfiguration,
+    this.removeRouteTableIds,
     this.throughputCapacity,
     this.weeklyMaintenanceStartTime,
   });
 
   Map<String, dynamic> toJson() {
+    final addRouteTableIds = this.addRouteTableIds;
     final automaticBackupRetentionDays = this.automaticBackupRetentionDays;
     final copyTagsToBackups = this.copyTagsToBackups;
     final copyTagsToVolumes = this.copyTagsToVolumes;
     final dailyAutomaticBackupStartTime = this.dailyAutomaticBackupStartTime;
     final diskIopsConfiguration = this.diskIopsConfiguration;
+    final removeRouteTableIds = this.removeRouteTableIds;
     final throughputCapacity = this.throughputCapacity;
     final weeklyMaintenanceStartTime = this.weeklyMaintenanceStartTime;
     return {
+      if (addRouteTableIds != null) 'AddRouteTableIds': addRouteTableIds,
       if (automaticBackupRetentionDays != null)
         'AutomaticBackupRetentionDays': automaticBackupRetentionDays,
       if (copyTagsToBackups != null) 'CopyTagsToBackups': copyTagsToBackups,
@@ -11062,6 +12136,8 @@ class UpdateFileSystemOpenZFSConfiguration {
         'DailyAutomaticBackupStartTime': dailyAutomaticBackupStartTime,
       if (diskIopsConfiguration != null)
         'DiskIopsConfiguration': diskIopsConfiguration,
+      if (removeRouteTableIds != null)
+        'RemoveRouteTableIds': removeRouteTableIds,
       if (throughputCapacity != null) 'ThroughputCapacity': throughputCapacity,
       if (weeklyMaintenanceStartTime != null)
         'WeeklyMaintenanceStartTime': weeklyMaintenanceStartTime,
@@ -11096,9 +12172,10 @@ class UpdateFileSystemWindowsConfiguration {
   /// Windows File Server file system..
   final WindowsAuditLogCreateConfiguration? auditLogConfiguration;
 
-  /// The number of days to retain automatic daily backups. Setting this to zero
-  /// (0) disables automatic daily backups. You can retain automatic daily backups
-  /// for a maximum of 90 days. For more information, see <a
+  /// The number of days to retain automatic backups. Setting this property to
+  /// <code>0</code> disables automatic backups. You can retain automatic backups
+  /// for a maximum of 90 days. The default is <code>30</code>. For more
+  /// information, see <a
   /// href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/using-backups.html#automatic-backups">Working
   /// with Automatic Daily Backups</a>.
   final int? automaticBackupRetentionDays;
@@ -11106,6 +12183,13 @@ class UpdateFileSystemWindowsConfiguration {
   /// The preferred time to start the daily automatic backup, in the UTC time
   /// zone, for example, <code>02:00</code>
   final String? dailyAutomaticBackupStartTime;
+
+  /// The SSD IOPS (input/output operations per second) configuration for an
+  /// Amazon FSx for Windows file system. By default, Amazon FSx automatically
+  /// provisions 3 IOPS per GiB of storage capacity. You can provision additional
+  /// IOPS per GiB of storage, up to the maximum limit associated with your chosen
+  /// throughput capacity.
+  final DiskIopsConfiguration? diskIopsConfiguration;
 
   /// The configuration Amazon FSx uses to join the Windows File Server instance
   /// to the self-managed Microsoft AD directory. You cannot make a self-managed
@@ -11132,6 +12216,7 @@ class UpdateFileSystemWindowsConfiguration {
     this.auditLogConfiguration,
     this.automaticBackupRetentionDays,
     this.dailyAutomaticBackupStartTime,
+    this.diskIopsConfiguration,
     this.selfManagedActiveDirectoryConfiguration,
     this.throughputCapacity,
     this.weeklyMaintenanceStartTime,
@@ -11141,6 +12226,7 @@ class UpdateFileSystemWindowsConfiguration {
     final auditLogConfiguration = this.auditLogConfiguration;
     final automaticBackupRetentionDays = this.automaticBackupRetentionDays;
     final dailyAutomaticBackupStartTime = this.dailyAutomaticBackupStartTime;
+    final diskIopsConfiguration = this.diskIopsConfiguration;
     final selfManagedActiveDirectoryConfiguration =
         this.selfManagedActiveDirectoryConfiguration;
     final throughputCapacity = this.throughputCapacity;
@@ -11152,6 +12238,8 @@ class UpdateFileSystemWindowsConfiguration {
         'AutomaticBackupRetentionDays': automaticBackupRetentionDays,
       if (dailyAutomaticBackupStartTime != null)
         'DailyAutomaticBackupStartTime': dailyAutomaticBackupStartTime,
+      if (diskIopsConfiguration != null)
+        'DiskIopsConfiguration': diskIopsConfiguration,
       if (selfManagedActiveDirectoryConfiguration != null)
         'SelfManagedActiveDirectoryConfiguration':
             selfManagedActiveDirectoryConfiguration,
@@ -11179,12 +12267,19 @@ class UpdateOntapVolumeConfiguration {
   /// <code>/vol3</code>.
   final String? junctionPath;
 
-  /// The security style for the volume, which can be <code>UNIX</code>.
+  /// The security style for the volume, which can be <code>UNIX</code>,
   /// <code>NTFS</code>, or <code>MIXED</code>.
   final SecurityStyle? securityStyle;
 
+  /// The configured size of the volume, in bytes.
+  final int? sizeInBytes;
+
   /// Specifies the size of the volume in megabytes.
   final int? sizeInMegabytes;
+
+  /// The configuration object for updating the SnapLock configuration of an FSx
+  /// for ONTAP SnapLock volume.
+  final UpdateSnaplockConfiguration? snaplockConfiguration;
 
   /// Specifies the snapshot policy for the volume. There are three built-in
   /// snapshot policies:
@@ -11225,7 +12320,9 @@ class UpdateOntapVolumeConfiguration {
     this.copyTagsToBackups,
     this.junctionPath,
     this.securityStyle,
+    this.sizeInBytes,
     this.sizeInMegabytes,
+    this.snaplockConfiguration,
     this.snapshotPolicy,
     this.storageEfficiencyEnabled,
     this.tieringPolicy,
@@ -11235,15 +12332,20 @@ class UpdateOntapVolumeConfiguration {
     final copyTagsToBackups = this.copyTagsToBackups;
     final junctionPath = this.junctionPath;
     final securityStyle = this.securityStyle;
+    final sizeInBytes = this.sizeInBytes;
     final sizeInMegabytes = this.sizeInMegabytes;
+    final snaplockConfiguration = this.snaplockConfiguration;
     final snapshotPolicy = this.snapshotPolicy;
     final storageEfficiencyEnabled = this.storageEfficiencyEnabled;
     final tieringPolicy = this.tieringPolicy;
     return {
       if (copyTagsToBackups != null) 'CopyTagsToBackups': copyTagsToBackups,
       if (junctionPath != null) 'JunctionPath': junctionPath,
-      if (securityStyle != null) 'SecurityStyle': securityStyle.toValue(),
+      if (securityStyle != null) 'SecurityStyle': securityStyle.value,
+      if (sizeInBytes != null) 'SizeInBytes': sizeInBytes,
       if (sizeInMegabytes != null) 'SizeInMegabytes': sizeInMegabytes,
+      if (snaplockConfiguration != null)
+        'SnaplockConfiguration': snaplockConfiguration,
       if (snapshotPolicy != null) 'SnapshotPolicy': snapshotPolicy,
       if (storageEfficiencyEnabled != null)
         'StorageEfficiencyEnabled': storageEfficiencyEnabled,
@@ -11329,7 +12431,7 @@ class UpdateOpenZFSVolumeConfiguration {
     final userAndGroupQuotas = this.userAndGroupQuotas;
     return {
       if (dataCompressionType != null)
-        'DataCompressionType': dataCompressionType.toValue(),
+        'DataCompressionType': dataCompressionType.value,
       if (nfsExports != null) 'NfsExports': nfsExports,
       if (readOnly != null) 'ReadOnly': readOnly,
       if (recordSizeKiB != null) 'RecordSizeKiB': recordSizeKiB,
@@ -11338,6 +12440,106 @@ class UpdateOpenZFSVolumeConfiguration {
       if (storageCapacityReservationGiB != null)
         'StorageCapacityReservationGiB': storageCapacityReservationGiB,
       if (userAndGroupQuotas != null) 'UserAndGroupQuotas': userAndGroupQuotas,
+    };
+  }
+}
+
+enum UpdateOpenZFSVolumeOption {
+  deleteIntermediateSnapshots('DELETE_INTERMEDIATE_SNAPSHOTS'),
+  deleteClonedVolumes('DELETE_CLONED_VOLUMES'),
+  deleteIntermediateData('DELETE_INTERMEDIATE_DATA'),
+  ;
+
+  final String value;
+
+  const UpdateOpenZFSVolumeOption(this.value);
+
+  static UpdateOpenZFSVolumeOption fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum UpdateOpenZFSVolumeOption'));
+}
+
+class UpdateSharedVpcConfigurationResponse {
+  /// Indicates whether participant accounts can create FSx for ONTAP Multi-AZ
+  /// file systems in shared subnets.
+  final String? enableFsxRouteTableUpdatesFromParticipantAccounts;
+
+  UpdateSharedVpcConfigurationResponse({
+    this.enableFsxRouteTableUpdatesFromParticipantAccounts,
+  });
+
+  factory UpdateSharedVpcConfigurationResponse.fromJson(
+      Map<String, dynamic> json) {
+    return UpdateSharedVpcConfigurationResponse(
+      enableFsxRouteTableUpdatesFromParticipantAccounts:
+          json['EnableFsxRouteTableUpdatesFromParticipantAccounts'] as String?,
+    );
+  }
+}
+
+/// Updates the SnapLock configuration for an existing FSx for ONTAP volume.
+class UpdateSnaplockConfiguration {
+  /// Enables or disables the audit log volume for an FSx for ONTAP SnapLock
+  /// volume. The default value is <code>false</code>. If you set
+  /// <code>AuditLogVolume</code> to <code>true</code>, the SnapLock volume is
+  /// created as an audit log volume. The minimum retention period for an audit
+  /// log volume is six months.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/how-snaplock-works.html#snaplock-audit-log-volume">
+  /// SnapLock audit log volumes</a>.
+  final bool? auditLogVolume;
+
+  /// The configuration object for setting the autocommit period of files in an
+  /// FSx for ONTAP SnapLock volume.
+  final AutocommitPeriod? autocommitPeriod;
+
+  /// Enables, disables, or permanently disables privileged delete on an FSx for
+  /// ONTAP SnapLock Enterprise volume. Enabling privileged delete allows SnapLock
+  /// administrators to delete write once, read many (WORM) files even if they
+  /// have active retention periods. <code>PERMANENTLY_DISABLED</code> is a
+  /// terminal state. If privileged delete is permanently disabled on a SnapLock
+  /// volume, you can't re-enable it. The default value is <code>DISABLED</code>.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/snaplock-enterprise.html#privileged-delete">Privileged
+  /// delete</a>.
+  final PrivilegedDelete? privilegedDelete;
+
+  /// Specifies the retention period of an FSx for ONTAP SnapLock volume.
+  final SnaplockRetentionPeriod? retentionPeriod;
+
+  /// Enables or disables volume-append mode on an FSx for ONTAP SnapLock volume.
+  /// Volume-append mode allows you to create WORM-appendable files and write data
+  /// to them incrementally. The default value is <code>false</code>.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/fsx/latest/ONTAPGuide/worm-state.html#worm-state-append">Volume-append
+  /// mode</a>.
+  final bool? volumeAppendModeEnabled;
+
+  UpdateSnaplockConfiguration({
+    this.auditLogVolume,
+    this.autocommitPeriod,
+    this.privilegedDelete,
+    this.retentionPeriod,
+    this.volumeAppendModeEnabled,
+  });
+
+  Map<String, dynamic> toJson() {
+    final auditLogVolume = this.auditLogVolume;
+    final autocommitPeriod = this.autocommitPeriod;
+    final privilegedDelete = this.privilegedDelete;
+    final retentionPeriod = this.retentionPeriod;
+    final volumeAppendModeEnabled = this.volumeAppendModeEnabled;
+    return {
+      if (auditLogVolume != null) 'AuditLogVolume': auditLogVolume,
+      if (autocommitPeriod != null) 'AutocommitPeriod': autocommitPeriod,
+      if (privilegedDelete != null) 'PrivilegedDelete': privilegedDelete.value,
+      if (retentionPeriod != null) 'RetentionPeriod': retentionPeriod,
+      if (volumeAppendModeEnabled != null)
+        'VolumeAppendModeEnabled': volumeAppendModeEnabled,
     };
   }
 }
@@ -11378,21 +12580,27 @@ class UpdateStorageVirtualMachineResponse {
   }
 }
 
-/// Updates the Microsoft Active Directory (AD) configuration of an SVM joined
-/// to an AD. Please note, account credentials are not returned in the response
-/// payload.
+/// Specifies updates to an FSx for ONTAP storage virtual machine's (SVM)
+/// Microsoft Active Directory (AD) configuration. Note that account credentials
+/// are not returned in the response payload.
 class UpdateSvmActiveDirectoryConfiguration {
+  /// Specifies an updated NetBIOS name of the AD computer object
+  /// <code>NetBiosName</code> to which an SVM is joined.
+  final String? netBiosName;
   final SelfManagedActiveDirectoryConfigurationUpdates?
       selfManagedActiveDirectoryConfiguration;
 
   UpdateSvmActiveDirectoryConfiguration({
+    this.netBiosName,
     this.selfManagedActiveDirectoryConfiguration,
   });
 
   Map<String, dynamic> toJson() {
+    final netBiosName = this.netBiosName;
     final selfManagedActiveDirectoryConfiguration =
         this.selfManagedActiveDirectoryConfiguration;
     return {
+      if (netBiosName != null) 'NetBiosName': netBiosName,
       if (selfManagedActiveDirectoryConfiguration != null)
         'SelfManagedActiveDirectoryConfiguration':
             selfManagedActiveDirectoryConfiguration,
@@ -11418,7 +12626,7 @@ class UpdateVolumeResponse {
   }
 }
 
-/// Describes an Amazon FSx for NetApp ONTAP or Amazon FSx for OpenZFS volume.
+/// Describes an Amazon FSx volume.
 class Volume {
   /// A list of administrative actions for the volume that are in process or
   /// waiting to be processed. Administrative actions describe changes to the
@@ -11491,12 +12699,13 @@ class Volume {
   factory Volume.fromJson(Map<String, dynamic> json) {
     return Volume(
       administrativeActions: (json['AdministrativeActions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => AdministrativeAction.fromJson(e as Map<String, dynamic>))
           .toList(),
       creationTime: timeStampFromJson(json['CreationTime']),
       fileSystemId: json['FileSystemId'] as String?,
-      lifecycle: (json['Lifecycle'] as String?)?.toVolumeLifecycle(),
+      lifecycle:
+          (json['Lifecycle'] as String?)?.let(VolumeLifecycle.fromString),
       lifecycleTransitionReason: json['LifecycleTransitionReason'] != null
           ? LifecycleTransitionReason.fromJson(
               json['LifecycleTransitionReason'] as Map<String, dynamic>)
@@ -11512,11 +12721,11 @@ class Volume {
           : null,
       resourceARN: json['ResourceARN'] as String?,
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       volumeId: json['VolumeId'] as String?,
-      volumeType: (json['VolumeType'] as String?)?.toVolumeType(),
+      volumeType: (json['VolumeType'] as String?)?.let(VolumeType.fromString),
     );
   }
 }
@@ -11541,158 +12750,90 @@ class VolumeFilter {
     final name = this.name;
     final values = this.values;
     return {
-      if (name != null) 'Name': name.toValue(),
+      if (name != null) 'Name': name.value,
       if (values != null) 'Values': values,
     };
   }
 }
 
 enum VolumeFilterName {
-  fileSystemId,
-  storageVirtualMachineId,
-}
+  fileSystemId('file-system-id'),
+  storageVirtualMachineId('storage-virtual-machine-id'),
+  ;
 
-extension VolumeFilterNameValueExtension on VolumeFilterName {
-  String toValue() {
-    switch (this) {
-      case VolumeFilterName.fileSystemId:
-        return 'file-system-id';
-      case VolumeFilterName.storageVirtualMachineId:
-        return 'storage-virtual-machine-id';
-    }
-  }
-}
+  final String value;
 
-extension VolumeFilterNameFromString on String {
-  VolumeFilterName toVolumeFilterName() {
-    switch (this) {
-      case 'file-system-id':
-        return VolumeFilterName.fileSystemId;
-      case 'storage-virtual-machine-id':
-        return VolumeFilterName.storageVirtualMachineId;
-    }
-    throw Exception('$this is not known in enum VolumeFilterName');
-  }
+  const VolumeFilterName(this.value);
+
+  static VolumeFilterName fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum VolumeFilterName'));
 }
 
 enum VolumeLifecycle {
-  creating,
-  created,
-  deleting,
-  failed,
-  misconfigured,
-  pending,
-  available,
+  creating('CREATING'),
+  created('CREATED'),
+  deleting('DELETING'),
+  failed('FAILED'),
+  misconfigured('MISCONFIGURED'),
+  pending('PENDING'),
+  available('AVAILABLE'),
+  ;
+
+  final String value;
+
+  const VolumeLifecycle(this.value);
+
+  static VolumeLifecycle fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum VolumeLifecycle'));
 }
 
-extension VolumeLifecycleValueExtension on VolumeLifecycle {
-  String toValue() {
-    switch (this) {
-      case VolumeLifecycle.creating:
-        return 'CREATING';
-      case VolumeLifecycle.created:
-        return 'CREATED';
-      case VolumeLifecycle.deleting:
-        return 'DELETING';
-      case VolumeLifecycle.failed:
-        return 'FAILED';
-      case VolumeLifecycle.misconfigured:
-        return 'MISCONFIGURED';
-      case VolumeLifecycle.pending:
-        return 'PENDING';
-      case VolumeLifecycle.available:
-        return 'AVAILABLE';
-    }
-  }
-}
+enum VolumeStyle {
+  flexvol('FLEXVOL'),
+  flexgroup('FLEXGROUP'),
+  ;
 
-extension VolumeLifecycleFromString on String {
-  VolumeLifecycle toVolumeLifecycle() {
-    switch (this) {
-      case 'CREATING':
-        return VolumeLifecycle.creating;
-      case 'CREATED':
-        return VolumeLifecycle.created;
-      case 'DELETING':
-        return VolumeLifecycle.deleting;
-      case 'FAILED':
-        return VolumeLifecycle.failed;
-      case 'MISCONFIGURED':
-        return VolumeLifecycle.misconfigured;
-      case 'PENDING':
-        return VolumeLifecycle.pending;
-      case 'AVAILABLE':
-        return VolumeLifecycle.available;
-    }
-    throw Exception('$this is not known in enum VolumeLifecycle');
-  }
+  final String value;
+
+  const VolumeStyle(this.value);
+
+  static VolumeStyle fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum VolumeStyle'));
 }
 
 enum VolumeType {
-  ontap,
-  openzfs,
-}
+  ontap('ONTAP'),
+  openzfs('OPENZFS'),
+  ;
 
-extension VolumeTypeValueExtension on VolumeType {
-  String toValue() {
-    switch (this) {
-      case VolumeType.ontap:
-        return 'ONTAP';
-      case VolumeType.openzfs:
-        return 'OPENZFS';
-    }
-  }
-}
+  final String value;
 
-extension VolumeTypeFromString on String {
-  VolumeType toVolumeType() {
-    switch (this) {
-      case 'ONTAP':
-        return VolumeType.ontap;
-      case 'OPENZFS':
-        return VolumeType.openzfs;
-    }
-    throw Exception('$this is not known in enum VolumeType');
-  }
+  const VolumeType(this.value);
+
+  static VolumeType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum VolumeType'));
 }
 
 enum WindowsAccessAuditLogLevel {
-  disabled,
-  successOnly,
-  failureOnly,
-  successAndFailure,
-}
+  disabled('DISABLED'),
+  successOnly('SUCCESS_ONLY'),
+  failureOnly('FAILURE_ONLY'),
+  successAndFailure('SUCCESS_AND_FAILURE'),
+  ;
 
-extension WindowsAccessAuditLogLevelValueExtension
-    on WindowsAccessAuditLogLevel {
-  String toValue() {
-    switch (this) {
-      case WindowsAccessAuditLogLevel.disabled:
-        return 'DISABLED';
-      case WindowsAccessAuditLogLevel.successOnly:
-        return 'SUCCESS_ONLY';
-      case WindowsAccessAuditLogLevel.failureOnly:
-        return 'FAILURE_ONLY';
-      case WindowsAccessAuditLogLevel.successAndFailure:
-        return 'SUCCESS_AND_FAILURE';
-    }
-  }
-}
+  final String value;
 
-extension WindowsAccessAuditLogLevelFromString on String {
-  WindowsAccessAuditLogLevel toWindowsAccessAuditLogLevel() {
-    switch (this) {
-      case 'DISABLED':
-        return WindowsAccessAuditLogLevel.disabled;
-      case 'SUCCESS_ONLY':
-        return WindowsAccessAuditLogLevel.successOnly;
-      case 'FAILURE_ONLY':
-        return WindowsAccessAuditLogLevel.failureOnly;
-      case 'SUCCESS_AND_FAILURE':
-        return WindowsAccessAuditLogLevel.successAndFailure;
-    }
-    throw Exception('$this is not known in enum WindowsAccessAuditLogLevel');
-  }
+  const WindowsAccessAuditLogLevel(this.value);
+
+  static WindowsAccessAuditLogLevel fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum WindowsAccessAuditLogLevel'));
 }
 
 /// The configuration that Amazon FSx for Windows File Server uses to audit and
@@ -11749,7 +12890,7 @@ class WindowsAuditLogConfiguration {
   /// Kinesis Data Firehose delivery stream ARN.
   ///
   /// The name of the Amazon CloudWatch Logs log group must begin with the
-  /// <code>/aws/fsx</code> prefix. The name of the Amazon Kinesis Data Firehouse
+  /// <code>/aws/fsx</code> prefix. The name of the Amazon Kinesis Data Firehose
   /// delivery stream must begin with the <code>aws-fsx</code> prefix.
   ///
   /// The destination ARN (either CloudWatch Logs log group or Kinesis Data
@@ -11766,11 +12907,10 @@ class WindowsAuditLogConfiguration {
 
   factory WindowsAuditLogConfiguration.fromJson(Map<String, dynamic> json) {
     return WindowsAuditLogConfiguration(
-      fileAccessAuditLogLevel: (json['FileAccessAuditLogLevel'] as String)
-          .toWindowsAccessAuditLogLevel(),
-      fileShareAccessAuditLogLevel:
-          (json['FileShareAccessAuditLogLevel'] as String)
-              .toWindowsAccessAuditLogLevel(),
+      fileAccessAuditLogLevel: WindowsAccessAuditLogLevel.fromString(
+          (json['FileAccessAuditLogLevel'] as String)),
+      fileShareAccessAuditLogLevel: WindowsAccessAuditLogLevel.fromString(
+          (json['FileShareAccessAuditLogLevel'] as String)),
       auditLogDestination: json['AuditLogDestination'] as String?,
     );
   }
@@ -11837,7 +12977,7 @@ class WindowsAuditLogCreateConfiguration {
   /// </li>
   /// <li>
   /// The name of the Amazon CloudWatch Logs log group must begin with the
-  /// <code>/aws/fsx</code> prefix. The name of the Amazon Kinesis Data Firehouse
+  /// <code>/aws/fsx</code> prefix. The name of the Amazon Kinesis Data Firehose
   /// delivery stream must begin with the <code>aws-fsx</code> prefix.
   /// </li>
   /// <li>
@@ -11869,8 +13009,8 @@ class WindowsAuditLogCreateConfiguration {
     final fileShareAccessAuditLogLevel = this.fileShareAccessAuditLogLevel;
     final auditLogDestination = this.auditLogDestination;
     return {
-      'FileAccessAuditLogLevel': fileAccessAuditLogLevel.toValue(),
-      'FileShareAccessAuditLogLevel': fileShareAccessAuditLogLevel.toValue(),
+      'FileAccessAuditLogLevel': fileAccessAuditLogLevel.value,
+      'FileShareAccessAuditLogLevel': fileShareAccessAuditLogLevel.value,
       if (auditLogDestination != null)
         'AuditLogDestination': auditLogDestination,
     };
@@ -11878,36 +13018,19 @@ class WindowsAuditLogCreateConfiguration {
 }
 
 enum WindowsDeploymentType {
-  multiAz_1,
-  singleAz_1,
-  singleAz_2,
-}
+  multiAz_1('MULTI_AZ_1'),
+  singleAz_1('SINGLE_AZ_1'),
+  singleAz_2('SINGLE_AZ_2'),
+  ;
 
-extension WindowsDeploymentTypeValueExtension on WindowsDeploymentType {
-  String toValue() {
-    switch (this) {
-      case WindowsDeploymentType.multiAz_1:
-        return 'MULTI_AZ_1';
-      case WindowsDeploymentType.singleAz_1:
-        return 'SINGLE_AZ_1';
-      case WindowsDeploymentType.singleAz_2:
-        return 'SINGLE_AZ_2';
-    }
-  }
-}
+  final String value;
 
-extension WindowsDeploymentTypeFromString on String {
-  WindowsDeploymentType toWindowsDeploymentType() {
-    switch (this) {
-      case 'MULTI_AZ_1':
-        return WindowsDeploymentType.multiAz_1;
-      case 'SINGLE_AZ_1':
-        return WindowsDeploymentType.singleAz_1;
-      case 'SINGLE_AZ_2':
-        return WindowsDeploymentType.singleAz_2;
-    }
-    throw Exception('$this is not known in enum WindowsDeploymentType');
-  }
+  const WindowsDeploymentType(this.value);
+
+  static WindowsDeploymentType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum WindowsDeploymentType'));
 }
 
 /// The configuration for this Microsoft Windows file system.
@@ -11961,6 +13084,13 @@ class WindowsFileSystemConfiguration {
   /// href="https://docs.aws.amazon.com/fsx/latest/WindowsGuide/high-availability-multiAZ.html">Single-AZ
   /// and Multi-AZ File Systems</a>.
   final WindowsDeploymentType? deploymentType;
+
+  /// The SSD IOPS (input/output operations per second) configuration for an
+  /// Amazon FSx for Windows file system. By default, Amazon FSx automatically
+  /// provisions 3 IOPS per GiB of storage capacity. You can provision additional
+  /// IOPS per GiB of storage, up to the maximum limit associated with your chosen
+  /// throughput capacity.
+  final DiskIopsConfiguration? diskIopsConfiguration;
 
   /// The list of maintenance operations in progress for this file system.
   final List<FileSystemMaintenanceOperation>? maintenanceOperationsInProgress;
@@ -12022,6 +13152,7 @@ class WindowsFileSystemConfiguration {
     this.copyTagsToBackups,
     this.dailyAutomaticBackupStartTime,
     this.deploymentType,
+    this.diskIopsConfiguration,
     this.maintenanceOperationsInProgress,
     this.preferredFileServerIp,
     this.preferredSubnetId,
@@ -12035,7 +13166,7 @@ class WindowsFileSystemConfiguration {
     return WindowsFileSystemConfiguration(
       activeDirectoryId: json['ActiveDirectoryId'] as String?,
       aliases: (json['Aliases'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Alias.fromJson(e as Map<String, dynamic>))
           .toList(),
       auditLogConfiguration: json['AuditLogConfiguration'] != null
@@ -12047,13 +13178,17 @@ class WindowsFileSystemConfiguration {
       copyTagsToBackups: json['CopyTagsToBackups'] as bool?,
       dailyAutomaticBackupStartTime:
           json['DailyAutomaticBackupStartTime'] as String?,
-      deploymentType:
-          (json['DeploymentType'] as String?)?.toWindowsDeploymentType(),
-      maintenanceOperationsInProgress:
-          (json['MaintenanceOperationsInProgress'] as List?)
-              ?.whereNotNull()
-              .map((e) => (e as String).toFileSystemMaintenanceOperation())
-              .toList(),
+      deploymentType: (json['DeploymentType'] as String?)
+          ?.let(WindowsDeploymentType.fromString),
+      diskIopsConfiguration: json['DiskIopsConfiguration'] != null
+          ? DiskIopsConfiguration.fromJson(
+              json['DiskIopsConfiguration'] as Map<String, dynamic>)
+          : null,
+      maintenanceOperationsInProgress: (json['MaintenanceOperationsInProgress']
+              as List?)
+          ?.nonNulls
+          .map((e) => FileSystemMaintenanceOperation.fromString((e as String)))
+          .toList(),
       preferredFileServerIp: json['PreferredFileServerIp'] as String?,
       preferredSubnetId: json['PreferredSubnetId'] as String?,
       remoteAdministrationEndpoint:

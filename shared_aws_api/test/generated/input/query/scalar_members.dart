@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'scalar_members.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Scalar members
 class ScalarMembers {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   ScalarMembers({
     required String region,
@@ -31,7 +30,7 @@ class ScalarMembers {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'ScalarMembers',
@@ -40,9 +39,7 @@ class ScalarMembers {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -58,10 +55,11 @@ class ScalarMembers {
     bool? baz,
     String? foo,
   }) async {
-    final $request = <String, dynamic>{};
-    bar?.also((arg) => $request['Bar'] = arg);
-    baz?.also((arg) => $request['Baz'] = arg);
-    foo?.also((arg) => $request['Foo'] = arg);
+    final $request = <String, String>{
+      if (bar != null) 'Bar': bar,
+      if (baz != null) 'Baz': baz.toString(),
+      if (foo != null) 'Foo': foo,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -69,8 +67,6 @@ class ScalarMembers {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 
@@ -79,10 +75,11 @@ class ScalarMembers {
     bool? baz,
     String? foo,
   }) async {
-    final $request = <String, dynamic>{};
-    bar?.also((arg) => $request['Bar'] = arg);
-    baz?.also((arg) => $request['Baz'] = arg);
-    foo?.also((arg) => $request['Foo'] = arg);
+    final $request = <String, String>{
+      if (bar != null) 'Bar': bar,
+      if (baz != null) 'Baz': baz.toString(),
+      if (foo != null) 'Foo': foo,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -90,8 +87,6 @@ class ScalarMembers {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 
@@ -100,10 +95,11 @@ class ScalarMembers {
     bool? baz,
     String? foo,
   }) async {
-    final $request = <String, dynamic>{};
-    bar?.also((arg) => $request['Bar'] = arg);
-    baz?.also((arg) => $request['Baz'] = arg);
-    foo?.also((arg) => $request['Foo'] = arg);
+    final $request = <String, String>{
+      if (bar != null) 'Bar': bar,
+      if (baz != null) 'Baz': baz.toString(),
+      if (foo != null) 'Foo': foo,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -111,8 +107,6 @@ class ScalarMembers {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }

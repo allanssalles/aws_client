@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -107,12 +108,10 @@ class RedshiftDataApi {
   /// Guide</i>.
   ///
   /// May throw [ValidationException].
+  /// May throw [ActiveSessionsExceededException].
   /// May throw [ActiveStatementsExceededException].
   /// May throw [BatchExecuteStatementException].
-  ///
-  /// Parameter [database] :
-  /// The name of the database. This parameter is required when authenticating
-  /// using either Secrets Manager or temporary credentials.
+  /// May throw [InternalServerException].
   ///
   /// Parameter [sqls] :
   /// One or more SQL statements to run. <pre><code> The SQL statements are run
@@ -130,6 +129,10 @@ class RedshiftDataApi {
   /// cluster and authenticating using either Secrets Manager or temporary
   /// credentials.
   ///
+  /// Parameter [database] :
+  /// The name of the database. This parameter is required when authenticating
+  /// using either Secrets Manager or temporary credentials.
+  ///
   /// Parameter [dbUser] :
   /// The database user name. This parameter is required when connecting to a
   /// cluster as a database user and authenticating using temporary credentials.
@@ -137,6 +140,14 @@ class RedshiftDataApi {
   /// Parameter [secretArn] :
   /// The name or ARN of the secret that enables access to the database. This
   /// parameter is required when authenticating using Secrets Manager.
+  ///
+  /// Parameter [sessionId] :
+  /// The session identifier of the query.
+  ///
+  /// Parameter [sessionKeepAliveSeconds] :
+  /// The number of seconds to keep the session alive after the query finishes.
+  /// The maximum time a session can keep alive is 24 hours. After 24 hours, the
+  /// session is forced closed and the query is terminated.
   ///
   /// Parameter [statementName] :
   /// The name of the SQL statements. You can name the SQL statements when you
@@ -151,16 +162,24 @@ class RedshiftDataApi {
   /// parameter is required when connecting to a serverless workgroup and
   /// authenticating using either Secrets Manager or temporary credentials.
   Future<BatchExecuteStatementOutput> batchExecuteStatement({
-    required String database,
     required List<String> sqls,
     String? clientToken,
     String? clusterIdentifier,
+    String? database,
     String? dbUser,
     String? secretArn,
+    String? sessionId,
+    int? sessionKeepAliveSeconds,
     String? statementName,
     bool? withEvent,
     String? workgroupName,
   }) async {
+    _s.validateNumRange(
+      'sessionKeepAliveSeconds',
+      sessionKeepAliveSeconds,
+      0,
+      86400,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'RedshiftData.BatchExecuteStatement'
@@ -172,12 +191,15 @@ class RedshiftDataApi {
       // TODO queryParams
       headers: headers,
       payload: {
-        'Database': database,
         'Sqls': sqls,
         'ClientToken': clientToken ?? _s.generateIdempotencyToken(),
         if (clusterIdentifier != null) 'ClusterIdentifier': clusterIdentifier,
+        if (database != null) 'Database': database,
         if (dbUser != null) 'DbUser': dbUser,
         if (secretArn != null) 'SecretArn': secretArn,
+        if (sessionId != null) 'SessionId': sessionId,
+        if (sessionKeepAliveSeconds != null)
+          'SessionKeepAliveSeconds': sessionKeepAliveSeconds,
         if (statementName != null) 'StatementName': statementName,
         if (withEvent != null) 'WithEvent': withEvent,
         if (workgroupName != null) 'WorkgroupName': workgroupName,
@@ -321,6 +343,7 @@ class RedshiftDataApi {
   /// Guide</i>.
   ///
   /// May throw [ValidationException].
+  /// May throw [QueryTimeoutException].
   /// May throw [InternalServerException].
   /// May throw [DatabaseConnectionException].
   ///
@@ -468,12 +491,10 @@ class RedshiftDataApi {
   /// Guide</i>.
   ///
   /// May throw [ValidationException].
+  /// May throw [ActiveSessionsExceededException].
   /// May throw [ExecuteStatementException].
   /// May throw [ActiveStatementsExceededException].
-  ///
-  /// Parameter [database] :
-  /// The name of the database. This parameter is required when authenticating
-  /// using either Secrets Manager or temporary credentials.
+  /// May throw [InternalServerException].
   ///
   /// Parameter [sql] :
   /// The SQL statement text to run.
@@ -487,6 +508,10 @@ class RedshiftDataApi {
   /// cluster and authenticating using either Secrets Manager or temporary
   /// credentials.
   ///
+  /// Parameter [database] :
+  /// The name of the database. This parameter is required when authenticating
+  /// using either Secrets Manager or temporary credentials.
+  ///
   /// Parameter [dbUser] :
   /// The database user name. This parameter is required when connecting to a
   /// cluster as a database user and authenticating using temporary credentials.
@@ -497,6 +522,14 @@ class RedshiftDataApi {
   /// Parameter [secretArn] :
   /// The name or ARN of the secret that enables access to the database. This
   /// parameter is required when authenticating using Secrets Manager.
+  ///
+  /// Parameter [sessionId] :
+  /// The session identifier of the query.
+  ///
+  /// Parameter [sessionKeepAliveSeconds] :
+  /// The number of seconds to keep the session alive after the query finishes.
+  /// The maximum time a session can keep alive is 24 hours. After 24 hours, the
+  /// session is forced closed and the query is terminated.
   ///
   /// Parameter [statementName] :
   /// The name of the SQL statement. You can name the SQL statement when you
@@ -511,17 +544,25 @@ class RedshiftDataApi {
   /// parameter is required when connecting to a serverless workgroup and
   /// authenticating using either Secrets Manager or temporary credentials.
   Future<ExecuteStatementOutput> executeStatement({
-    required String database,
     required String sql,
     String? clientToken,
     String? clusterIdentifier,
+    String? database,
     String? dbUser,
     List<SqlParameter>? parameters,
     String? secretArn,
+    String? sessionId,
+    int? sessionKeepAliveSeconds,
     String? statementName,
     bool? withEvent,
     String? workgroupName,
   }) async {
+    _s.validateNumRange(
+      'sessionKeepAliveSeconds',
+      sessionKeepAliveSeconds,
+      0,
+      86400,
+    );
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'RedshiftData.ExecuteStatement'
@@ -533,13 +574,16 @@ class RedshiftDataApi {
       // TODO queryParams
       headers: headers,
       payload: {
-        'Database': database,
         'Sql': sql,
         'ClientToken': clientToken ?? _s.generateIdempotencyToken(),
         if (clusterIdentifier != null) 'ClusterIdentifier': clusterIdentifier,
+        if (database != null) 'Database': database,
         if (dbUser != null) 'DbUser': dbUser,
         if (parameters != null) 'Parameters': parameters,
         if (secretArn != null) 'SecretArn': secretArn,
+        if (sessionId != null) 'SessionId': sessionId,
+        if (sessionKeepAliveSeconds != null)
+          'SessionKeepAliveSeconds': sessionKeepAliveSeconds,
         if (statementName != null) 'StatementName': statementName,
         if (withEvent != null) 'WithEvent': withEvent,
         if (workgroupName != null) 'WorkgroupName': workgroupName,
@@ -652,6 +696,7 @@ class RedshiftDataApi {
   /// Guide</i>.
   ///
   /// May throw [ValidationException].
+  /// May throw [QueryTimeoutException].
   /// May throw [InternalServerException].
   /// May throw [DatabaseConnectionException].
   ///
@@ -778,6 +823,7 @@ class RedshiftDataApi {
   /// Guide</i>.
   ///
   /// May throw [ValidationException].
+  /// May throw [QueryTimeoutException].
   /// May throw [InternalServerException].
   /// May throw [DatabaseConnectionException].
   ///
@@ -965,7 +1011,7 @@ class RedshiftDataApi {
         if (nextToken != null) 'NextToken': nextToken,
         if (roleLevel != null) 'RoleLevel': roleLevel,
         if (statementName != null) 'StatementName': statementName,
-        if (status != null) 'Status': status.toValue(),
+        if (status != null) 'Status': status.value,
       },
     );
 
@@ -1024,6 +1070,7 @@ class RedshiftDataApi {
   /// Guide</i>.
   ///
   /// May throw [ValidationException].
+  /// May throw [QueryTimeoutException].
   /// May throw [InternalServerException].
   /// May throw [DatabaseConnectionException].
   ///
@@ -1141,6 +1188,9 @@ class BatchExecuteStatementOutput {
   /// The name of the database.
   final String? database;
 
+  /// A list of colon (:) separated names of database groups.
+  final List<String>? dbGroups;
+
   /// The database user name.
   final String? dbUser;
 
@@ -1152,6 +1202,9 @@ class BatchExecuteStatementOutput {
   /// The name or ARN of the secret that enables access to the database.
   final String? secretArn;
 
+  /// The session identifier of the query.
+  final String? sessionId;
+
   /// The serverless workgroup name or Amazon Resource Name (ARN). This element is
   /// not returned when connecting to a provisioned cluster.
   final String? workgroupName;
@@ -1160,9 +1213,11 @@ class BatchExecuteStatementOutput {
     this.clusterIdentifier,
     this.createdAt,
     this.database,
+    this.dbGroups,
     this.dbUser,
     this.id,
     this.secretArn,
+    this.sessionId,
     this.workgroupName,
   });
 
@@ -1171,9 +1226,14 @@ class BatchExecuteStatementOutput {
       clusterIdentifier: json['ClusterIdentifier'] as String?,
       createdAt: timeStampFromJson(json['CreatedAt']),
       database: json['Database'] as String?,
+      dbGroups: (json['DbGroups'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       dbUser: json['DbUser'] as String?,
       id: json['Id'] as String?,
       secretArn: json['SecretArn'] as String?,
+      sessionId: json['SessionId'] as String?,
       workgroupName: json['WorkgroupName'] as String?,
     );
   }
@@ -1182,17 +1242,21 @@ class BatchExecuteStatementOutput {
     final clusterIdentifier = this.clusterIdentifier;
     final createdAt = this.createdAt;
     final database = this.database;
+    final dbGroups = this.dbGroups;
     final dbUser = this.dbUser;
     final id = this.id;
     final secretArn = this.secretArn;
+    final sessionId = this.sessionId;
     final workgroupName = this.workgroupName;
     return {
       if (clusterIdentifier != null) 'ClusterIdentifier': clusterIdentifier,
       if (createdAt != null) 'CreatedAt': unixTimestampToJson(createdAt),
       if (database != null) 'Database': database,
+      if (dbGroups != null) 'DbGroups': dbGroups,
       if (dbUser != null) 'DbUser': dbUser,
       if (id != null) 'Id': id,
       if (secretArn != null) 'SecretArn': secretArn,
+      if (sessionId != null) 'SessionId': sessionId,
       if (workgroupName != null) 'WorkgroupName': workgroupName,
     };
   }
@@ -1384,6 +1448,9 @@ class DescribeStatementResponse {
   /// the database.
   final String? secretArn;
 
+  /// The session identifier of the query.
+  final String? sessionId;
+
   /// The status of the SQL statement being described. Status values are defined
   /// as follows:
   ///
@@ -1439,6 +1506,7 @@ class DescribeStatementResponse {
     this.resultRows,
     this.resultSize,
     this.secretArn,
+    this.sessionId,
     this.status,
     this.subStatements,
     this.updatedAt,
@@ -1456,7 +1524,7 @@ class DescribeStatementResponse {
       error: json['Error'] as String?,
       hasResultSet: json['HasResultSet'] as bool?,
       queryParameters: (json['QueryParameters'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => SqlParameter.fromJson(e as Map<String, dynamic>))
           .toList(),
       queryString: json['QueryString'] as String?,
@@ -1465,9 +1533,10 @@ class DescribeStatementResponse {
       resultRows: json['ResultRows'] as int?,
       resultSize: json['ResultSize'] as int?,
       secretArn: json['SecretArn'] as String?,
-      status: (json['Status'] as String?)?.toStatusString(),
+      sessionId: json['SessionId'] as String?,
+      status: (json['Status'] as String?)?.let(StatusString.fromString),
       subStatements: (json['SubStatements'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => SubStatementData.fromJson(e as Map<String, dynamic>))
           .toList(),
       updatedAt: timeStampFromJson(json['UpdatedAt']),
@@ -1491,6 +1560,7 @@ class DescribeStatementResponse {
     final resultRows = this.resultRows;
     final resultSize = this.resultSize;
     final secretArn = this.secretArn;
+    final sessionId = this.sessionId;
     final status = this.status;
     final subStatements = this.subStatements;
     final updatedAt = this.updatedAt;
@@ -1511,7 +1581,8 @@ class DescribeStatementResponse {
       if (resultRows != null) 'ResultRows': resultRows,
       if (resultSize != null) 'ResultSize': resultSize,
       if (secretArn != null) 'SecretArn': secretArn,
-      if (status != null) 'Status': status.toValue(),
+      if (sessionId != null) 'SessionId': sessionId,
+      if (status != null) 'Status': status.value,
       if (subStatements != null) 'SubStatements': subStatements,
       if (updatedAt != null) 'UpdatedAt': unixTimestampToJson(updatedAt),
       if (workgroupName != null) 'WorkgroupName': workgroupName,
@@ -1543,7 +1614,7 @@ class DescribeTableResponse {
   factory DescribeTableResponse.fromJson(Map<String, dynamic> json) {
     return DescribeTableResponse(
       columnList: (json['ColumnList'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ColumnMetadata.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -1574,6 +1645,9 @@ class ExecuteStatementOutput {
   /// The name of the database.
   final String? database;
 
+  /// A list of colon (:) separated names of database groups.
+  final List<String>? dbGroups;
+
   /// The database user name.
   final String? dbUser;
 
@@ -1585,6 +1659,9 @@ class ExecuteStatementOutput {
   /// The name or ARN of the secret that enables access to the database.
   final String? secretArn;
 
+  /// The session identifier of the query.
+  final String? sessionId;
+
   /// The serverless workgroup name or Amazon Resource Name (ARN). This element is
   /// not returned when connecting to a provisioned cluster.
   final String? workgroupName;
@@ -1593,9 +1670,11 @@ class ExecuteStatementOutput {
     this.clusterIdentifier,
     this.createdAt,
     this.database,
+    this.dbGroups,
     this.dbUser,
     this.id,
     this.secretArn,
+    this.sessionId,
     this.workgroupName,
   });
 
@@ -1604,9 +1683,14 @@ class ExecuteStatementOutput {
       clusterIdentifier: json['ClusterIdentifier'] as String?,
       createdAt: timeStampFromJson(json['CreatedAt']),
       database: json['Database'] as String?,
+      dbGroups: (json['DbGroups'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       dbUser: json['DbUser'] as String?,
       id: json['Id'] as String?,
       secretArn: json['SecretArn'] as String?,
+      sessionId: json['SessionId'] as String?,
       workgroupName: json['WorkgroupName'] as String?,
     );
   }
@@ -1615,17 +1699,21 @@ class ExecuteStatementOutput {
     final clusterIdentifier = this.clusterIdentifier;
     final createdAt = this.createdAt;
     final database = this.database;
+    final dbGroups = this.dbGroups;
     final dbUser = this.dbUser;
     final id = this.id;
     final secretArn = this.secretArn;
+    final sessionId = this.sessionId;
     final workgroupName = this.workgroupName;
     return {
       if (clusterIdentifier != null) 'ClusterIdentifier': clusterIdentifier,
       if (createdAt != null) 'CreatedAt': unixTimestampToJson(createdAt),
       if (database != null) 'Database': database,
+      if (dbGroups != null) 'DbGroups': dbGroups,
       if (dbUser != null) 'DbUser': dbUser,
       if (id != null) 'Id': id,
       if (secretArn != null) 'SecretArn': secretArn,
+      if (sessionId != null) 'SessionId': sessionId,
       if (workgroupName != null) 'WorkgroupName': workgroupName,
     };
   }
@@ -1720,14 +1808,14 @@ class GetStatementResultResponse {
   factory GetStatementResultResponse.fromJson(Map<String, dynamic> json) {
     return GetStatementResultResponse(
       records: (json['Records'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => (e as List)
-              .whereNotNull()
+              .nonNulls
               .map((e) => Field.fromJson(e as Map<String, dynamic>))
               .toList())
           .toList(),
       columnMetadata: (json['ColumnMetadata'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ColumnMetadata.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -1769,7 +1857,7 @@ class ListDatabasesResponse {
   factory ListDatabasesResponse.fromJson(Map<String, dynamic> json) {
     return ListDatabasesResponse(
       databases: (json['Databases'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -1806,10 +1894,8 @@ class ListSchemasResponse {
   factory ListSchemasResponse.fromJson(Map<String, dynamic> json) {
     return ListSchemasResponse(
       nextToken: json['NextToken'] as String?,
-      schemas: (json['Schemas'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      schemas:
+          (json['Schemas'] as List?)?.nonNulls.map((e) => e as String).toList(),
     );
   }
 
@@ -1843,7 +1929,7 @@ class ListStatementsResponse {
   factory ListStatementsResponse.fromJson(Map<String, dynamic> json) {
     return ListStatementsResponse(
       statements: (json['Statements'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => StatementData.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -1881,7 +1967,7 @@ class ListTablesResponse {
     return ListTablesResponse(
       nextToken: json['NextToken'] as String?,
       tables: (json['Tables'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => TableMember.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -1956,6 +2042,9 @@ class StatementData {
   /// the database.
   final String? secretArn;
 
+  /// The session identifier of the query.
+  final String? sessionId;
+
   /// The name of the SQL statement.
   final String? statementName;
 
@@ -1974,6 +2063,7 @@ class StatementData {
     this.queryString,
     this.queryStrings,
     this.secretArn,
+    this.sessionId,
     this.statementName,
     this.status,
     this.updatedAt,
@@ -1985,17 +2075,18 @@ class StatementData {
       createdAt: timeStampFromJson(json['CreatedAt']),
       isBatchStatement: json['IsBatchStatement'] as bool?,
       queryParameters: (json['QueryParameters'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => SqlParameter.fromJson(e as Map<String, dynamic>))
           .toList(),
       queryString: json['QueryString'] as String?,
       queryStrings: (json['QueryStrings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       secretArn: json['SecretArn'] as String?,
+      sessionId: json['SessionId'] as String?,
       statementName: json['StatementName'] as String?,
-      status: (json['Status'] as String?)?.toStatusString(),
+      status: (json['Status'] as String?)?.let(StatusString.fromString),
       updatedAt: timeStampFromJson(json['UpdatedAt']),
     );
   }
@@ -2008,6 +2099,7 @@ class StatementData {
     final queryString = this.queryString;
     final queryStrings = this.queryStrings;
     final secretArn = this.secretArn;
+    final sessionId = this.sessionId;
     final statementName = this.statementName;
     final status = this.status;
     final updatedAt = this.updatedAt;
@@ -2019,112 +2111,51 @@ class StatementData {
       if (queryString != null) 'QueryString': queryString,
       if (queryStrings != null) 'QueryStrings': queryStrings,
       if (secretArn != null) 'SecretArn': secretArn,
+      if (sessionId != null) 'SessionId': sessionId,
       if (statementName != null) 'StatementName': statementName,
-      if (status != null) 'Status': status.toValue(),
+      if (status != null) 'Status': status.value,
       if (updatedAt != null) 'UpdatedAt': unixTimestampToJson(updatedAt),
     };
   }
 }
 
 enum StatementStatusString {
-  submitted,
-  picked,
-  started,
-  finished,
-  aborted,
-  failed,
-}
+  submitted('SUBMITTED'),
+  picked('PICKED'),
+  started('STARTED'),
+  finished('FINISHED'),
+  aborted('ABORTED'),
+  failed('FAILED'),
+  ;
 
-extension StatementStatusStringValueExtension on StatementStatusString {
-  String toValue() {
-    switch (this) {
-      case StatementStatusString.submitted:
-        return 'SUBMITTED';
-      case StatementStatusString.picked:
-        return 'PICKED';
-      case StatementStatusString.started:
-        return 'STARTED';
-      case StatementStatusString.finished:
-        return 'FINISHED';
-      case StatementStatusString.aborted:
-        return 'ABORTED';
-      case StatementStatusString.failed:
-        return 'FAILED';
-    }
-  }
-}
+  final String value;
 
-extension StatementStatusStringFromString on String {
-  StatementStatusString toStatementStatusString() {
-    switch (this) {
-      case 'SUBMITTED':
-        return StatementStatusString.submitted;
-      case 'PICKED':
-        return StatementStatusString.picked;
-      case 'STARTED':
-        return StatementStatusString.started;
-      case 'FINISHED':
-        return StatementStatusString.finished;
-      case 'ABORTED':
-        return StatementStatusString.aborted;
-      case 'FAILED':
-        return StatementStatusString.failed;
-    }
-    throw Exception('$this is not known in enum StatementStatusString');
-  }
+  const StatementStatusString(this.value);
+
+  static StatementStatusString fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum StatementStatusString'));
 }
 
 enum StatusString {
-  submitted,
-  picked,
-  started,
-  finished,
-  aborted,
-  failed,
-  all,
-}
+  submitted('SUBMITTED'),
+  picked('PICKED'),
+  started('STARTED'),
+  finished('FINISHED'),
+  aborted('ABORTED'),
+  failed('FAILED'),
+  all('ALL'),
+  ;
 
-extension StatusStringValueExtension on StatusString {
-  String toValue() {
-    switch (this) {
-      case StatusString.submitted:
-        return 'SUBMITTED';
-      case StatusString.picked:
-        return 'PICKED';
-      case StatusString.started:
-        return 'STARTED';
-      case StatusString.finished:
-        return 'FINISHED';
-      case StatusString.aborted:
-        return 'ABORTED';
-      case StatusString.failed:
-        return 'FAILED';
-      case StatusString.all:
-        return 'ALL';
-    }
-  }
-}
+  final String value;
 
-extension StatusStringFromString on String {
-  StatusString toStatusString() {
-    switch (this) {
-      case 'SUBMITTED':
-        return StatusString.submitted;
-      case 'PICKED':
-        return StatusString.picked;
-      case 'STARTED':
-        return StatusString.started;
-      case 'FINISHED':
-        return StatusString.finished;
-      case 'ABORTED':
-        return StatusString.aborted;
-      case 'FAILED':
-        return StatusString.failed;
-      case 'ALL':
-        return StatusString.all;
-    }
-    throw Exception('$this is not known in enum StatusString');
-  }
+  const StatusString(this.value);
+
+  static StatusString fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum StatusString'));
 }
 
 /// Information about an SQL statement.
@@ -2199,7 +2230,8 @@ class SubStatementData {
       redshiftQueryId: json['RedshiftQueryId'] as int?,
       resultRows: json['ResultRows'] as int?,
       resultSize: json['ResultSize'] as int?,
-      status: (json['Status'] as String?)?.toStatementStatusString(),
+      status:
+          (json['Status'] as String?)?.let(StatementStatusString.fromString),
       updatedAt: timeStampFromJson(json['UpdatedAt']),
     );
   }
@@ -2226,7 +2258,7 @@ class SubStatementData {
       if (redshiftQueryId != null) 'RedshiftQueryId': redshiftQueryId,
       if (resultRows != null) 'ResultRows': resultRows,
       if (resultSize != null) 'ResultSize': resultSize,
-      if (status != null) 'Status': status.toValue(),
+      if (status != null) 'Status': status.value,
       if (updatedAt != null) 'UpdatedAt': unixTimestampToJson(updatedAt),
     };
   }
@@ -2270,6 +2302,14 @@ class TableMember {
   }
 }
 
+class ActiveSessionsExceededException extends _s.GenericAwsException {
+  ActiveSessionsExceededException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'ActiveSessionsExceededException',
+            message: message);
+}
+
 class ActiveStatementsExceededException extends _s.GenericAwsException {
   ActiveStatementsExceededException({String? type, String? message})
       : super(
@@ -2302,6 +2342,11 @@ class InternalServerException extends _s.GenericAwsException {
       : super(type: type, code: 'InternalServerException', message: message);
 }
 
+class QueryTimeoutException extends _s.GenericAwsException {
+  QueryTimeoutException({String? type, String? message})
+      : super(type: type, code: 'QueryTimeoutException', message: message);
+}
+
 class ResourceNotFoundException extends _s.GenericAwsException {
   ResourceNotFoundException({String? type, String? message})
       : super(type: type, code: 'ResourceNotFoundException', message: message);
@@ -2313,6 +2358,8 @@ class ValidationException extends _s.GenericAwsException {
 }
 
 final _exceptionFns = <String, _s.AwsExceptionFn>{
+  'ActiveSessionsExceededException': (type, message) =>
+      ActiveSessionsExceededException(type: type, message: message),
   'ActiveStatementsExceededException': (type, message) =>
       ActiveStatementsExceededException(type: type, message: message),
   'BatchExecuteStatementException': (type, message) =>
@@ -2323,6 +2370,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       ExecuteStatementException(type: type, message: message),
   'InternalServerException': (type, message) =>
       InternalServerException(type: type, message: message),
+  'QueryTimeoutException': (type, message) =>
+      QueryTimeoutException(type: type, message: message),
   'ResourceNotFoundException': (type, message) =>
       ResourceNotFoundException(type: type, message: message),
   'ValidationException': (type, message) =>

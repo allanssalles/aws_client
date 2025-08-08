@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -89,7 +90,7 @@ class ElasticInference {
     List<String>? acceleratorTypes,
   }) async {
     final $payload = <String, dynamic>{
-      'locationType': locationType.toValue(),
+      'locationType': locationType.value,
       if (acceleratorTypes != null) 'acceleratorTypes': acceleratorTypes,
     };
     final response = await _protocol.send(
@@ -311,7 +312,7 @@ class AcceleratorType {
           ? MemoryInfo.fromJson(json['memoryInfo'] as Map<String, dynamic>)
           : null,
       throughputInfo: (json['throughputInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => KeyValuePair.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -357,7 +358,8 @@ class AcceleratorTypeOffering {
     return AcceleratorTypeOffering(
       acceleratorType: json['acceleratorType'] as String?,
       location: json['location'] as String?,
-      locationType: (json['locationType'] as String?)?.toLocationType(),
+      locationType:
+          (json['locationType'] as String?)?.let(LocationType.fromString),
     );
   }
 
@@ -368,7 +370,7 @@ class AcceleratorTypeOffering {
     return {
       if (acceleratorType != null) 'acceleratorType': acceleratorType,
       if (location != null) 'location': location,
-      if (locationType != null) 'locationType': locationType.toValue(),
+      if (locationType != null) 'locationType': locationType.value,
     };
   }
 }
@@ -385,7 +387,7 @@ class DescribeAcceleratorOfferingsResponse {
       Map<String, dynamic> json) {
     return DescribeAcceleratorOfferingsResponse(
       acceleratorTypeOfferings: (json['acceleratorTypeOfferings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               AcceleratorTypeOffering.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -412,7 +414,7 @@ class DescribeAcceleratorTypesResponse {
   factory DescribeAcceleratorTypesResponse.fromJson(Map<String, dynamic> json) {
     return DescribeAcceleratorTypesResponse(
       acceleratorTypes: (json['acceleratorTypes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => AcceleratorType.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -442,7 +444,7 @@ class DescribeAcceleratorsResponse {
   factory DescribeAcceleratorsResponse.fromJson(Map<String, dynamic> json) {
     return DescribeAcceleratorsResponse(
       acceleratorSet: (json['acceleratorSet'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               ElasticInferenceAccelerator.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -620,36 +622,19 @@ class ListTagsForResourceResult {
 }
 
 enum LocationType {
-  region,
-  availabilityZone,
-  availabilityZoneId,
-}
+  region('region'),
+  availabilityZone('availability-zone'),
+  availabilityZoneId('availability-zone-id'),
+  ;
 
-extension LocationTypeValueExtension on LocationType {
-  String toValue() {
-    switch (this) {
-      case LocationType.region:
-        return 'region';
-      case LocationType.availabilityZone:
-        return 'availability-zone';
-      case LocationType.availabilityZoneId:
-        return 'availability-zone-id';
-    }
-  }
-}
+  final String value;
 
-extension LocationTypeFromString on String {
-  LocationType toLocationType() {
-    switch (this) {
-      case 'region':
-        return LocationType.region;
-      case 'availability-zone':
-        return LocationType.availabilityZone;
-      case 'availability-zone-id':
-        return LocationType.availabilityZoneId;
-    }
-    throw Exception('$this is not known in enum LocationType');
-  }
+  const LocationType(this.value);
+
+  static LocationType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum LocationType'));
 }
 
 /// The memory information of an Elastic Inference Accelerator type.

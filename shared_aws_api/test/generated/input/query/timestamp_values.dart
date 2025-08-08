@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'timestamp_values.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Timestamp values
 class TimestampValues {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   TimestampValues({
     required String region,
@@ -31,7 +30,7 @@ class TimestampValues {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'TimestampValues',
@@ -40,9 +39,7 @@ class TimestampValues {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -58,12 +55,13 @@ class TimestampValues {
     DateTime? timeCustom,
     DateTime? timeFormat,
   }) async {
-    final $request = <String, dynamic>{};
-    timeArg?.also((arg) => $request['TimeArg'] = _s.iso8601ToJson(arg));
-    timeCustom?.also((arg) =>
-        $request['TimeCustom'] = _s.unixTimestampToJson(arg).toString());
-    timeFormat?.also((arg) =>
-        $request['TimeFormat'] = _s.unixTimestampToJson(arg).toString());
+    final $request = <String, String>{
+      if (timeArg != null) 'TimeArg': _s.iso8601ToJson(timeArg),
+      if (timeCustom != null)
+        'TimeCustom': _s.unixTimestampToJson(timeCustom).toString(),
+      if (timeFormat != null)
+        'TimeFormat': _s.unixTimestampToJson(timeFormat).toString(),
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -71,8 +69,6 @@ class TimestampValues {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }

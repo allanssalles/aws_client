@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -1264,7 +1265,7 @@ class ListProjectsResult {
   factory ListProjectsResult.fromJson(Map<String, dynamic> json) {
     return ListProjectsResult(
       projects: (json['projects'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ProjectSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -1289,7 +1290,7 @@ class ListResourcesResult {
     return ListResourcesResult(
       nextToken: json['nextToken'] as String?,
       resources: (json['resources'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Resource.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -1333,7 +1334,7 @@ class ListTeamMembersResult {
   factory ListTeamMembersResult.fromJson(Map<String, dynamic> json) {
     return ListTeamMembersResult(
       teamMembers: (json['teamMembers'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => TeamMember.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -1357,7 +1358,7 @@ class ListUserProfilesResult {
   factory ListUserProfilesResult.fromJson(Map<String, dynamic> json) {
     return ListUserProfilesResult(
       userProfiles: (json['userProfiles'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => UserProfileSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,

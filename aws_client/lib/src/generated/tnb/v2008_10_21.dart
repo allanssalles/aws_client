@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -313,7 +314,7 @@ class TelcoNetworkBuilder {
   }
 
   /// Gets the details of a network function instance, including the
-  /// instantation state and metadata from the function package descriptor in
+  /// instantiation state and metadata from the function package descriptor in
   /// the network function package.
   ///
   /// A network function instance is a function in a function package .
@@ -392,7 +393,7 @@ class TelcoNetworkBuilder {
     required String vnfPkgId,
   }) async {
     final headers = <String, String>{
-      'Accept': accept.toValue(),
+      'Accept': accept.value,
     };
     final response = await _protocol.sendRaw(
       payload: null,
@@ -406,7 +407,7 @@ class TelcoNetworkBuilder {
       packageContent: await response.stream.toBytes(),
       contentType: _s
           .extractHeaderStringValue(response.headers, 'Content-Type')
-          ?.toPackageContentType(),
+          ?.let(PackageContentType.fromString),
     );
   }
 
@@ -439,7 +440,7 @@ class TelcoNetworkBuilder {
     required String vnfPkgId,
   }) async {
     final headers = <String, String>{
-      'Accept': accept.toValue(),
+      'Accept': accept.value,
     };
     final response = await _protocol.sendRaw(
       payload: null,
@@ -453,7 +454,7 @@ class TelcoNetworkBuilder {
       vnfd: await response.stream.toBytes(),
       contentType: _s
           .extractHeaderStringValue(response.headers, 'Content-Type')
-          ?.toDescriptorContentType(),
+          ?.let(DescriptorContentType.fromString),
     );
   }
 
@@ -560,7 +561,7 @@ class TelcoNetworkBuilder {
     required String nsdInfoId,
   }) async {
     final headers = <String, String>{
-      'Accept': accept.toValue(),
+      'Accept': accept.value,
     };
     final response = await _protocol.sendRaw(
       payload: null,
@@ -574,7 +575,7 @@ class TelcoNetworkBuilder {
       nsdContent: await response.stream.toBytes(),
       contentType: _s
           .extractHeaderStringValue(response.headers, 'Content-Type')
-          ?.toPackageContentType(),
+          ?.let(PackageContentType.fromString),
     );
   }
 
@@ -607,7 +608,7 @@ class TelcoNetworkBuilder {
       nsd: await response.stream.toBytes(),
       contentType: _s
           .extractHeaderStringValue(response.headers, 'Content-Type')
-          ?.toDescriptorContentType(),
+          ?.let(DescriptorContentType.fromString),
     );
   }
 
@@ -644,8 +645,9 @@ class TelcoNetworkBuilder {
   /// Parameter [tags] :
   /// A tag is a label that you assign to an Amazon Web Services resource. Each
   /// tag consists of a key and an optional value. When you use this API, the
-  /// tags are transferred to the network operation that is created. Use tags to
-  /// search and filter your resources or track your Amazon Web Services costs.
+  /// tags are only applied to the network operation that is created. These tags
+  /// are not applied to the network instance. Use tags to search and filter
+  /// your resources or track your Amazon Web Services costs.
   Future<InstantiateSolNetworkInstanceOutput> instantiateSolNetworkInstance({
     required String nsInstanceId,
     Document? additionalParamsForNs,
@@ -806,9 +808,14 @@ class TelcoNetworkBuilder {
   ///
   /// Parameter [nextToken] :
   /// The token for the next page of results.
+  ///
+  /// Parameter [nsInstanceId] :
+  /// Network instance id filter, to retrieve network operations associated to a
+  /// network instance.
   Future<ListSolNetworkOperationsOutput> listSolNetworkOperations({
     int? maxResults,
     String? nextToken,
+    String? nsInstanceId,
   }) async {
     _s.validateNumRange(
       'maxResults',
@@ -819,6 +826,7 @@ class TelcoNetworkBuilder {
     final $query = <String, List<String>>{
       if (maxResults != null) 'max_results': [maxResults.toString()],
       if (nextToken != null) 'nextpage_opaque_marker': [nextToken],
+      if (nsInstanceId != null) 'nsInstanceId': [nsInstanceId],
     };
     final response = await _protocol.send(
       payload: null,
@@ -919,7 +927,7 @@ class TelcoNetworkBuilder {
     PackageContentType? contentType,
   }) async {
     final headers = <String, String>{
-      if (contentType != null) 'Content-Type': contentType.toValue(),
+      if (contentType != null) 'Content-Type': contentType.value,
     };
     final response = await _protocol.send(
       payload: file,
@@ -958,7 +966,7 @@ class TelcoNetworkBuilder {
     PackageContentType? contentType,
   }) async {
     final headers = <String, String>{
-      if (contentType != null) 'Content-Type': contentType.toValue(),
+      if (contentType != null) 'Content-Type': contentType.value,
     };
     final response = await _protocol.send(
       payload: file,
@@ -1026,8 +1034,9 @@ class TelcoNetworkBuilder {
   /// Parameter [tags] :
   /// A tag is a label that you assign to an Amazon Web Services resource. Each
   /// tag consists of a key and an optional value. When you use this API, the
-  /// tags are transferred to the network operation that is created. Use tags to
-  /// search and filter your resources or track your Amazon Web Services costs.
+  /// tags are only applied to the network operation that is created. These tags
+  /// are not applied to the network instance. Use tags to search and filter
+  /// your resources or track your Amazon Web Services costs.
   Future<TerminateSolNetworkInstanceOutput> terminateSolNetworkInstance({
     required String nsInstanceId,
     Map<String, String>? tags,
@@ -1101,7 +1110,7 @@ class TelcoNetworkBuilder {
     required String vnfPkgId,
   }) async {
     final $payload = <String, dynamic>{
-      'operationalState': operationalState.toValue(),
+      'operationalState': operationalState.value,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -1119,6 +1128,9 @@ class TelcoNetworkBuilder {
   /// that can be deployed and on which life-cycle operations (like terminate,
   /// update, and delete) can be performed.
   ///
+  /// Choose the <i>updateType</i> parameter to target the necessary update of
+  /// the network instance.
+  ///
   /// May throw [InternalServerException].
   /// May throw [ServiceQuotaExceededException].
   /// May throw [ThrottlingException].
@@ -1132,25 +1144,48 @@ class TelcoNetworkBuilder {
   /// Parameter [updateType] :
   /// The type of update.
   ///
+  /// <ul>
+  /// <li>
+  /// Use the <code>MODIFY_VNF_INFORMATION</code> update type, to update a
+  /// specific network function configuration, in the network instance.
+  /// </li>
+  /// <li>
+  /// Use the <code>UPDATE_NS</code> update type, to update the network instance
+  /// to a new network service descriptor.
+  /// </li>
+  /// </ul>
+  ///
   /// Parameter [modifyVnfInfoData] :
   /// Identifies the network function information parameters and/or the
   /// configurable properties of the network function to be modified.
   ///
+  /// Include this property only if the update type is
+  /// <code>MODIFY_VNF_INFORMATION</code>.
+  ///
   /// Parameter [tags] :
   /// A tag is a label that you assign to an Amazon Web Services resource. Each
   /// tag consists of a key and an optional value. When you use this API, the
-  /// tags are transferred to the network operation that is created. Use tags to
-  /// search and filter your resources or track your Amazon Web Services costs.
+  /// tags are only applied to the network operation that is created. These tags
+  /// are not applied to the network instance. Use tags to search and filter
+  /// your resources or track your Amazon Web Services costs.
+  ///
+  /// Parameter [updateNs] :
+  /// Identifies the network service descriptor and the configurable properties
+  /// of the descriptor, to be used for the update.
+  ///
+  /// Include this property only if the update type is <code>UPDATE_NS</code>.
   Future<UpdateSolNetworkInstanceOutput> updateSolNetworkInstance({
     required String nsInstanceId,
     required UpdateSolNetworkType updateType,
     UpdateSolNetworkModify? modifyVnfInfoData,
     Map<String, String>? tags,
+    UpdateSolNetworkServiceData? updateNs,
   }) async {
     final $payload = <String, dynamic>{
-      'updateType': updateType.toValue(),
+      'updateType': updateType.value,
       if (modifyVnfInfoData != null) 'modifyVnfInfoData': modifyVnfInfoData,
       if (tags != null) 'tags': tags,
+      if (updateNs != null) 'updateNs': updateNs,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -1190,7 +1225,7 @@ class TelcoNetworkBuilder {
     required NsdOperationalState nsdOperationalState,
   }) async {
     final $payload = <String, dynamic>{
-      'nsdOperationalState': nsdOperationalState.toValue(),
+      'nsdOperationalState': nsdOperationalState.value,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -1232,7 +1267,7 @@ class TelcoNetworkBuilder {
     PackageContentType? contentType,
   }) async {
     final headers = <String, String>{
-      if (contentType != null) 'Content-Type': contentType.toValue(),
+      if (contentType != null) 'Content-Type': contentType.value,
     };
     final response = await _protocol.send(
       payload: file,
@@ -1274,7 +1309,7 @@ class TelcoNetworkBuilder {
     PackageContentType? contentType,
   }) async {
     final headers = <String, String>{
-      if (contentType != null) 'Content-Type': contentType.toValue(),
+      if (contentType != null) 'Content-Type': contentType.value,
     };
     final response = await _protocol.send(
       payload: file,
@@ -1322,10 +1357,11 @@ class CreateSolFunctionPackageOutput {
     return CreateSolFunctionPackageOutput(
       arn: json['arn'] as String,
       id: json['id'] as String,
-      onboardingState: (json['onboardingState'] as String).toOnboardingState(),
+      onboardingState:
+          OnboardingState.fromString((json['onboardingState'] as String)),
       operationalState:
-          (json['operationalState'] as String).toOperationalState(),
-      usageState: (json['usageState'] as String).toUsageState(),
+          OperationalState.fromString((json['operationalState'] as String)),
+      usageState: UsageState.fromString((json['usageState'] as String)),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -1341,9 +1377,9 @@ class CreateSolFunctionPackageOutput {
     return {
       'arn': arn,
       'id': id,
-      'onboardingState': onboardingState.toValue(),
-      'operationalState': operationalState.toValue(),
-      'usageState': usageState.toValue(),
+      'onboardingState': onboardingState.value,
+      'operationalState': operationalState.value,
+      'usageState': usageState.value,
       if (tags != null) 'tags': tags,
     };
   }
@@ -1437,10 +1473,11 @@ class CreateSolNetworkPackageOutput {
       arn: json['arn'] as String,
       id: json['id'] as String,
       nsdOnboardingState:
-          (json['nsdOnboardingState'] as String).toNsdOnboardingState(),
-      nsdOperationalState:
-          (json['nsdOperationalState'] as String).toNsdOperationalState(),
-      nsdUsageState: (json['nsdUsageState'] as String).toNsdUsageState(),
+          NsdOnboardingState.fromString((json['nsdOnboardingState'] as String)),
+      nsdOperationalState: NsdOperationalState.fromString(
+          (json['nsdOperationalState'] as String)),
+      nsdUsageState:
+          NsdUsageState.fromString((json['nsdUsageState'] as String)),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -1456,39 +1493,34 @@ class CreateSolNetworkPackageOutput {
     return {
       'arn': arn,
       'id': id,
-      'nsdOnboardingState': nsdOnboardingState.toValue(),
-      'nsdOperationalState': nsdOperationalState.toValue(),
-      'nsdUsageState': nsdUsageState.toValue(),
+      'nsdOnboardingState': nsdOnboardingState.value,
+      'nsdOperationalState': nsdOperationalState.value,
+      'nsdUsageState': nsdUsageState.value,
       if (tags != null) 'tags': tags,
     };
   }
 }
 
 enum DescriptorContentType {
-  textPlain,
-}
+  textPlain('text/plain'),
+  ;
 
-extension DescriptorContentTypeValueExtension on DescriptorContentType {
-  String toValue() {
-    switch (this) {
-      case DescriptorContentType.textPlain:
-        return 'text/plain';
-    }
-  }
-}
+  final String value;
 
-extension DescriptorContentTypeFromString on String {
-  DescriptorContentType toDescriptorContentType() {
-    switch (this) {
-      case 'text/plain':
-        return DescriptorContentType.textPlain;
-    }
-    throw Exception('$this is not known in enum DescriptorContentType');
-  }
+  const DescriptorContentType(this.value);
+
+  static DescriptorContentType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum DescriptorContentType'));
 }
 
 class Document {
   Document();
+
+  factory Document.fromJson(Map<String, dynamic> _) {
+    return Document();
+  }
 
   Map<String, dynamic> toJson() {
     return {};
@@ -1540,7 +1572,7 @@ class FunctionArtifactMeta {
   factory FunctionArtifactMeta.fromJson(Map<String, dynamic> json) {
     return FunctionArtifactMeta(
       overrides: (json['overrides'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ToscaOverride.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -1641,8 +1673,8 @@ class GetSolFunctionInstanceOutput {
     return GetSolFunctionInstanceOutput(
       arn: json['arn'] as String,
       id: json['id'] as String,
-      instantiationState:
-          (json['instantiationState'] as String).toVnfInstantiationState(),
+      instantiationState: VnfInstantiationState.fromString(
+          (json['instantiationState'] as String)),
       metadata: GetSolFunctionInstanceMetadata.fromJson(
           json['metadata'] as Map<String, dynamic>),
       nsInstanceId: json['nsInstanceId'] as String,
@@ -1676,7 +1708,7 @@ class GetSolFunctionInstanceOutput {
     return {
       'arn': arn,
       'id': id,
-      'instantiationState': instantiationState.toValue(),
+      'instantiationState': instantiationState.value,
       'metadata': metadata,
       'nsInstanceId': nsInstanceId,
       'vnfPkgId': vnfPkgId,
@@ -1831,10 +1863,11 @@ class GetSolFunctionPackageOutput {
     return GetSolFunctionPackageOutput(
       arn: json['arn'] as String,
       id: json['id'] as String,
-      onboardingState: (json['onboardingState'] as String).toOnboardingState(),
+      onboardingState:
+          OnboardingState.fromString((json['onboardingState'] as String)),
       operationalState:
-          (json['operationalState'] as String).toOperationalState(),
-      usageState: (json['usageState'] as String).toUsageState(),
+          OperationalState.fromString((json['operationalState'] as String)),
+      usageState: UsageState.fromString((json['usageState'] as String)),
       metadata: json['metadata'] != null
           ? GetSolFunctionPackageMetadata.fromJson(
               json['metadata'] as Map<String, dynamic>)
@@ -1863,9 +1896,9 @@ class GetSolFunctionPackageOutput {
     return {
       'arn': arn,
       'id': id,
-      'onboardingState': onboardingState.toValue(),
-      'operationalState': operationalState.toValue(),
-      'usageState': usageState.toValue(),
+      'onboardingState': onboardingState.value,
+      'operationalState': operationalState.value,
+      'usageState': usageState.value,
       if (metadata != null) 'metadata': metadata,
       if (tags != null) 'tags': tags,
       if (vnfProductName != null) 'vnfProductName': vnfProductName,
@@ -1891,14 +1924,15 @@ class GetSolInstantiatedVnfInfo {
 
   factory GetSolInstantiatedVnfInfo.fromJson(Map<String, dynamic> json) {
     return GetSolInstantiatedVnfInfo(
-      vnfState: (json['vnfState'] as String?)?.toVnfOperationalState(),
+      vnfState:
+          (json['vnfState'] as String?)?.let(VnfOperationalState.fromString),
     );
   }
 
   Map<String, dynamic> toJson() {
     final vnfState = this.vnfState;
     return {
-      if (vnfState != null) 'vnfState': vnfState.toValue(),
+      if (vnfState != null) 'vnfState': vnfState.value,
     };
   }
 }
@@ -1993,7 +2027,7 @@ class GetSolNetworkInstanceOutput {
       lcmOpInfo: json['lcmOpInfo'] != null
           ? LcmOperationInfo.fromJson(json['lcmOpInfo'] as Map<String, dynamic>)
           : null,
-      nsState: (json['nsState'] as String?)?.toNsState(),
+      nsState: (json['nsState'] as String?)?.let(NsState.fromString),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -2019,7 +2053,7 @@ class GetSolNetworkInstanceOutput {
       'nsdId': nsdId,
       'nsdInfoId': nsdInfoId,
       if (lcmOpInfo != null) 'lcmOpInfo': lcmOpInfo,
-      if (nsState != null) 'nsState': nsState.toValue(),
+      if (nsState != null) 'nsState': nsState.value,
       if (tags != null) 'tags': tags,
     };
   }
@@ -2036,9 +2070,28 @@ class GetSolNetworkOperationMetadata {
   /// The date that the resource was last modified.
   final DateTime lastModified;
 
+  /// Metadata related to the network operation occurrence for network
+  /// instantiation. This is populated only if the lcmOperationType is
+  /// <code>INSTANTIATE</code>.
+  final InstantiateMetadata? instantiateMetadata;
+
+  /// Metadata related to the network operation occurrence for network function
+  /// updates in a network instance. This is populated only if the
+  /// lcmOperationType is <code>UPDATE</code> and the updateType is
+  /// <code>MODIFY_VNF_INFORMATION</code>.
+  final ModifyVnfInfoMetadata? modifyVnfInfoMetadata;
+
+  /// Metadata related to the network operation occurrence for network instance
+  /// updates. This is populated only if the lcmOperationType is
+  /// <code>UPDATE</code> and the updateType is <code>UPDATE_NS</code>.
+  final UpdateNsMetadata? updateNsMetadata;
+
   GetSolNetworkOperationMetadata({
     required this.createdAt,
     required this.lastModified,
+    this.instantiateMetadata,
+    this.modifyVnfInfoMetadata,
+    this.updateNsMetadata,
   });
 
   factory GetSolNetworkOperationMetadata.fromJson(Map<String, dynamic> json) {
@@ -2046,15 +2099,35 @@ class GetSolNetworkOperationMetadata {
       createdAt: nonNullableTimeStampFromJson(json['createdAt'] as Object),
       lastModified:
           nonNullableTimeStampFromJson(json['lastModified'] as Object),
+      instantiateMetadata: json['instantiateMetadata'] != null
+          ? InstantiateMetadata.fromJson(
+              json['instantiateMetadata'] as Map<String, dynamic>)
+          : null,
+      modifyVnfInfoMetadata: json['modifyVnfInfoMetadata'] != null
+          ? ModifyVnfInfoMetadata.fromJson(
+              json['modifyVnfInfoMetadata'] as Map<String, dynamic>)
+          : null,
+      updateNsMetadata: json['updateNsMetadata'] != null
+          ? UpdateNsMetadata.fromJson(
+              json['updateNsMetadata'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final createdAt = this.createdAt;
     final lastModified = this.lastModified;
+    final instantiateMetadata = this.instantiateMetadata;
+    final modifyVnfInfoMetadata = this.modifyVnfInfoMetadata;
+    final updateNsMetadata = this.updateNsMetadata;
     return {
       'createdAt': iso8601ToJson(createdAt),
       'lastModified': iso8601ToJson(lastModified),
+      if (instantiateMetadata != null)
+        'instantiateMetadata': instantiateMetadata,
+      if (modifyVnfInfoMetadata != null)
+        'modifyVnfInfoMetadata': modifyVnfInfoMetadata,
+      if (updateNsMetadata != null) 'updateNsMetadata': updateNsMetadata,
     };
   }
 }
@@ -2089,6 +2162,10 @@ class GetSolNetworkOperationOutput {
   /// All tasks associated with this operation occurrence.
   final List<GetSolNetworkOperationTaskDetails>? tasks;
 
+  /// Type of the update. Only present if the network operation lcmOperationType
+  /// is <code>UPDATE</code>.
+  final UpdateSolNetworkType? updateType;
+
   GetSolNetworkOperationOutput({
     required this.arn,
     this.error,
@@ -2099,6 +2176,7 @@ class GetSolNetworkOperationOutput {
     this.operationState,
     this.tags,
     this.tasks,
+    this.updateType,
   });
 
   factory GetSolNetworkOperationOutput.fromJson(Map<String, dynamic> json) {
@@ -2108,22 +2186,24 @@ class GetSolNetworkOperationOutput {
           ? ProblemDetails.fromJson(json['error'] as Map<String, dynamic>)
           : null,
       id: json['id'] as String?,
-      lcmOperationType:
-          (json['lcmOperationType'] as String?)?.toLcmOperationType(),
+      lcmOperationType: (json['lcmOperationType'] as String?)
+          ?.let(LcmOperationType.fromString),
       metadata: json['metadata'] != null
           ? GetSolNetworkOperationMetadata.fromJson(
               json['metadata'] as Map<String, dynamic>)
           : null,
       nsInstanceId: json['nsInstanceId'] as String?,
-      operationState:
-          (json['operationState'] as String?)?.toNsLcmOperationState(),
+      operationState: (json['operationState'] as String?)
+          ?.let(NsLcmOperationState.fromString),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       tasks: (json['tasks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => GetSolNetworkOperationTaskDetails.fromJson(
               e as Map<String, dynamic>))
           .toList(),
+      updateType:
+          (json['updateType'] as String?)?.let(UpdateSolNetworkType.fromString),
     );
   }
 
@@ -2137,17 +2217,18 @@ class GetSolNetworkOperationOutput {
     final operationState = this.operationState;
     final tags = this.tags;
     final tasks = this.tasks;
+    final updateType = this.updateType;
     return {
       'arn': arn,
       if (error != null) 'error': error,
       if (id != null) 'id': id,
-      if (lcmOperationType != null)
-        'lcmOperationType': lcmOperationType.toValue(),
+      if (lcmOperationType != null) 'lcmOperationType': lcmOperationType.value,
       if (metadata != null) 'metadata': metadata,
       if (nsInstanceId != null) 'nsInstanceId': nsInstanceId,
-      if (operationState != null) 'operationState': operationState.toValue(),
+      if (operationState != null) 'operationState': operationState.value,
       if (tags != null) 'tags': tags,
       if (tasks != null) 'tasks': tasks,
+      if (updateType != null) 'updateType': updateType.value,
     };
   }
 }
@@ -2195,7 +2276,7 @@ class GetSolNetworkOperationTaskDetails {
           : null,
       taskName: json['taskName'] as String?,
       taskStartTime: timeStampFromJson(json['taskStartTime']),
-      taskStatus: (json['taskStatus'] as String?)?.toTaskStatus(),
+      taskStatus: (json['taskStatus'] as String?)?.let(TaskStatus.fromString),
     );
   }
 
@@ -2212,7 +2293,7 @@ class GetSolNetworkOperationTaskDetails {
       if (taskErrorDetails != null) 'taskErrorDetails': taskErrorDetails,
       if (taskName != null) 'taskName': taskName,
       if (taskStartTime != null) 'taskStartTime': iso8601ToJson(taskStartTime),
-      if (taskStatus != null) 'taskStatus': taskStatus.toValue(),
+      if (taskStatus != null) 'taskStatus': taskStatus.value,
     };
   }
 }
@@ -2362,15 +2443,14 @@ class GetSolNetworkPackageOutput {
       nsdId: json['nsdId'] as String,
       nsdName: json['nsdName'] as String,
       nsdOnboardingState:
-          (json['nsdOnboardingState'] as String).toNsdOnboardingState(),
-      nsdOperationalState:
-          (json['nsdOperationalState'] as String).toNsdOperationalState(),
-      nsdUsageState: (json['nsdUsageState'] as String).toNsdUsageState(),
+          NsdOnboardingState.fromString((json['nsdOnboardingState'] as String)),
+      nsdOperationalState: NsdOperationalState.fromString(
+          (json['nsdOperationalState'] as String)),
+      nsdUsageState:
+          NsdUsageState.fromString((json['nsdUsageState'] as String)),
       nsdVersion: json['nsdVersion'] as String,
-      vnfPkgIds: (json['vnfPkgIds'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      vnfPkgIds:
+          (json['vnfPkgIds'] as List).nonNulls.map((e) => e as String).toList(),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -2394,9 +2474,9 @@ class GetSolNetworkPackageOutput {
       'metadata': metadata,
       'nsdId': nsdId,
       'nsdName': nsdName,
-      'nsdOnboardingState': nsdOnboardingState.toValue(),
-      'nsdOperationalState': nsdOperationalState.toValue(),
-      'nsdUsageState': nsdUsageState.toValue(),
+      'nsdOnboardingState': nsdOnboardingState.value,
+      'nsdOperationalState': nsdOperationalState.value,
+      'nsdUsageState': nsdUsageState.value,
       'nsdVersion': nsdVersion,
       'vnfPkgIds': vnfPkgIds,
       if (tags != null) 'tags': tags,
@@ -2421,9 +2501,10 @@ class GetSolVnfInfo {
 
   factory GetSolVnfInfo.fromJson(Map<String, dynamic> json) {
     return GetSolVnfInfo(
-      vnfState: (json['vnfState'] as String?)?.toVnfOperationalState(),
+      vnfState:
+          (json['vnfState'] as String?)?.let(VnfOperationalState.fromString),
       vnfcResourceInfo: (json['vnfcResourceInfo'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map(
               (e) => GetSolVnfcResourceInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -2434,7 +2515,7 @@ class GetSolVnfInfo {
     final vnfState = this.vnfState;
     final vnfcResourceInfo = this.vnfcResourceInfo;
     return {
-      if (vnfState != null) 'vnfState': vnfState.toValue(),
+      if (vnfState != null) 'vnfState': vnfState.value,
       if (vnfcResourceInfo != null) 'vnfcResourceInfo': vnfcResourceInfo,
     };
   }
@@ -2511,14 +2592,50 @@ class GetSolVnfcResourceInfoMetadata {
   }
 }
 
+/// Metadata related to the configuration properties used during instantiation
+/// of the network instance.
+class InstantiateMetadata {
+  /// The network service descriptor used for instantiating the network instance.
+  final String nsdInfoId;
+
+  /// The configurable properties used during instantiation.
+  final Document? additionalParamsForNs;
+
+  InstantiateMetadata({
+    required this.nsdInfoId,
+    this.additionalParamsForNs,
+  });
+
+  factory InstantiateMetadata.fromJson(Map<String, dynamic> json) {
+    return InstantiateMetadata(
+      nsdInfoId: json['nsdInfoId'] as String,
+      additionalParamsForNs: json['additionalParamsForNs'] != null
+          ? Document.fromJson(
+              json['additionalParamsForNs'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final nsdInfoId = this.nsdInfoId;
+    final additionalParamsForNs = this.additionalParamsForNs;
+    return {
+      'nsdInfoId': nsdInfoId,
+      if (additionalParamsForNs != null)
+        'additionalParamsForNs': additionalParamsForNs,
+    };
+  }
+}
+
 class InstantiateSolNetworkInstanceOutput {
   /// The identifier of the network operation.
   final String nsLcmOpOccId;
 
   /// A tag is a label that you assign to an Amazon Web Services resource. Each
   /// tag consists of a key and an optional value. When you use this API, the tags
-  /// are transferred to the network operation that is created. Use tags to search
-  /// and filter your resources or track your Amazon Web Services costs.
+  /// are only applied to the network operation that is created. These tags are
+  /// not applied to the network instance. Use tags to search and filter your
+  /// resources or track your Amazon Web Services costs.
   final Map<String, String>? tags;
 
   InstantiateSolNetworkInstanceOutput({
@@ -2571,36 +2688,19 @@ class LcmOperationInfo {
 }
 
 enum LcmOperationType {
-  instantiate,
-  update,
-  terminate,
-}
+  instantiate('INSTANTIATE'),
+  update('UPDATE'),
+  terminate('TERMINATE'),
+  ;
 
-extension LcmOperationTypeValueExtension on LcmOperationType {
-  String toValue() {
-    switch (this) {
-      case LcmOperationType.instantiate:
-        return 'INSTANTIATE';
-      case LcmOperationType.update:
-        return 'UPDATE';
-      case LcmOperationType.terminate:
-        return 'TERMINATE';
-    }
-  }
-}
+  final String value;
 
-extension LcmOperationTypeFromString on String {
-  LcmOperationType toLcmOperationType() {
-    switch (this) {
-      case 'INSTANTIATE':
-        return LcmOperationType.instantiate;
-      case 'UPDATE':
-        return LcmOperationType.update;
-      case 'TERMINATE':
-        return LcmOperationType.terminate;
-    }
-    throw Exception('$this is not known in enum LcmOperationType');
-  }
+  const LcmOperationType(this.value);
+
+  static LcmOperationType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum LcmOperationType'));
 }
 
 /// Lists information about a network function instance.
@@ -2644,8 +2744,8 @@ class ListSolFunctionInstanceInfo {
     return ListSolFunctionInstanceInfo(
       arn: json['arn'] as String,
       id: json['id'] as String,
-      instantiationState:
-          (json['instantiationState'] as String).toVnfInstantiationState(),
+      instantiationState: VnfInstantiationState.fromString(
+          (json['instantiationState'] as String)),
       metadata: ListSolFunctionInstanceMetadata.fromJson(
           json['metadata'] as Map<String, dynamic>),
       nsInstanceId: json['nsInstanceId'] as String,
@@ -2670,7 +2770,7 @@ class ListSolFunctionInstanceInfo {
     return {
       'arn': arn,
       'id': id,
-      'instantiationState': instantiationState.toValue(),
+      'instantiationState': instantiationState.value,
       'metadata': metadata,
       'nsInstanceId': nsInstanceId,
       'vnfPkgId': vnfPkgId,
@@ -2730,7 +2830,7 @@ class ListSolFunctionInstancesOutput {
   factory ListSolFunctionInstancesOutput.fromJson(Map<String, dynamic> json) {
     return ListSolFunctionInstancesOutput(
       functionInstances: (json['functionInstances'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               ListSolFunctionInstanceInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -2802,10 +2902,11 @@ class ListSolFunctionPackageInfo {
     return ListSolFunctionPackageInfo(
       arn: json['arn'] as String,
       id: json['id'] as String,
-      onboardingState: (json['onboardingState'] as String).toOnboardingState(),
+      onboardingState:
+          OnboardingState.fromString((json['onboardingState'] as String)),
       operationalState:
-          (json['operationalState'] as String).toOperationalState(),
-      usageState: (json['usageState'] as String).toUsageState(),
+          OperationalState.fromString((json['operationalState'] as String)),
+      usageState: UsageState.fromString((json['usageState'] as String)),
       metadata: json['metadata'] != null
           ? ListSolFunctionPackageMetadata.fromJson(
               json['metadata'] as Map<String, dynamic>)
@@ -2831,9 +2932,9 @@ class ListSolFunctionPackageInfo {
     return {
       'arn': arn,
       'id': id,
-      'onboardingState': onboardingState.toValue(),
-      'operationalState': operationalState.toValue(),
-      'usageState': usageState.toValue(),
+      'onboardingState': onboardingState.value,
+      'operationalState': operationalState.value,
+      'usageState': usageState.value,
       if (metadata != null) 'metadata': metadata,
       if (vnfProductName != null) 'vnfProductName': vnfProductName,
       if (vnfProvider != null) 'vnfProvider': vnfProvider,
@@ -2899,7 +3000,7 @@ class ListSolFunctionPackagesOutput {
   factory ListSolFunctionPackagesOutput.fromJson(Map<String, dynamic> json) {
     return ListSolFunctionPackagesOutput(
       functionPackages: (json['functionPackages'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               ListSolFunctionPackageInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -2966,7 +3067,7 @@ class ListSolNetworkInstanceInfo {
           json['metadata'] as Map<String, dynamic>),
       nsInstanceDescription: json['nsInstanceDescription'] as String,
       nsInstanceName: json['nsInstanceName'] as String,
-      nsState: (json['nsState'] as String).toNsState(),
+      nsState: NsState.fromString((json['nsState'] as String)),
       nsdId: json['nsdId'] as String,
       nsdInfoId: json['nsdInfoId'] as String,
     );
@@ -2987,7 +3088,7 @@ class ListSolNetworkInstanceInfo {
       'metadata': metadata,
       'nsInstanceDescription': nsInstanceDescription,
       'nsInstanceName': nsInstanceName,
-      'nsState': nsState.toValue(),
+      'nsState': nsState.value,
       'nsdId': nsdId,
       'nsdInfoId': nsdInfoId,
     };
@@ -3045,7 +3146,7 @@ class ListSolNetworkInstancesOutput {
   factory ListSolNetworkInstancesOutput.fromJson(Map<String, dynamic> json) {
     return ListSolNetworkInstancesOutput(
       networkInstances: (json['networkInstances'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               ListSolNetworkInstanceInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -3086,6 +3187,10 @@ class ListSolNetworkOperationsInfo {
   /// Metadata related to this network operation.
   final ListSolNetworkOperationsMetadata? metadata;
 
+  /// Type of the update. Only present if the network operation lcmOperationType
+  /// is <code>UPDATE</code>.
+  final UpdateSolNetworkType? updateType;
+
   ListSolNetworkOperationsInfo({
     required this.arn,
     required this.id,
@@ -3094,6 +3199,7 @@ class ListSolNetworkOperationsInfo {
     required this.operationState,
     this.error,
     this.metadata,
+    this.updateType,
   });
 
   factory ListSolNetworkOperationsInfo.fromJson(Map<String, dynamic> json) {
@@ -3101,10 +3207,10 @@ class ListSolNetworkOperationsInfo {
       arn: json['arn'] as String,
       id: json['id'] as String,
       lcmOperationType:
-          (json['lcmOperationType'] as String).toLcmOperationType(),
+          LcmOperationType.fromString((json['lcmOperationType'] as String)),
       nsInstanceId: json['nsInstanceId'] as String,
       operationState:
-          (json['operationState'] as String).toNsLcmOperationState(),
+          NsLcmOperationState.fromString((json['operationState'] as String)),
       error: json['error'] != null
           ? ProblemDetails.fromJson(json['error'] as Map<String, dynamic>)
           : null,
@@ -3112,6 +3218,8 @@ class ListSolNetworkOperationsInfo {
           ? ListSolNetworkOperationsMetadata.fromJson(
               json['metadata'] as Map<String, dynamic>)
           : null,
+      updateType:
+          (json['updateType'] as String?)?.let(UpdateSolNetworkType.fromString),
     );
   }
 
@@ -3123,14 +3231,16 @@ class ListSolNetworkOperationsInfo {
     final operationState = this.operationState;
     final error = this.error;
     final metadata = this.metadata;
+    final updateType = this.updateType;
     return {
       'arn': arn,
       'id': id,
-      'lcmOperationType': lcmOperationType.toValue(),
+      'lcmOperationType': lcmOperationType.value,
       'nsInstanceId': nsInstanceId,
-      'operationState': operationState.toValue(),
+      'operationState': operationState.value,
       if (error != null) 'error': error,
       if (metadata != null) 'metadata': metadata,
+      if (updateType != null) 'updateType': updateType.value,
     };
   }
 }
@@ -3146,9 +3256,21 @@ class ListSolNetworkOperationsMetadata {
   /// The date that the resource was last modified.
   final DateTime lastModified;
 
+  /// The network service descriptor id used for the operation.
+  ///
+  /// Only present if the updateType is <code>UPDATE_NS</code>.
+  final String? nsdInfoId;
+
+  /// The network function id used for the operation.
+  ///
+  /// Only present if the updateType is <code>MODIFY_VNF_INFO</code>.
+  final String? vnfInstanceId;
+
   ListSolNetworkOperationsMetadata({
     required this.createdAt,
     required this.lastModified,
+    this.nsdInfoId,
+    this.vnfInstanceId,
   });
 
   factory ListSolNetworkOperationsMetadata.fromJson(Map<String, dynamic> json) {
@@ -3156,15 +3278,21 @@ class ListSolNetworkOperationsMetadata {
       createdAt: nonNullableTimeStampFromJson(json['createdAt'] as Object),
       lastModified:
           nonNullableTimeStampFromJson(json['lastModified'] as Object),
+      nsdInfoId: json['nsdInfoId'] as String?,
+      vnfInstanceId: json['vnfInstanceId'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final createdAt = this.createdAt;
     final lastModified = this.lastModified;
+    final nsdInfoId = this.nsdInfoId;
+    final vnfInstanceId = this.vnfInstanceId;
     return {
       'createdAt': iso8601ToJson(createdAt),
       'lastModified': iso8601ToJson(lastModified),
+      if (nsdInfoId != null) 'nsdInfoId': nsdInfoId,
+      if (vnfInstanceId != null) 'vnfInstanceId': vnfInstanceId,
     };
   }
 }
@@ -3186,7 +3314,7 @@ class ListSolNetworkOperationsOutput {
   factory ListSolNetworkOperationsOutput.fromJson(Map<String, dynamic> json) {
     return ListSolNetworkOperationsOutput(
       networkOperations: (json['networkOperations'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               ListSolNetworkOperationsInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -3269,17 +3397,18 @@ class ListSolNetworkPackageInfo {
       metadata: ListSolNetworkPackageMetadata.fromJson(
           json['metadata'] as Map<String, dynamic>),
       nsdOnboardingState:
-          (json['nsdOnboardingState'] as String).toNsdOnboardingState(),
-      nsdOperationalState:
-          (json['nsdOperationalState'] as String).toNsdOperationalState(),
-      nsdUsageState: (json['nsdUsageState'] as String).toNsdUsageState(),
+          NsdOnboardingState.fromString((json['nsdOnboardingState'] as String)),
+      nsdOperationalState: NsdOperationalState.fromString(
+          (json['nsdOperationalState'] as String)),
+      nsdUsageState:
+          NsdUsageState.fromString((json['nsdUsageState'] as String)),
       nsdDesigner: json['nsdDesigner'] as String?,
       nsdId: json['nsdId'] as String?,
       nsdInvariantId: json['nsdInvariantId'] as String?,
       nsdName: json['nsdName'] as String?,
       nsdVersion: json['nsdVersion'] as String?,
       vnfPkgIds: (json['vnfPkgIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -3302,9 +3431,9 @@ class ListSolNetworkPackageInfo {
       'arn': arn,
       'id': id,
       'metadata': metadata,
-      'nsdOnboardingState': nsdOnboardingState.toValue(),
-      'nsdOperationalState': nsdOperationalState.toValue(),
-      'nsdUsageState': nsdUsageState.toValue(),
+      'nsdOnboardingState': nsdOnboardingState.value,
+      'nsdOperationalState': nsdOperationalState.value,
+      'nsdUsageState': nsdUsageState.value,
       if (nsdDesigner != null) 'nsdDesigner': nsdDesigner,
       if (nsdId != null) 'nsdId': nsdId,
       if (nsdInvariantId != null) 'nsdInvariantId': nsdInvariantId,
@@ -3368,7 +3497,7 @@ class ListSolNetworkPackagesOutput {
   factory ListSolNetworkPackagesOutput.fromJson(Map<String, dynamic> json) {
     return ListSolNetworkPackagesOutput(
       networkPackages: (json['networkPackages'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               ListSolNetworkPackageInfo.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -3411,6 +3540,39 @@ class ListTagsForResourceOutput {
   }
 }
 
+/// Metadata related to the configuration properties used during update of a
+/// specific network function in a network instance.
+class ModifyVnfInfoMetadata {
+  /// The configurable properties used during update of the network function
+  /// instance.
+  final Document vnfConfigurableProperties;
+
+  /// The network function instance that was updated in the network instance.
+  final String vnfInstanceId;
+
+  ModifyVnfInfoMetadata({
+    required this.vnfConfigurableProperties,
+    required this.vnfInstanceId,
+  });
+
+  factory ModifyVnfInfoMetadata.fromJson(Map<String, dynamic> json) {
+    return ModifyVnfInfoMetadata(
+      vnfConfigurableProperties: Document.fromJson(
+          json['vnfConfigurableProperties'] as Map<String, dynamic>),
+      vnfInstanceId: json['vnfInstanceId'] as String,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final vnfConfigurableProperties = this.vnfConfigurableProperties;
+    final vnfInstanceId = this.vnfInstanceId;
+    return {
+      'vnfConfigurableProperties': vnfConfigurableProperties,
+      'vnfInstanceId': vnfInstanceId,
+    };
+  }
+}
+
 /// Metadata for network package artifacts.
 ///
 /// Artifacts are the contents of the package descriptor file and the state of
@@ -3426,7 +3588,7 @@ class NetworkArtifactMeta {
   factory NetworkArtifactMeta.fromJson(Map<String, dynamic> json) {
     return NetworkArtifactMeta(
       overrides: (json['overrides'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ToscaOverride.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -3441,277 +3603,135 @@ class NetworkArtifactMeta {
 }
 
 enum NsLcmOperationState {
-  processing,
-  completed,
-  failed,
-  cancelling,
-  cancelled,
-}
+  processing('PROCESSING'),
+  completed('COMPLETED'),
+  failed('FAILED'),
+  cancelling('CANCELLING'),
+  cancelled('CANCELLED'),
+  ;
 
-extension NsLcmOperationStateValueExtension on NsLcmOperationState {
-  String toValue() {
-    switch (this) {
-      case NsLcmOperationState.processing:
-        return 'PROCESSING';
-      case NsLcmOperationState.completed:
-        return 'COMPLETED';
-      case NsLcmOperationState.failed:
-        return 'FAILED';
-      case NsLcmOperationState.cancelling:
-        return 'CANCELLING';
-      case NsLcmOperationState.cancelled:
-        return 'CANCELLED';
-    }
-  }
-}
+  final String value;
 
-extension NsLcmOperationStateFromString on String {
-  NsLcmOperationState toNsLcmOperationState() {
-    switch (this) {
-      case 'PROCESSING':
-        return NsLcmOperationState.processing;
-      case 'COMPLETED':
-        return NsLcmOperationState.completed;
-      case 'FAILED':
-        return NsLcmOperationState.failed;
-      case 'CANCELLING':
-        return NsLcmOperationState.cancelling;
-      case 'CANCELLED':
-        return NsLcmOperationState.cancelled;
-    }
-    throw Exception('$this is not known in enum NsLcmOperationState');
-  }
+  const NsLcmOperationState(this.value);
+
+  static NsLcmOperationState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum NsLcmOperationState'));
 }
 
 enum NsState {
-  instantiated,
-  notInstantiated,
-  impaired,
-  stopped,
-  deleted,
-  instantiateInProgress,
-  updateInProgress,
-  terminateInProgress,
-}
+  instantiated('INSTANTIATED'),
+  notInstantiated('NOT_INSTANTIATED'),
+  updated('UPDATED'),
+  impaired('IMPAIRED'),
+  updateFailed('UPDATE_FAILED'),
+  stopped('STOPPED'),
+  deleted('DELETED'),
+  instantiateInProgress('INSTANTIATE_IN_PROGRESS'),
+  intentToUpdateInProgress('INTENT_TO_UPDATE_IN_PROGRESS'),
+  updateInProgress('UPDATE_IN_PROGRESS'),
+  terminateInProgress('TERMINATE_IN_PROGRESS'),
+  ;
 
-extension NsStateValueExtension on NsState {
-  String toValue() {
-    switch (this) {
-      case NsState.instantiated:
-        return 'INSTANTIATED';
-      case NsState.notInstantiated:
-        return 'NOT_INSTANTIATED';
-      case NsState.impaired:
-        return 'IMPAIRED';
-      case NsState.stopped:
-        return 'STOPPED';
-      case NsState.deleted:
-        return 'DELETED';
-      case NsState.instantiateInProgress:
-        return 'INSTANTIATE_IN_PROGRESS';
-      case NsState.updateInProgress:
-        return 'UPDATE_IN_PROGRESS';
-      case NsState.terminateInProgress:
-        return 'TERMINATE_IN_PROGRESS';
-    }
-  }
-}
+  final String value;
 
-extension NsStateFromString on String {
-  NsState toNsState() {
-    switch (this) {
-      case 'INSTANTIATED':
-        return NsState.instantiated;
-      case 'NOT_INSTANTIATED':
-        return NsState.notInstantiated;
-      case 'IMPAIRED':
-        return NsState.impaired;
-      case 'STOPPED':
-        return NsState.stopped;
-      case 'DELETED':
-        return NsState.deleted;
-      case 'INSTANTIATE_IN_PROGRESS':
-        return NsState.instantiateInProgress;
-      case 'UPDATE_IN_PROGRESS':
-        return NsState.updateInProgress;
-      case 'TERMINATE_IN_PROGRESS':
-        return NsState.terminateInProgress;
-    }
-    throw Exception('$this is not known in enum NsState');
-  }
+  const NsState(this.value);
+
+  static NsState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum NsState'));
 }
 
 enum NsdOnboardingState {
-  created,
-  onboarded,
-  error,
-}
+  created('CREATED'),
+  onboarded('ONBOARDED'),
+  error('ERROR'),
+  ;
 
-extension NsdOnboardingStateValueExtension on NsdOnboardingState {
-  String toValue() {
-    switch (this) {
-      case NsdOnboardingState.created:
-        return 'CREATED';
-      case NsdOnboardingState.onboarded:
-        return 'ONBOARDED';
-      case NsdOnboardingState.error:
-        return 'ERROR';
-    }
-  }
-}
+  final String value;
 
-extension NsdOnboardingStateFromString on String {
-  NsdOnboardingState toNsdOnboardingState() {
-    switch (this) {
-      case 'CREATED':
-        return NsdOnboardingState.created;
-      case 'ONBOARDED':
-        return NsdOnboardingState.onboarded;
-      case 'ERROR':
-        return NsdOnboardingState.error;
-    }
-    throw Exception('$this is not known in enum NsdOnboardingState');
-  }
+  const NsdOnboardingState(this.value);
+
+  static NsdOnboardingState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum NsdOnboardingState'));
 }
 
 enum NsdOperationalState {
-  enabled,
-  disabled,
-}
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
 
-extension NsdOperationalStateValueExtension on NsdOperationalState {
-  String toValue() {
-    switch (this) {
-      case NsdOperationalState.enabled:
-        return 'ENABLED';
-      case NsdOperationalState.disabled:
-        return 'DISABLED';
-    }
-  }
-}
+  final String value;
 
-extension NsdOperationalStateFromString on String {
-  NsdOperationalState toNsdOperationalState() {
-    switch (this) {
-      case 'ENABLED':
-        return NsdOperationalState.enabled;
-      case 'DISABLED':
-        return NsdOperationalState.disabled;
-    }
-    throw Exception('$this is not known in enum NsdOperationalState');
-  }
+  const NsdOperationalState(this.value);
+
+  static NsdOperationalState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum NsdOperationalState'));
 }
 
 enum NsdUsageState {
-  inUse,
-  notInUse,
-}
+  inUse('IN_USE'),
+  notInUse('NOT_IN_USE'),
+  ;
 
-extension NsdUsageStateValueExtension on NsdUsageState {
-  String toValue() {
-    switch (this) {
-      case NsdUsageState.inUse:
-        return 'IN_USE';
-      case NsdUsageState.notInUse:
-        return 'NOT_IN_USE';
-    }
-  }
-}
+  final String value;
 
-extension NsdUsageStateFromString on String {
-  NsdUsageState toNsdUsageState() {
-    switch (this) {
-      case 'IN_USE':
-        return NsdUsageState.inUse;
-      case 'NOT_IN_USE':
-        return NsdUsageState.notInUse;
-    }
-    throw Exception('$this is not known in enum NsdUsageState');
-  }
+  const NsdUsageState(this.value);
+
+  static NsdUsageState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum NsdUsageState'));
 }
 
 enum OnboardingState {
-  created,
-  onboarded,
-  error,
-}
+  created('CREATED'),
+  onboarded('ONBOARDED'),
+  error('ERROR'),
+  ;
 
-extension OnboardingStateValueExtension on OnboardingState {
-  String toValue() {
-    switch (this) {
-      case OnboardingState.created:
-        return 'CREATED';
-      case OnboardingState.onboarded:
-        return 'ONBOARDED';
-      case OnboardingState.error:
-        return 'ERROR';
-    }
-  }
-}
+  final String value;
 
-extension OnboardingStateFromString on String {
-  OnboardingState toOnboardingState() {
-    switch (this) {
-      case 'CREATED':
-        return OnboardingState.created;
-      case 'ONBOARDED':
-        return OnboardingState.onboarded;
-      case 'ERROR':
-        return OnboardingState.error;
-    }
-    throw Exception('$this is not known in enum OnboardingState');
-  }
+  const OnboardingState(this.value);
+
+  static OnboardingState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum OnboardingState'));
 }
 
 enum OperationalState {
-  enabled,
-  disabled,
-}
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
 
-extension OperationalStateValueExtension on OperationalState {
-  String toValue() {
-    switch (this) {
-      case OperationalState.enabled:
-        return 'ENABLED';
-      case OperationalState.disabled:
-        return 'DISABLED';
-    }
-  }
-}
+  final String value;
 
-extension OperationalStateFromString on String {
-  OperationalState toOperationalState() {
-    switch (this) {
-      case 'ENABLED':
-        return OperationalState.enabled;
-      case 'DISABLED':
-        return OperationalState.disabled;
-    }
-    throw Exception('$this is not known in enum OperationalState');
-  }
+  const OperationalState(this.value);
+
+  static OperationalState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum OperationalState'));
 }
 
 enum PackageContentType {
-  applicationZip,
-}
+  applicationZip('application/zip'),
+  ;
 
-extension PackageContentTypeValueExtension on PackageContentType {
-  String toValue() {
-    switch (this) {
-      case PackageContentType.applicationZip:
-        return 'application/zip';
-    }
-  }
-}
+  final String value;
 
-extension PackageContentTypeFromString on String {
-  PackageContentType toPackageContentType() {
-    switch (this) {
-      case 'application/zip':
-        return PackageContentType.applicationZip;
-    }
-    throw Exception('$this is not known in enum PackageContentType');
-  }
+  const PackageContentType(this.value);
+
+  static PackageContentType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum PackageContentType'));
 }
 
 /// Details related to problems with AWS TNB resources.
@@ -3904,10 +3924,8 @@ class PutSolNetworkPackageContentOutput {
       nsdId: json['nsdId'] as String,
       nsdName: json['nsdName'] as String,
       nsdVersion: json['nsdVersion'] as String,
-      vnfPkgIds: (json['vnfPkgIds'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      vnfPkgIds:
+          (json['vnfPkgIds'] as List).nonNulls.map((e) => e as String).toList(),
     );
   }
 
@@ -3944,56 +3962,22 @@ class TagResourceOutput {
 }
 
 enum TaskStatus {
-  scheduled,
-  started,
-  inProgress,
-  completed,
-  error,
-  skipped,
-  cancelled,
-}
+  scheduled('SCHEDULED'),
+  started('STARTED'),
+  inProgress('IN_PROGRESS'),
+  completed('COMPLETED'),
+  error('ERROR'),
+  skipped('SKIPPED'),
+  cancelled('CANCELLED'),
+  ;
 
-extension TaskStatusValueExtension on TaskStatus {
-  String toValue() {
-    switch (this) {
-      case TaskStatus.scheduled:
-        return 'SCHEDULED';
-      case TaskStatus.started:
-        return 'STARTED';
-      case TaskStatus.inProgress:
-        return 'IN_PROGRESS';
-      case TaskStatus.completed:
-        return 'COMPLETED';
-      case TaskStatus.error:
-        return 'ERROR';
-      case TaskStatus.skipped:
-        return 'SKIPPED';
-      case TaskStatus.cancelled:
-        return 'CANCELLED';
-    }
-  }
-}
+  final String value;
 
-extension TaskStatusFromString on String {
-  TaskStatus toTaskStatus() {
-    switch (this) {
-      case 'SCHEDULED':
-        return TaskStatus.scheduled;
-      case 'STARTED':
-        return TaskStatus.started;
-      case 'IN_PROGRESS':
-        return TaskStatus.inProgress;
-      case 'COMPLETED':
-        return TaskStatus.completed;
-      case 'ERROR':
-        return TaskStatus.error;
-      case 'SKIPPED':
-        return TaskStatus.skipped;
-      case 'CANCELLED':
-        return TaskStatus.cancelled;
-    }
-    throw Exception('$this is not known in enum TaskStatus');
-  }
+  const TaskStatus(this.value);
+
+  static TaskStatus fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum TaskStatus'));
 }
 
 class TerminateSolNetworkInstanceOutput {
@@ -4002,8 +3986,9 @@ class TerminateSolNetworkInstanceOutput {
 
   /// A tag is a label that you assign to an Amazon Web Services resource. Each
   /// tag consists of a key and an optional value. When you use this API, the tags
-  /// are transferred to the network operation that is created. Use tags to search
-  /// and filter your resources or track your Amazon Web Services costs.
+  /// are only applied to the network operation that is created. These tags are
+  /// not applied to the network instance. Use tags to search and filter your
+  /// resources or track your Amazon Web Services costs.
   final Map<String, String>? tags;
 
   TerminateSolNetworkInstanceOutput({
@@ -4072,6 +4057,41 @@ class UntagResourceOutput {
   }
 }
 
+/// Metadata related to the configuration properties used during update of a
+/// network instance.
+class UpdateNsMetadata {
+  /// The network service descriptor used for updating the network instance.
+  final String nsdInfoId;
+
+  /// The configurable properties used during update.
+  final Document? additionalParamsForNs;
+
+  UpdateNsMetadata({
+    required this.nsdInfoId,
+    this.additionalParamsForNs,
+  });
+
+  factory UpdateNsMetadata.fromJson(Map<String, dynamic> json) {
+    return UpdateNsMetadata(
+      nsdInfoId: json['nsdInfoId'] as String,
+      additionalParamsForNs: json['additionalParamsForNs'] != null
+          ? Document.fromJson(
+              json['additionalParamsForNs'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final nsdInfoId = this.nsdInfoId;
+    final additionalParamsForNs = this.additionalParamsForNs;
+    return {
+      'nsdInfoId': nsdInfoId,
+      if (additionalParamsForNs != null)
+        'additionalParamsForNs': additionalParamsForNs,
+    };
+  }
+}
+
 class UpdateSolFunctionPackageOutput {
   /// Operational state of the function package.
   final OperationalState operationalState;
@@ -4083,14 +4103,14 @@ class UpdateSolFunctionPackageOutput {
   factory UpdateSolFunctionPackageOutput.fromJson(Map<String, dynamic> json) {
     return UpdateSolFunctionPackageOutput(
       operationalState:
-          (json['operationalState'] as String).toOperationalState(),
+          OperationalState.fromString((json['operationalState'] as String)),
     );
   }
 
   Map<String, dynamic> toJson() {
     final operationalState = this.operationalState;
     return {
-      'operationalState': operationalState.toValue(),
+      'operationalState': operationalState.value,
     };
   }
 }
@@ -4101,8 +4121,9 @@ class UpdateSolNetworkInstanceOutput {
 
   /// A tag is a label that you assign to an Amazon Web Services resource. Each
   /// tag consists of a key and an optional value. When you use this API, the tags
-  /// are transferred to the network operation that is created. Use tags to search
-  /// and filter your resources or track your Amazon Web Services costs.
+  /// are only applied to the network operation that is created. These tags are
+  /// not applied to the network instance. Use tags to search and filter your
+  /// resources or track your Amazon Web Services costs.
   final Map<String, String>? tags;
 
   UpdateSolNetworkInstanceOutput({
@@ -4167,68 +4188,72 @@ class UpdateSolNetworkPackageOutput {
 
   factory UpdateSolNetworkPackageOutput.fromJson(Map<String, dynamic> json) {
     return UpdateSolNetworkPackageOutput(
-      nsdOperationalState:
-          (json['nsdOperationalState'] as String).toNsdOperationalState(),
+      nsdOperationalState: NsdOperationalState.fromString(
+          (json['nsdOperationalState'] as String)),
     );
   }
 
   Map<String, dynamic> toJson() {
     final nsdOperationalState = this.nsdOperationalState;
     return {
-      'nsdOperationalState': nsdOperationalState.toValue(),
+      'nsdOperationalState': nsdOperationalState.value,
+    };
+  }
+}
+
+/// Information parameters and/or the configurable properties for a network
+/// descriptor used for update.
+class UpdateSolNetworkServiceData {
+  /// ID of the network service descriptor.
+  final String nsdInfoId;
+
+  /// Values for the configurable properties declared in the network service
+  /// descriptor.
+  final Document? additionalParamsForNs;
+
+  UpdateSolNetworkServiceData({
+    required this.nsdInfoId,
+    this.additionalParamsForNs,
+  });
+
+  Map<String, dynamic> toJson() {
+    final nsdInfoId = this.nsdInfoId;
+    final additionalParamsForNs = this.additionalParamsForNs;
+    return {
+      'nsdInfoId': nsdInfoId,
+      if (additionalParamsForNs != null)
+        'additionalParamsForNs': additionalParamsForNs,
     };
   }
 }
 
 enum UpdateSolNetworkType {
-  modifyVnfInformation,
-}
+  modifyVnfInformation('MODIFY_VNF_INFORMATION'),
+  updateNs('UPDATE_NS'),
+  ;
 
-extension UpdateSolNetworkTypeValueExtension on UpdateSolNetworkType {
-  String toValue() {
-    switch (this) {
-      case UpdateSolNetworkType.modifyVnfInformation:
-        return 'MODIFY_VNF_INFORMATION';
-    }
-  }
-}
+  final String value;
 
-extension UpdateSolNetworkTypeFromString on String {
-  UpdateSolNetworkType toUpdateSolNetworkType() {
-    switch (this) {
-      case 'MODIFY_VNF_INFORMATION':
-        return UpdateSolNetworkType.modifyVnfInformation;
-    }
-    throw Exception('$this is not known in enum UpdateSolNetworkType');
-  }
+  const UpdateSolNetworkType(this.value);
+
+  static UpdateSolNetworkType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum UpdateSolNetworkType'));
 }
 
 enum UsageState {
-  inUse,
-  notInUse,
-}
+  inUse('IN_USE'),
+  notInUse('NOT_IN_USE'),
+  ;
 
-extension UsageStateValueExtension on UsageState {
-  String toValue() {
-    switch (this) {
-      case UsageState.inUse:
-        return 'IN_USE';
-      case UsageState.notInUse:
-        return 'NOT_IN_USE';
-    }
-  }
-}
+  final String value;
 
-extension UsageStateFromString on String {
-  UsageState toUsageState() {
-    switch (this) {
-      case 'IN_USE':
-        return UsageState.inUse;
-      case 'NOT_IN_USE':
-        return UsageState.notInUse;
-    }
-    throw Exception('$this is not known in enum UsageState');
-  }
+  const UsageState(this.value);
+
+  static UsageState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum UsageState'));
 }
 
 /// Validates function package content metadata.
@@ -4391,10 +4416,8 @@ class ValidateSolNetworkPackageContentOutput {
       nsdId: json['nsdId'] as String,
       nsdName: json['nsdName'] as String,
       nsdVersion: json['nsdVersion'] as String,
-      vnfPkgIds: (json['vnfPkgIds'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      vnfPkgIds:
+          (json['vnfPkgIds'] as List).nonNulls.map((e) => e as String).toList(),
     );
   }
 
@@ -4419,59 +4442,33 @@ class ValidateSolNetworkPackageContentOutput {
 }
 
 enum VnfInstantiationState {
-  instantiated,
-  notInstantiated,
-}
+  instantiated('INSTANTIATED'),
+  notInstantiated('NOT_INSTANTIATED'),
+  ;
 
-extension VnfInstantiationStateValueExtension on VnfInstantiationState {
-  String toValue() {
-    switch (this) {
-      case VnfInstantiationState.instantiated:
-        return 'INSTANTIATED';
-      case VnfInstantiationState.notInstantiated:
-        return 'NOT_INSTANTIATED';
-    }
-  }
-}
+  final String value;
 
-extension VnfInstantiationStateFromString on String {
-  VnfInstantiationState toVnfInstantiationState() {
-    switch (this) {
-      case 'INSTANTIATED':
-        return VnfInstantiationState.instantiated;
-      case 'NOT_INSTANTIATED':
-        return VnfInstantiationState.notInstantiated;
-    }
-    throw Exception('$this is not known in enum VnfInstantiationState');
-  }
+  const VnfInstantiationState(this.value);
+
+  static VnfInstantiationState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum VnfInstantiationState'));
 }
 
 enum VnfOperationalState {
-  started,
-  stopped,
-}
+  started('STARTED'),
+  stopped('STOPPED'),
+  ;
 
-extension VnfOperationalStateValueExtension on VnfOperationalState {
-  String toValue() {
-    switch (this) {
-      case VnfOperationalState.started:
-        return 'STARTED';
-      case VnfOperationalState.stopped:
-        return 'STOPPED';
-    }
-  }
-}
+  final String value;
 
-extension VnfOperationalStateFromString on String {
-  VnfOperationalState toVnfOperationalState() {
-    switch (this) {
-      case 'STARTED':
-        return VnfOperationalState.started;
-      case 'STOPPED':
-        return VnfOperationalState.stopped;
-    }
-    throw Exception('$this is not known in enum VnfOperationalState');
-  }
+  const VnfOperationalState(this.value);
+
+  static VnfOperationalState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum VnfOperationalState'));
 }
 
 class AccessDeniedException extends _s.GenericAwsException {

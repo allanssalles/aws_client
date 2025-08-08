@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -19,11 +20,15 @@ import '../../shared/shared.dart'
 
 export '../../shared/shared.dart' show AwsClientCredentials;
 
-/// Amazon Kinesis Data Analytics is a fully managed service that you can use to
-/// process and analyze streaming data using Java, SQL, or Scala. The service
-/// enables you to quickly author and run Java, SQL, or Scala code against
-/// streaming sources to perform time series analytics, feed real-time
-/// dashboards, and create real-time metrics.
+/// <note>
+/// Amazon Managed Service for Apache Flink was previously known as Amazon
+/// Kinesis Data Analytics for Apache Flink.
+/// </note>
+/// Amazon Managed Service for Apache Flink is a fully managed service that you
+/// can use to process and analyze streaming data using Java, Python, SQL, or
+/// Scala. The service enables you to quickly author and run Java, SQL, or Scala
+/// code against streaming sources to perform time series analytics, feed
+/// real-time dashboards, and create real-time metrics.
 class KinesisAnalyticsV2 {
   final _s.JsonProtocol _protocol;
   KinesisAnalyticsV2({
@@ -78,8 +83,8 @@ class KinesisAnalyticsV2 {
   /// instead of <code>CurrentApplicationVersionId</code>.
   ///
   /// Parameter [currentApplicationVersionId] :
-  /// The version ID of the Kinesis Data Analytics application. You must provide
-  /// the <code>CurrentApplicationVersionId</code> or the
+  /// The version ID of the SQL-based Kinesis Data Analytics application. You
+  /// must provide the <code>CurrentApplicationVersionId</code> or the
   /// <code>ConditionalToken</code>.You can retrieve the application version ID
   /// using <a>DescribeApplication</a>. For better concurrency support, use the
   /// <code>ConditionalToken</code> parameter instead of
@@ -394,15 +399,15 @@ class KinesisAnalyticsV2 {
   /// Adds a Virtual Private Cloud (VPC) configuration to the application.
   /// Applications can use VPCs to store and access resources securely.
   ///
-  /// Note the following about VPC configurations for Kinesis Data Analytics
-  /// applications:
+  /// Note the following about VPC configurations for Managed Service for Apache
+  /// Flink applications:
   ///
   /// <ul>
   /// <li>
   /// VPC configurations are not supported for SQL applications.
   /// </li>
   /// <li>
-  /// When a VPC is added to a Kinesis Data Analytics application, the
+  /// When a VPC is added to a Managed Service for Apache Flink application, the
   /// application can no longer be accessed from the Internet directly. To
   /// enable Internet access to the application, add an Internet gateway to your
   /// VPC.
@@ -474,8 +479,8 @@ class KinesisAnalyticsV2 {
     return AddApplicationVpcConfigurationResponse.fromJson(jsonResponse.body);
   }
 
-  /// Creates a Kinesis Data Analytics application. For information about
-  /// creating a Kinesis Data Analytics application, see <a
+  /// Creates a Managed Service for Apache Flink application. For information
+  /// about creating a Managed Service for Apache Flink application, see <a
   /// href="https://docs.aws.amazon.com/kinesisanalytics/latest/java/getting-started.html">Creating
   /// an Application</a>.
   ///
@@ -506,9 +511,9 @@ class KinesisAnalyticsV2 {
   /// A summary description of the application.
   ///
   /// Parameter [applicationMode] :
-  /// Use the <code>STREAMING</code> mode to create a Kinesis Data Analytics For
-  /// Flink application. To create a Kinesis Data Analytics Studio notebook, use
-  /// the <code>INTERACTIVE</code> mode.
+  /// Use the <code>STREAMING</code> mode to create a Managed Service for Apache
+  /// Flink application. To create a Managed Service for Apache Flink Studio
+  /// notebook, use the <code>INTERACTIVE</code> mode.
   ///
   /// Parameter [cloudWatchLoggingOptions] :
   /// Use this parameter to configure an Amazon CloudWatch log stream to monitor
@@ -543,14 +548,13 @@ class KinesisAnalyticsV2 {
       headers: headers,
       payload: {
         'ApplicationName': applicationName,
-        'RuntimeEnvironment': runtimeEnvironment.toValue(),
+        'RuntimeEnvironment': runtimeEnvironment.value,
         'ServiceExecutionRole': serviceExecutionRole,
         if (applicationConfiguration != null)
           'ApplicationConfiguration': applicationConfiguration,
         if (applicationDescription != null)
           'ApplicationDescription': applicationDescription,
-        if (applicationMode != null)
-          'ApplicationMode': applicationMode.toValue(),
+        if (applicationMode != null) 'ApplicationMode': applicationMode.value,
         if (cloudWatchLoggingOptions != null)
           'CloudWatchLoggingOptions': cloudWatchLoggingOptions,
         if (tags != null) 'Tags': tags,
@@ -615,7 +619,7 @@ class KinesisAnalyticsV2 {
       headers: headers,
       payload: {
         'ApplicationName': applicationName,
-        'UrlType': urlType.toValue(),
+        'UrlType': urlType.value,
         if (sessionExpirationDurationInSeconds != null)
           'SessionExpirationDurationInSeconds':
               sessionExpirationDurationInSeconds,
@@ -661,7 +665,7 @@ class KinesisAnalyticsV2 {
     );
   }
 
-  /// Deletes the specified application. Kinesis Data Analytics halts
+  /// Deletes the specified application. Managed Service for Apache Flink halts
   /// application execution and deletes the application.
   ///
   /// May throw [ConcurrentModificationException].
@@ -697,8 +701,8 @@ class KinesisAnalyticsV2 {
     );
   }
 
-  /// Deletes an Amazon CloudWatch log stream from an Kinesis Data Analytics
-  /// application.
+  /// Deletes an Amazon CloudWatch log stream from an SQL-based Kinesis Data
+  /// Analytics application.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [ResourceInUseException].
@@ -988,7 +992,8 @@ class KinesisAnalyticsV2 {
     );
   }
 
-  /// Removes a VPC configuration from a Kinesis Data Analytics application.
+  /// Removes a VPC configuration from a Managed Service for Apache Flink
+  /// application.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [ResourceInUseException].
@@ -1054,7 +1059,8 @@ class KinesisAnalyticsV2 {
         jsonResponse.body);
   }
 
-  /// Returns information about a specific Kinesis Data Analytics application.
+  /// Returns information about a specific Managed Service for Apache Flink
+  /// application.
   ///
   /// If you want to retrieve a list of all applications in your account, use
   /// the <a>ListApplications</a> operation.
@@ -1067,8 +1073,8 @@ class KinesisAnalyticsV2 {
   /// The name of the application.
   ///
   /// Parameter [includeAdditionalDetails] :
-  /// Displays verbose information about a Kinesis Data Analytics application,
-  /// including the application's job plan.
+  /// Displays verbose information about a Managed Service for Apache Flink
+  /// application, including the application's job plan.
   Future<DescribeApplicationResponse> describeApplication({
     required String applicationName,
     bool? includeAdditionalDetails,
@@ -1091,6 +1097,35 @@ class KinesisAnalyticsV2 {
     );
 
     return DescribeApplicationResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Returns information about a specific operation performed on a Managed
+  /// Service for Apache Flink application
+  ///
+  /// May throw [InvalidArgumentException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [UnsupportedOperationException].
+  Future<DescribeApplicationOperationResponse> describeApplicationOperation({
+    required String applicationName,
+    required String operationId,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'KinesisAnalytics_20180523.DescribeApplicationOperation'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ApplicationName': applicationName,
+        'OperationId': operationId,
+      },
+    );
+
+    return DescribeApplicationOperationResponse.fromJson(jsonResponse.body);
   }
 
   /// Returns information about a snapshot of application state data.
@@ -1132,8 +1167,7 @@ class KinesisAnalyticsV2 {
   /// To see a list of all the versions of an application, invoke the
   /// <a>ListApplicationVersions</a> operation.
   /// <note>
-  /// This operation is supported only for Amazon Kinesis Data Analytics for
-  /// Apache Flink.
+  /// This operation is supported only for Managed Service for Apache Flink.
   /// </note>
   ///
   /// May throw [InvalidArgumentException].
@@ -1204,7 +1238,7 @@ class KinesisAnalyticsV2 {
   ///
   /// Parameter [inputStartingPositionConfiguration] :
   /// The point at which you want Kinesis Data Analytics to start reading
-  /// records from the specified streaming source discovery purposes.
+  /// records from the specified streaming source for discovery purposes.
   ///
   /// Parameter [resourceARN] :
   /// The Amazon Resource Name (ARN) of the streaming source.
@@ -1242,6 +1276,47 @@ class KinesisAnalyticsV2 {
     );
 
     return DiscoverInputSchemaResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Lists information about operations performed on a Managed Service for
+  /// Apache Flink application
+  ///
+  /// May throw [InvalidArgumentException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [UnsupportedOperationException].
+  Future<ListApplicationOperationsResponse> listApplicationOperations({
+    required String applicationName,
+    int? limit,
+    String? nextToken,
+    String? operation,
+    OperationStatus? operationStatus,
+  }) async {
+    _s.validateNumRange(
+      'limit',
+      limit,
+      1,
+      50,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'KinesisAnalytics_20180523.ListApplicationOperations'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ApplicationName': applicationName,
+        if (limit != null) 'Limit': limit,
+        if (nextToken != null) 'NextToken': nextToken,
+        if (operation != null) 'Operation': operation,
+        if (operationStatus != null) 'OperationStatus': operationStatus.value,
+      },
+    );
+
+    return ListApplicationOperationsResponse.fromJson(jsonResponse.body);
   }
 
   /// Lists information about the current application snapshots.
@@ -1298,8 +1373,7 @@ class KinesisAnalyticsV2 {
   /// To get the complete description of a specific application version, invoke
   /// the <a>DescribeApplicationVersion</a> operation.
   /// <note>
-  /// This operation is supported only for Amazon Kinesis Data Analytics for
-  /// Apache Flink.
+  /// This operation is supported only for Managed Service for Apache Flink.
   /// </note>
   ///
   /// May throw [InvalidArgumentException].
@@ -1350,9 +1424,9 @@ class KinesisAnalyticsV2 {
     return ListApplicationVersionsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Returns a list of Kinesis Data Analytics applications in your account. For
-  /// each application, the response includes the application name, Amazon
-  /// Resource Name (ARN), and status.
+  /// Returns a list of Managed Service for Apache Flink applications in your
+  /// account. For each application, the response includes the application name,
+  /// Amazon Resource Name (ARN), and status.
   ///
   /// If you want detailed information about a specific application, use
   /// <a>DescribeApplication</a>.
@@ -1430,17 +1504,16 @@ class KinesisAnalyticsV2 {
   }
 
   /// Reverts the application to the previous running version. You can roll back
-  /// an application if you suspect it is stuck in a transient status.
+  /// an application if you suspect it is stuck in a transient status or in the
+  /// running status.
   ///
   /// You can roll back an application only if it is in the
-  /// <code>UPDATING</code> or <code>AUTOSCALING</code> status.
+  /// <code>UPDATING</code>, <code>AUTOSCALING</code>, or <code>RUNNING</code>
+  /// statuses.
   ///
   /// When you rollback an application, it loads state data from the last
-  /// successful snapshot. If the application has no snapshots, Kinesis Data
-  /// Analytics rejects the rollback request.
-  ///
-  /// This action is not supported for Kinesis Data Analytics for SQL
-  /// applications.
+  /// successful snapshot. If the application has no snapshots, Managed Service
+  /// for Apache Flink rejects the rollback request.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [InvalidArgumentException].
@@ -1485,9 +1558,9 @@ class KinesisAnalyticsV2 {
     return RollbackApplicationResponse.fromJson(jsonResponse.body);
   }
 
-  /// Starts the specified Kinesis Data Analytics application. After creating an
-  /// application, you must exclusively call this operation to start your
-  /// application.
+  /// Starts the specified Managed Service for Apache Flink application. After
+  /// creating an application, you must exclusively call this operation to start
+  /// your application.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [ResourceInUseException].
@@ -1499,9 +1572,9 @@ class KinesisAnalyticsV2 {
   /// The name of the application.
   ///
   /// Parameter [runConfiguration] :
-  /// Identifies the run configuration (start parameters) of a Kinesis Data
-  /// Analytics application.
-  Future<void> startApplication({
+  /// Identifies the run configuration (start parameters) of a Managed Service
+  /// for Apache Flink application.
+  Future<StartApplicationResponse> startApplication({
     required String applicationName,
     RunConfiguration? runConfiguration,
   }) async {
@@ -1509,7 +1582,7 @@ class KinesisAnalyticsV2 {
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'KinesisAnalytics_20180523.StartApplication'
     };
-    await _protocol.send(
+    final jsonResponse = await _protocol.send(
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
@@ -1520,6 +1593,8 @@ class KinesisAnalyticsV2 {
         if (runConfiguration != null) 'RunConfiguration': runConfiguration,
       },
     );
+
+    return StartApplicationResponse.fromJson(jsonResponse.body);
   }
 
   /// Stops the application from processing data. You can stop an application
@@ -1529,8 +1604,8 @@ class KinesisAnalyticsV2 {
   /// You can use the <a>DescribeApplication</a> operation to find the
   /// application status.
   ///
-  /// Kinesis Data Analytics takes a snapshot when the application is stopped,
-  /// unless <code>Force</code> is set to <code>true</code>.
+  /// Managed Service for Apache Flink takes a snapshot when the application is
+  /// stopped, unless <code>Force</code> is set to <code>true</code>.
   ///
   /// May throw [ResourceNotFoundException].
   /// May throw [ResourceInUseException].
@@ -1544,20 +1619,20 @@ class KinesisAnalyticsV2 {
   ///
   /// Parameter [force] :
   /// Set to <code>true</code> to force the application to stop. If you set
-  /// <code>Force</code> to <code>true</code>, Kinesis Data Analytics stops the
-  /// application without taking a snapshot.
+  /// <code>Force</code> to <code>true</code>, Managed Service for Apache Flink
+  /// stops the application without taking a snapshot.
   /// <note>
   /// Force-stopping your application may lead to data loss or duplication. To
   /// prevent data loss or duplicate processing of data during application
   /// restarts, we recommend you to take frequent snapshots of your application.
   /// </note>
-  /// You can only force stop a Flink-based Kinesis Data Analytics application.
+  /// You can only force stop a Managed Service for Apache Flink application.
   /// You can't force stop a SQL-based Kinesis Data Analytics application.
   ///
   /// The application must be in the <code>STARTING</code>,
   /// <code>UPDATING</code>, <code>STOPPING</code>, <code>AUTOSCALING</code>, or
   /// <code>RUNNING</code> status.
-  Future<void> stopApplication({
+  Future<StopApplicationResponse> stopApplication({
     required String applicationName,
     bool? force,
   }) async {
@@ -1565,7 +1640,7 @@ class KinesisAnalyticsV2 {
       'Content-Type': 'application/x-amz-json-1.1',
       'X-Amz-Target': 'KinesisAnalytics_20180523.StopApplication'
     };
-    await _protocol.send(
+    final jsonResponse = await _protocol.send(
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
@@ -1576,12 +1651,14 @@ class KinesisAnalyticsV2 {
         if (force != null) 'Force': force,
       },
     );
+
+    return StopApplicationResponse.fromJson(jsonResponse.body);
   }
 
-  /// Adds one or more key-value tags to a Kinesis Data Analytics application.
-  /// Note that the maximum number of application tags includes system tags. The
-  /// maximum number of user-defined application tags is 50. For more
-  /// information, see <a
+  /// Adds one or more key-value tags to a Managed Service for Apache Flink
+  /// application. Note that the maximum number of application tags includes
+  /// system tags. The maximum number of user-defined application tags is 50.
+  /// For more information, see <a
   /// href="https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-tagging.html">Using
   /// Tagging</a>.
   ///
@@ -1617,8 +1694,8 @@ class KinesisAnalyticsV2 {
     );
   }
 
-  /// Removes one or more tags from a Kinesis Data Analytics application. For
-  /// more information, see <a
+  /// Removes one or more tags from a Managed Service for Apache Flink
+  /// application. For more information, see <a
   /// href="https://docs.aws.amazon.com/kinesisanalytics/latest/java/how-tagging.html">Using
   /// Tagging</a>.
   ///
@@ -1629,8 +1706,8 @@ class KinesisAnalyticsV2 {
   /// May throw [ConcurrentModificationException].
   ///
   /// Parameter [resourceARN] :
-  /// The ARN of the Kinesis Data Analytics application from which to remove the
-  /// tags.
+  /// The ARN of the Managed Service for Apache Flink application from which to
+  /// remove the tags.
   ///
   /// Parameter [tagKeys] :
   /// A list of keys of tags to remove from the specified application.
@@ -1655,18 +1732,12 @@ class KinesisAnalyticsV2 {
     );
   }
 
-  /// Updates an existing Kinesis Data Analytics application. Using this
-  /// operation, you can update application code, input configuration, and
+  /// Updates an existing Managed Service for Apache Flink application. Using
+  /// this operation, you can update application code, input configuration, and
   /// output configuration.
   ///
-  /// Kinesis Data Analytics updates the <code>ApplicationVersionId</code> each
-  /// time you update your application.
-  /// <note>
-  /// You cannot update the <code>RuntimeEnvironment</code> of an existing
-  /// application. If you need to update an application's
-  /// <code>RuntimeEnvironment</code>, you must delete the application and
-  /// create it again.
-  /// </note>
+  /// Managed Service for Apache Flink updates the
+  /// <code>ApplicationVersionId</code> each time you update your application.
   ///
   /// May throw [CodeValidationException].
   /// May throw [ResourceNotFoundException].
@@ -1708,6 +1779,21 @@ class KinesisAnalyticsV2 {
   /// Parameter [runConfigurationUpdate] :
   /// Describes updates to the application's starting parameters.
   ///
+  /// Parameter [runtimeEnvironmentUpdate] :
+  /// Updates the Managed Service for Apache Flink runtime environment used to
+  /// run your code. To avoid issues you must:
+  ///
+  /// <ul>
+  /// <li>
+  /// Ensure your new jar and dependencies are compatible with the new runtime
+  /// selected.
+  /// </li>
+  /// <li>
+  /// Ensure your new code's state is compatible with the snapshot from which
+  /// your application will start
+  /// </li>
+  /// </ul>
+  ///
   /// Parameter [serviceExecutionRoleUpdate] :
   /// Describes updates to the service execution role.
   Future<UpdateApplicationResponse> updateApplication({
@@ -1717,6 +1803,7 @@ class KinesisAnalyticsV2 {
     String? conditionalToken,
     int? currentApplicationVersionId,
     RunConfigurationUpdate? runConfigurationUpdate,
+    RuntimeEnvironment? runtimeEnvironmentUpdate,
     String? serviceExecutionRoleUpdate,
   }) async {
     _s.validateNumRange(
@@ -1746,6 +1833,8 @@ class KinesisAnalyticsV2 {
           'CurrentApplicationVersionId': currentApplicationVersionId,
         if (runConfigurationUpdate != null)
           'RunConfigurationUpdate': runConfigurationUpdate,
+        if (runtimeEnvironmentUpdate != null)
+          'RuntimeEnvironmentUpdate': runtimeEnvironmentUpdate.value,
         if (serviceExecutionRoleUpdate != null)
           'ServiceExecutionRoleUpdate': serviceExecutionRoleUpdate,
       },
@@ -1754,8 +1843,8 @@ class KinesisAnalyticsV2 {
     return UpdateApplicationResponse.fromJson(jsonResponse.body);
   }
 
-  /// Updates the maintenance configuration of the Kinesis Data Analytics
-  /// application.
+  /// Updates the maintenance configuration of the Managed Service for Apache
+  /// Flink application.
   ///
   /// You can invoke this operation on an application that is in one of the two
   /// following states: <code>READY</code> or <code>RUNNING</code>. If you
@@ -1773,11 +1862,10 @@ class KinesisAnalyticsV2 {
   /// the <a>DescribeApplication</a> operation.
   ///
   /// For information about application maintenance, see <a
-  /// href="https://docs.aws.amazon.com/kinesisanalytics/latest/java/maintenance.html">Kinesis
-  /// Data Analytics for Apache Flink Maintenance</a>.
+  /// href="https://docs.aws.amazon.com/kinesisanalytics/latest/java/maintenance.html">Managed
+  /// Service for Apache Flink for Apache Flink Maintenance</a>.
   /// <note>
-  /// This operation is supported only for Amazon Kinesis Data Analytics for
-  /// Apache Flink.
+  /// This operation is supported only for Managed Service for Apache Flink.
   /// </note>
   ///
   /// May throw [ResourceNotFoundException].
@@ -1825,20 +1913,24 @@ class AddApplicationCloudWatchLoggingOptionResponse {
   /// The application's ARN.
   final String? applicationARN;
 
-  /// The new version ID of the Kinesis Data Analytics application. Kinesis Data
-  /// Analytics updates the <code>ApplicationVersionId</code> each time you change
-  /// the CloudWatch logging options.
+  /// The new version ID of the SQL-based Kinesis Data Analytics application.
+  /// Kinesis Data Analytics updates the <code>ApplicationVersionId</code> each
+  /// time you change the CloudWatch logging options.
   final int? applicationVersionId;
 
-  /// The descriptions of the current CloudWatch logging options for the Kinesis
-  /// Data Analytics application.
+  /// The descriptions of the current CloudWatch logging options for the SQL-based
+  /// Kinesis Data Analytics application.
   final List<CloudWatchLoggingOptionDescription>?
       cloudWatchLoggingOptionDescriptions;
+
+  /// Operation ID for tracking AddApplicationCloudWatchLoggingOption request
+  final String? operationId;
 
   AddApplicationCloudWatchLoggingOptionResponse({
     this.applicationARN,
     this.applicationVersionId,
     this.cloudWatchLoggingOptionDescriptions,
+    this.operationId,
   });
 
   factory AddApplicationCloudWatchLoggingOptionResponse.fromJson(
@@ -1848,10 +1940,11 @@ class AddApplicationCloudWatchLoggingOptionResponse {
       applicationVersionId: json['ApplicationVersionId'] as int?,
       cloudWatchLoggingOptionDescriptions:
           (json['CloudWatchLoggingOptionDescriptions'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => CloudWatchLoggingOptionDescription.fromJson(
                   e as Map<String, dynamic>))
               .toList(),
+      operationId: json['OperationId'] as String?,
     );
   }
 
@@ -1860,6 +1953,7 @@ class AddApplicationCloudWatchLoggingOptionResponse {
     final applicationVersionId = this.applicationVersionId;
     final cloudWatchLoggingOptionDescriptions =
         this.cloudWatchLoggingOptionDescriptions;
+    final operationId = this.operationId;
     return {
       if (applicationARN != null) 'ApplicationARN': applicationARN,
       if (applicationVersionId != null)
@@ -1867,6 +1961,7 @@ class AddApplicationCloudWatchLoggingOptionResponse {
       if (cloudWatchLoggingOptionDescriptions != null)
         'CloudWatchLoggingOptionDescriptions':
             cloudWatchLoggingOptionDescriptions,
+      if (operationId != null) 'OperationId': operationId,
     };
   }
 }
@@ -1949,7 +2044,7 @@ class AddApplicationInputResponse {
       applicationARN: json['ApplicationARN'] as String?,
       applicationVersionId: json['ApplicationVersionId'] as int?,
       inputDescriptions: (json['InputDescriptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => InputDescription.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -1992,7 +2087,7 @@ class AddApplicationOutputResponse {
       applicationARN: json['ApplicationARN'] as String?,
       applicationVersionId: json['ApplicationVersionId'] as int?,
       outputDescriptions: (json['OutputDescriptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => OutputDescription.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -2035,7 +2130,7 @@ class AddApplicationReferenceDataSourceResponse {
       applicationVersionId: json['ApplicationVersionId'] as int?,
       referenceDataSourceDescriptions:
           (json['ReferenceDataSourceDescriptions'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => ReferenceDataSourceDescription.fromJson(
                   e as Map<String, dynamic>))
               .toList(),
@@ -2061,9 +2156,12 @@ class AddApplicationVpcConfigurationResponse {
   /// The ARN of the application.
   final String? applicationARN;
 
-  /// Provides the current application version. Kinesis Data Analytics updates the
-  /// ApplicationVersionId each time you update the application.
+  /// Provides the current application version. Managed Service for Apache Flink
+  /// updates the ApplicationVersionId each time you update the application.
   final int? applicationVersionId;
+
+  /// Operation ID for tracking AddApplicationVpcConfiguration request
+  final String? operationId;
 
   /// The parameters of the new VPC configuration.
   final VpcConfigurationDescription? vpcConfigurationDescription;
@@ -2071,6 +2169,7 @@ class AddApplicationVpcConfigurationResponse {
   AddApplicationVpcConfigurationResponse({
     this.applicationARN,
     this.applicationVersionId,
+    this.operationId,
     this.vpcConfigurationDescription,
   });
 
@@ -2079,6 +2178,7 @@ class AddApplicationVpcConfigurationResponse {
     return AddApplicationVpcConfigurationResponse(
       applicationARN: json['ApplicationARN'] as String?,
       applicationVersionId: json['ApplicationVersionId'] as int?,
+      operationId: json['OperationId'] as String?,
       vpcConfigurationDescription: json['VpcConfigurationDescription'] != null
           ? VpcConfigurationDescription.fromJson(
               json['VpcConfigurationDescription'] as Map<String, dynamic>)
@@ -2089,11 +2189,13 @@ class AddApplicationVpcConfigurationResponse {
   Map<String, dynamic> toJson() {
     final applicationARN = this.applicationARN;
     final applicationVersionId = this.applicationVersionId;
+    final operationId = this.operationId;
     final vpcConfigurationDescription = this.vpcConfigurationDescription;
     return {
       if (applicationARN != null) 'ApplicationARN': applicationARN,
       if (applicationVersionId != null)
         'ApplicationVersionId': applicationVersionId,
+      if (operationId != null) 'OperationId': operationId,
       if (vpcConfigurationDescription != null)
         'VpcConfigurationDescription': vpcConfigurationDescription,
     };
@@ -2117,7 +2219,7 @@ class ApplicationCodeConfiguration {
     final codeContentType = this.codeContentType;
     final codeContent = this.codeContent;
     return {
-      'CodeContentType': codeContentType.toValue(),
+      'CodeContentType': codeContentType.value,
       if (codeContent != null) 'CodeContent': codeContent,
     };
   }
@@ -2139,7 +2241,8 @@ class ApplicationCodeConfigurationDescription {
   factory ApplicationCodeConfigurationDescription.fromJson(
       Map<String, dynamic> json) {
     return ApplicationCodeConfigurationDescription(
-      codeContentType: (json['CodeContentType'] as String).toCodeContentType(),
+      codeContentType:
+          CodeContentType.fromString((json['CodeContentType'] as String)),
       codeContentDescription: json['CodeContentDescription'] != null
           ? CodeContentDescription.fromJson(
               json['CodeContentDescription'] as Map<String, dynamic>)
@@ -2151,7 +2254,7 @@ class ApplicationCodeConfigurationDescription {
     final codeContentType = this.codeContentType;
     final codeContentDescription = this.codeContentDescription;
     return {
-      'CodeContentType': codeContentType.toValue(),
+      'CodeContentType': codeContentType.value,
       if (codeContentDescription != null)
         'CodeContentDescription': codeContentDescription,
     };
@@ -2159,7 +2262,7 @@ class ApplicationCodeConfigurationDescription {
 }
 
 /// Describes code configuration updates for an application. This is supported
-/// for a Flink-based Kinesis Data Analytics application or a SQL-based Kinesis
+/// for a Managed Service for Apache Flink application or a SQL-based Kinesis
 /// Data Analytics application.
 class ApplicationCodeConfigurationUpdate {
   /// Describes updates to the code content type.
@@ -2178,27 +2281,30 @@ class ApplicationCodeConfigurationUpdate {
     final codeContentUpdate = this.codeContentUpdate;
     return {
       if (codeContentTypeUpdate != null)
-        'CodeContentTypeUpdate': codeContentTypeUpdate.toValue(),
+        'CodeContentTypeUpdate': codeContentTypeUpdate.value,
       if (codeContentUpdate != null) 'CodeContentUpdate': codeContentUpdate,
     };
   }
 }
 
-/// Specifies the creation parameters for a Kinesis Data Analytics application.
+/// Specifies the creation parameters for a Managed Service for Apache Flink
+/// application.
 class ApplicationConfiguration {
-  /// The code location and type parameters for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// The code location and type parameters for a Managed Service for Apache Flink
+  /// application.
   final ApplicationCodeConfiguration? applicationCodeConfiguration;
 
-  /// Describes whether snapshots are enabled for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// Describes whether snapshots are enabled for a Managed Service for Apache
+  /// Flink application.
   final ApplicationSnapshotConfiguration? applicationSnapshotConfiguration;
+  final ApplicationSystemRollbackConfiguration?
+      applicationSystemRollbackConfiguration;
 
-  /// Describes execution properties for a Flink-based Kinesis Data Analytics
+  /// Describes execution properties for a Managed Service for Apache Flink
   /// application.
   final EnvironmentProperties? environmentProperties;
 
-  /// The creation and update parameters for a Flink-based Kinesis Data Analytics
+  /// The creation and update parameters for a Managed Service for Apache Flink
   /// application.
   final FlinkApplicationConfiguration? flinkApplicationConfiguration;
 
@@ -2210,12 +2316,14 @@ class ApplicationConfiguration {
   /// application.
   final List<VpcConfiguration>? vpcConfigurations;
 
-  /// The configuration parameters for a Kinesis Data Analytics Studio notebook.
+  /// The configuration parameters for a Managed Service for Apache Flink Studio
+  /// notebook.
   final ZeppelinApplicationConfiguration? zeppelinApplicationConfiguration;
 
   ApplicationConfiguration({
     this.applicationCodeConfiguration,
     this.applicationSnapshotConfiguration,
+    this.applicationSystemRollbackConfiguration,
     this.environmentProperties,
     this.flinkApplicationConfiguration,
     this.sqlApplicationConfiguration,
@@ -2227,6 +2335,8 @@ class ApplicationConfiguration {
     final applicationCodeConfiguration = this.applicationCodeConfiguration;
     final applicationSnapshotConfiguration =
         this.applicationSnapshotConfiguration;
+    final applicationSystemRollbackConfiguration =
+        this.applicationSystemRollbackConfiguration;
     final environmentProperties = this.environmentProperties;
     final flinkApplicationConfiguration = this.flinkApplicationConfiguration;
     final sqlApplicationConfiguration = this.sqlApplicationConfiguration;
@@ -2238,6 +2348,9 @@ class ApplicationConfiguration {
         'ApplicationCodeConfiguration': applicationCodeConfiguration,
       if (applicationSnapshotConfiguration != null)
         'ApplicationSnapshotConfiguration': applicationSnapshotConfiguration,
+      if (applicationSystemRollbackConfiguration != null)
+        'ApplicationSystemRollbackConfiguration':
+            applicationSystemRollbackConfiguration,
       if (environmentProperties != null)
         'EnvironmentProperties': environmentProperties,
       if (flinkApplicationConfiguration != null)
@@ -2252,28 +2365,30 @@ class ApplicationConfiguration {
 }
 
 /// Describes details about the application code and starting parameters for a
-/// Kinesis Data Analytics application.
+/// Managed Service for Apache Flink application.
 class ApplicationConfigurationDescription {
-  /// The details about the application code for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// The details about the application code for a Managed Service for Apache
+  /// Flink application.
   final ApplicationCodeConfigurationDescription?
       applicationCodeConfigurationDescription;
 
-  /// Describes whether snapshots are enabled for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// Describes whether snapshots are enabled for a Managed Service for Apache
+  /// Flink application.
   final ApplicationSnapshotConfigurationDescription?
       applicationSnapshotConfigurationDescription;
+  final ApplicationSystemRollbackConfigurationDescription?
+      applicationSystemRollbackConfigurationDescription;
 
-  /// Describes execution properties for a Flink-based Kinesis Data Analytics
+  /// Describes execution properties for a Managed Service for Apache Flink
   /// application.
   final EnvironmentPropertyDescriptions? environmentPropertyDescriptions;
 
-  /// The details about a Flink-based Kinesis Data Analytics application.
+  /// The details about a Managed Service for Apache Flink application.
   final FlinkApplicationConfigurationDescription?
       flinkApplicationConfigurationDescription;
 
-  /// The details about the starting properties for a Kinesis Data Analytics
-  /// application.
+  /// The details about the starting properties for a Managed Service for Apache
+  /// Flink application.
   final RunConfigurationDescription? runConfigurationDescription;
 
   /// The details about inputs, outputs, and reference data sources for a
@@ -2285,13 +2400,15 @@ class ApplicationConfigurationDescription {
   /// application.
   final List<VpcConfigurationDescription>? vpcConfigurationDescriptions;
 
-  /// The configuration parameters for a Kinesis Data Analytics Studio notebook.
+  /// The configuration parameters for a Managed Service for Apache Flink Studio
+  /// notebook.
   final ZeppelinApplicationConfigurationDescription?
       zeppelinApplicationConfigurationDescription;
 
   ApplicationConfigurationDescription({
     this.applicationCodeConfigurationDescription,
     this.applicationSnapshotConfigurationDescription,
+    this.applicationSystemRollbackConfigurationDescription,
     this.environmentPropertyDescriptions,
     this.flinkApplicationConfigurationDescription,
     this.runConfigurationDescription,
@@ -2313,6 +2430,12 @@ class ApplicationConfigurationDescription {
           json['ApplicationSnapshotConfigurationDescription'] != null
               ? ApplicationSnapshotConfigurationDescription.fromJson(
                   json['ApplicationSnapshotConfigurationDescription']
+                      as Map<String, dynamic>)
+              : null,
+      applicationSystemRollbackConfigurationDescription:
+          json['ApplicationSystemRollbackConfigurationDescription'] != null
+              ? ApplicationSystemRollbackConfigurationDescription.fromJson(
+                  json['ApplicationSystemRollbackConfigurationDescription']
                       as Map<String, dynamic>)
               : null,
       environmentPropertyDescriptions:
@@ -2339,7 +2462,7 @@ class ApplicationConfigurationDescription {
               : null,
       vpcConfigurationDescriptions: (json['VpcConfigurationDescriptions']
               as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               VpcConfigurationDescription.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -2357,6 +2480,8 @@ class ApplicationConfigurationDescription {
         this.applicationCodeConfigurationDescription;
     final applicationSnapshotConfigurationDescription =
         this.applicationSnapshotConfigurationDescription;
+    final applicationSystemRollbackConfigurationDescription =
+        this.applicationSystemRollbackConfigurationDescription;
     final environmentPropertyDescriptions =
         this.environmentPropertyDescriptions;
     final flinkApplicationConfigurationDescription =
@@ -2374,6 +2499,9 @@ class ApplicationConfigurationDescription {
       if (applicationSnapshotConfigurationDescription != null)
         'ApplicationSnapshotConfigurationDescription':
             applicationSnapshotConfigurationDescription,
+      if (applicationSystemRollbackConfigurationDescription != null)
+        'ApplicationSystemRollbackConfigurationDescription':
+            applicationSystemRollbackConfigurationDescription,
       if (environmentPropertyDescriptions != null)
         'EnvironmentPropertyDescriptions': environmentPropertyDescriptions,
       if (flinkApplicationConfigurationDescription != null)
@@ -2398,16 +2526,18 @@ class ApplicationConfigurationUpdate {
   /// Describes updates to an application's code configuration.
   final ApplicationCodeConfigurationUpdate? applicationCodeConfigurationUpdate;
 
-  /// Describes whether snapshots are enabled for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// Describes whether snapshots are enabled for a Managed Service for Apache
+  /// Flink application.
   final ApplicationSnapshotConfigurationUpdate?
       applicationSnapshotConfigurationUpdate;
+  final ApplicationSystemRollbackConfigurationUpdate?
+      applicationSystemRollbackConfigurationUpdate;
 
-  /// Describes updates to the environment properties for a Flink-based Kinesis
-  /// Data Analytics application.
+  /// Describes updates to the environment properties for a Managed Service for
+  /// Apache Flink application.
   final EnvironmentPropertyUpdates? environmentPropertyUpdates;
 
-  /// Describes updates to a Flink-based Kinesis Data Analytics application's
+  /// Describes updates to a Managed Service for Apache Flink application's
   /// configuration.
   final FlinkApplicationConfigurationUpdate?
       flinkApplicationConfigurationUpdate;
@@ -2420,13 +2550,15 @@ class ApplicationConfigurationUpdate {
   /// application.
   final List<VpcConfigurationUpdate>? vpcConfigurationUpdates;
 
-  /// Updates to the configuration of a Kinesis Data Analytics Studio notebook.
+  /// Updates to the configuration of a Managed Service for Apache Flink Studio
+  /// notebook.
   final ZeppelinApplicationConfigurationUpdate?
       zeppelinApplicationConfigurationUpdate;
 
   ApplicationConfigurationUpdate({
     this.applicationCodeConfigurationUpdate,
     this.applicationSnapshotConfigurationUpdate,
+    this.applicationSystemRollbackConfigurationUpdate,
     this.environmentPropertyUpdates,
     this.flinkApplicationConfigurationUpdate,
     this.sqlApplicationConfigurationUpdate,
@@ -2439,6 +2571,8 @@ class ApplicationConfigurationUpdate {
         this.applicationCodeConfigurationUpdate;
     final applicationSnapshotConfigurationUpdate =
         this.applicationSnapshotConfigurationUpdate;
+    final applicationSystemRollbackConfigurationUpdate =
+        this.applicationSystemRollbackConfigurationUpdate;
     final environmentPropertyUpdates = this.environmentPropertyUpdates;
     final flinkApplicationConfigurationUpdate =
         this.flinkApplicationConfigurationUpdate;
@@ -2454,6 +2588,9 @@ class ApplicationConfigurationUpdate {
       if (applicationSnapshotConfigurationUpdate != null)
         'ApplicationSnapshotConfigurationUpdate':
             applicationSnapshotConfigurationUpdate,
+      if (applicationSystemRollbackConfigurationUpdate != null)
+        'ApplicationSystemRollbackConfigurationUpdate':
+            applicationSystemRollbackConfigurationUpdate,
       if (environmentPropertyUpdates != null)
         'EnvironmentPropertyUpdates': environmentPropertyUpdates,
       if (flinkApplicationConfigurationUpdate != null)
@@ -2482,15 +2619,16 @@ class ApplicationDetail {
   /// The status of the application.
   final ApplicationStatus applicationStatus;
 
-  /// Provides the current application version. Kinesis Data Analytics updates the
-  /// <code>ApplicationVersionId</code> each time you update the application.
+  /// Provides the current application version. Managed Service for Apache Flink
+  /// updates the <code>ApplicationVersionId</code> each time you update the
+  /// application.
   final int applicationVersionId;
 
   /// The runtime environment for the application.
   final RuntimeEnvironment runtimeEnvironment;
 
   /// Describes details about the application code and starting parameters for a
-  /// Kinesis Data Analytics application.
+  /// Managed Service for Apache Flink application.
   final ApplicationConfigurationDescription?
       applicationConfigurationDescription;
 
@@ -2501,10 +2639,13 @@ class ApplicationDetail {
   final ApplicationMaintenanceConfigurationDescription?
       applicationMaintenanceConfigurationDescription;
 
-  /// To create a Kinesis Data Analytics Studio notebook, you must set the mode to
-  /// <code>INTERACTIVE</code>. However, for a Kinesis Data Analytics for Apache
-  /// Flink application, the mode is optional.
+  /// To create a Managed Service for Apache Flink Studio notebook, you must set
+  /// the mode to <code>INTERACTIVE</code>. However, for a Managed Service for
+  /// Apache Flink application, the mode is optional.
   final ApplicationMode? applicationMode;
+
+  /// The current timestamp when the application version was created.
+  final DateTime? applicationVersionCreateTimestamp;
 
   /// If you reverted the application using <a>RollbackApplication</a>, the
   /// application version when <code>RollbackApplication</code> was called.
@@ -2544,6 +2685,7 @@ class ApplicationDetail {
     this.applicationDescription,
     this.applicationMaintenanceConfigurationDescription,
     this.applicationMode,
+    this.applicationVersionCreateTimestamp,
     this.applicationVersionRolledBackFrom,
     this.applicationVersionRolledBackTo,
     this.applicationVersionUpdatedFrom,
@@ -2559,10 +2701,10 @@ class ApplicationDetail {
       applicationARN: json['ApplicationARN'] as String,
       applicationName: json['ApplicationName'] as String,
       applicationStatus:
-          (json['ApplicationStatus'] as String).toApplicationStatus(),
+          ApplicationStatus.fromString((json['ApplicationStatus'] as String)),
       applicationVersionId: json['ApplicationVersionId'] as int,
       runtimeEnvironment:
-          (json['RuntimeEnvironment'] as String).toRuntimeEnvironment(),
+          RuntimeEnvironment.fromString((json['RuntimeEnvironment'] as String)),
       applicationConfigurationDescription:
           json['ApplicationConfigurationDescription'] != null
               ? ApplicationConfigurationDescription.fromJson(
@@ -2577,7 +2719,9 @@ class ApplicationDetail {
                       as Map<String, dynamic>)
               : null,
       applicationMode:
-          (json['ApplicationMode'] as String?)?.toApplicationMode(),
+          (json['ApplicationMode'] as String?)?.let(ApplicationMode.fromString),
+      applicationVersionCreateTimestamp:
+          timeStampFromJson(json['ApplicationVersionCreateTimestamp']),
       applicationVersionRolledBackFrom:
           json['ApplicationVersionRolledBackFrom'] as int?,
       applicationVersionRolledBackTo:
@@ -2586,7 +2730,7 @@ class ApplicationDetail {
           json['ApplicationVersionUpdatedFrom'] as int?,
       cloudWatchLoggingOptionDescriptions:
           (json['CloudWatchLoggingOptionDescriptions'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => CloudWatchLoggingOptionDescription.fromJson(
                   e as Map<String, dynamic>))
               .toList(),
@@ -2609,6 +2753,8 @@ class ApplicationDetail {
     final applicationMaintenanceConfigurationDescription =
         this.applicationMaintenanceConfigurationDescription;
     final applicationMode = this.applicationMode;
+    final applicationVersionCreateTimestamp =
+        this.applicationVersionCreateTimestamp;
     final applicationVersionRolledBackFrom =
         this.applicationVersionRolledBackFrom;
     final applicationVersionRolledBackTo = this.applicationVersionRolledBackTo;
@@ -2622,9 +2768,9 @@ class ApplicationDetail {
     return {
       'ApplicationARN': applicationARN,
       'ApplicationName': applicationName,
-      'ApplicationStatus': applicationStatus.toValue(),
+      'ApplicationStatus': applicationStatus.value,
       'ApplicationVersionId': applicationVersionId,
-      'RuntimeEnvironment': runtimeEnvironment.toValue(),
+      'RuntimeEnvironment': runtimeEnvironment.value,
       if (applicationConfigurationDescription != null)
         'ApplicationConfigurationDescription':
             applicationConfigurationDescription,
@@ -2633,7 +2779,10 @@ class ApplicationDetail {
       if (applicationMaintenanceConfigurationDescription != null)
         'ApplicationMaintenanceConfigurationDescription':
             applicationMaintenanceConfigurationDescription,
-      if (applicationMode != null) 'ApplicationMode': applicationMode.toValue(),
+      if (applicationMode != null) 'ApplicationMode': applicationMode.value,
+      if (applicationVersionCreateTimestamp != null)
+        'ApplicationVersionCreateTimestamp':
+            unixTimestampToJson(applicationVersionCreateTimestamp),
       if (applicationVersionRolledBackFrom != null)
         'ApplicationVersionRolledBackFrom': applicationVersionRolledBackFrom,
       if (applicationVersionRolledBackTo != null)
@@ -2711,30 +2860,127 @@ class ApplicationMaintenanceConfigurationUpdate {
 }
 
 enum ApplicationMode {
-  streaming,
-  interactive,
+  streaming('STREAMING'),
+  interactive('INTERACTIVE'),
+  ;
+
+  final String value;
+
+  const ApplicationMode(this.value);
+
+  static ApplicationMode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ApplicationMode'));
 }
 
-extension ApplicationModeValueExtension on ApplicationMode {
-  String toValue() {
-    switch (this) {
-      case ApplicationMode.streaming:
-        return 'STREAMING';
-      case ApplicationMode.interactive:
-        return 'INTERACTIVE';
-    }
+/// Provides a description of the operation, such as the type and status of
+/// operation
+class ApplicationOperationInfo {
+  /// The timestamp at which the operation finished for the application
+  final DateTime? endTime;
+  final String? operation;
+  final String? operationId;
+  final OperationStatus? operationStatus;
+
+  /// The timestamp at which the operation was created
+  final DateTime? startTime;
+
+  ApplicationOperationInfo({
+    this.endTime,
+    this.operation,
+    this.operationId,
+    this.operationStatus,
+    this.startTime,
+  });
+
+  factory ApplicationOperationInfo.fromJson(Map<String, dynamic> json) {
+    return ApplicationOperationInfo(
+      endTime: timeStampFromJson(json['EndTime']),
+      operation: json['Operation'] as String?,
+      operationId: json['OperationId'] as String?,
+      operationStatus:
+          (json['OperationStatus'] as String?)?.let(OperationStatus.fromString),
+      startTime: timeStampFromJson(json['StartTime']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final endTime = this.endTime;
+    final operation = this.operation;
+    final operationId = this.operationId;
+    final operationStatus = this.operationStatus;
+    final startTime = this.startTime;
+    return {
+      if (endTime != null) 'EndTime': unixTimestampToJson(endTime),
+      if (operation != null) 'Operation': operation,
+      if (operationId != null) 'OperationId': operationId,
+      if (operationStatus != null) 'OperationStatus': operationStatus.value,
+      if (startTime != null) 'StartTime': unixTimestampToJson(startTime),
+    };
   }
 }
 
-extension ApplicationModeFromString on String {
-  ApplicationMode toApplicationMode() {
-    switch (this) {
-      case 'STREAMING':
-        return ApplicationMode.streaming;
-      case 'INTERACTIVE':
-        return ApplicationMode.interactive;
-    }
-    throw Exception('$this is not known in enum ApplicationMode');
+/// Provides a description of the operation, such as the operation-type and
+/// status
+class ApplicationOperationInfoDetails {
+  /// The timestamp at which the operation finished for the application
+  final DateTime endTime;
+  final String operation;
+  final OperationStatus operationStatus;
+
+  /// The timestamp at which the operation was created
+  final DateTime startTime;
+  final ApplicationVersionChangeDetails? applicationVersionChangeDetails;
+  final OperationFailureDetails? operationFailureDetails;
+
+  ApplicationOperationInfoDetails({
+    required this.endTime,
+    required this.operation,
+    required this.operationStatus,
+    required this.startTime,
+    this.applicationVersionChangeDetails,
+    this.operationFailureDetails,
+  });
+
+  factory ApplicationOperationInfoDetails.fromJson(Map<String, dynamic> json) {
+    return ApplicationOperationInfoDetails(
+      endTime: nonNullableTimeStampFromJson(json['EndTime'] as Object),
+      operation: json['Operation'] as String,
+      operationStatus:
+          OperationStatus.fromString((json['OperationStatus'] as String)),
+      startTime: nonNullableTimeStampFromJson(json['StartTime'] as Object),
+      applicationVersionChangeDetails:
+          json['ApplicationVersionChangeDetails'] != null
+              ? ApplicationVersionChangeDetails.fromJson(
+                  json['ApplicationVersionChangeDetails']
+                      as Map<String, dynamic>)
+              : null,
+      operationFailureDetails: json['OperationFailureDetails'] != null
+          ? OperationFailureDetails.fromJson(
+              json['OperationFailureDetails'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final endTime = this.endTime;
+    final operation = this.operation;
+    final operationStatus = this.operationStatus;
+    final startTime = this.startTime;
+    final applicationVersionChangeDetails =
+        this.applicationVersionChangeDetails;
+    final operationFailureDetails = this.operationFailureDetails;
+    return {
+      'EndTime': unixTimestampToJson(endTime),
+      'Operation': operation,
+      'OperationStatus': operationStatus.value,
+      'StartTime': unixTimestampToJson(startTime),
+      if (applicationVersionChangeDetails != null)
+        'ApplicationVersionChangeDetails': applicationVersionChangeDetails,
+      if (operationFailureDetails != null)
+        'OperationFailureDetails': operationFailureDetails,
+    };
   }
 }
 
@@ -2757,8 +3003,8 @@ class ApplicationRestoreConfiguration {
 
   factory ApplicationRestoreConfiguration.fromJson(Map<String, dynamic> json) {
     return ApplicationRestoreConfiguration(
-      applicationRestoreType:
-          (json['ApplicationRestoreType'] as String).toApplicationRestoreType(),
+      applicationRestoreType: ApplicationRestoreType.fromString(
+          (json['ApplicationRestoreType'] as String)),
       snapshotName: json['SnapshotName'] as String?,
     );
   }
@@ -2767,50 +3013,33 @@ class ApplicationRestoreConfiguration {
     final applicationRestoreType = this.applicationRestoreType;
     final snapshotName = this.snapshotName;
     return {
-      'ApplicationRestoreType': applicationRestoreType.toValue(),
+      'ApplicationRestoreType': applicationRestoreType.value,
       if (snapshotName != null) 'SnapshotName': snapshotName,
     };
   }
 }
 
 enum ApplicationRestoreType {
-  skipRestoreFromSnapshot,
-  restoreFromLatestSnapshot,
-  restoreFromCustomSnapshot,
+  skipRestoreFromSnapshot('SKIP_RESTORE_FROM_SNAPSHOT'),
+  restoreFromLatestSnapshot('RESTORE_FROM_LATEST_SNAPSHOT'),
+  restoreFromCustomSnapshot('RESTORE_FROM_CUSTOM_SNAPSHOT'),
+  ;
+
+  final String value;
+
+  const ApplicationRestoreType(this.value);
+
+  static ApplicationRestoreType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ApplicationRestoreType'));
 }
 
-extension ApplicationRestoreTypeValueExtension on ApplicationRestoreType {
-  String toValue() {
-    switch (this) {
-      case ApplicationRestoreType.skipRestoreFromSnapshot:
-        return 'SKIP_RESTORE_FROM_SNAPSHOT';
-      case ApplicationRestoreType.restoreFromLatestSnapshot:
-        return 'RESTORE_FROM_LATEST_SNAPSHOT';
-      case ApplicationRestoreType.restoreFromCustomSnapshot:
-        return 'RESTORE_FROM_CUSTOM_SNAPSHOT';
-    }
-  }
-}
-
-extension ApplicationRestoreTypeFromString on String {
-  ApplicationRestoreType toApplicationRestoreType() {
-    switch (this) {
-      case 'SKIP_RESTORE_FROM_SNAPSHOT':
-        return ApplicationRestoreType.skipRestoreFromSnapshot;
-      case 'RESTORE_FROM_LATEST_SNAPSHOT':
-        return ApplicationRestoreType.restoreFromLatestSnapshot;
-      case 'RESTORE_FROM_CUSTOM_SNAPSHOT':
-        return ApplicationRestoreType.restoreFromCustomSnapshot;
-    }
-    throw Exception('$this is not known in enum ApplicationRestoreType');
-  }
-}
-
-/// Describes whether snapshots are enabled for a Flink-based Kinesis Data
-/// Analytics application.
+/// Describes whether snapshots are enabled for a Managed Service for Apache
+/// Flink application.
 class ApplicationSnapshotConfiguration {
-  /// Describes whether snapshots are enabled for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// Describes whether snapshots are enabled for a Managed Service for Apache
+  /// Flink application.
   final bool snapshotsEnabled;
 
   ApplicationSnapshotConfiguration({
@@ -2825,11 +3054,11 @@ class ApplicationSnapshotConfiguration {
   }
 }
 
-/// Describes whether snapshots are enabled for a Flink-based Kinesis Data
-/// Analytics application.
+/// Describes whether snapshots are enabled for a Managed Service for Apache
+/// Flink application.
 class ApplicationSnapshotConfigurationDescription {
-  /// Describes whether snapshots are enabled for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// Describes whether snapshots are enabled for a Managed Service for Apache
+  /// Flink application.
   final bool snapshotsEnabled;
 
   ApplicationSnapshotConfigurationDescription({
@@ -2851,8 +3080,8 @@ class ApplicationSnapshotConfigurationDescription {
   }
 }
 
-/// Describes updates to whether snapshots are enabled for a Flink-based Kinesis
-/// Data Analytics application.
+/// Describes updates to whether snapshots are enabled for a Managed Service for
+/// Apache Flink application.
 class ApplicationSnapshotConfigurationUpdate {
   /// Describes updates to whether snapshots are enabled for an application.
   final bool snapshotsEnabledUpdate;
@@ -2870,76 +3099,27 @@ class ApplicationSnapshotConfigurationUpdate {
 }
 
 enum ApplicationStatus {
-  deleting,
-  starting,
-  stopping,
-  ready,
-  running,
-  updating,
-  autoscaling,
-  forceStopping,
-  rollingBack,
-  maintenance,
-  rolledBack,
-}
+  deleting('DELETING'),
+  starting('STARTING'),
+  stopping('STOPPING'),
+  ready('READY'),
+  running('RUNNING'),
+  updating('UPDATING'),
+  autoscaling('AUTOSCALING'),
+  forceStopping('FORCE_STOPPING'),
+  rollingBack('ROLLING_BACK'),
+  maintenance('MAINTENANCE'),
+  rolledBack('ROLLED_BACK'),
+  ;
 
-extension ApplicationStatusValueExtension on ApplicationStatus {
-  String toValue() {
-    switch (this) {
-      case ApplicationStatus.deleting:
-        return 'DELETING';
-      case ApplicationStatus.starting:
-        return 'STARTING';
-      case ApplicationStatus.stopping:
-        return 'STOPPING';
-      case ApplicationStatus.ready:
-        return 'READY';
-      case ApplicationStatus.running:
-        return 'RUNNING';
-      case ApplicationStatus.updating:
-        return 'UPDATING';
-      case ApplicationStatus.autoscaling:
-        return 'AUTOSCALING';
-      case ApplicationStatus.forceStopping:
-        return 'FORCE_STOPPING';
-      case ApplicationStatus.rollingBack:
-        return 'ROLLING_BACK';
-      case ApplicationStatus.maintenance:
-        return 'MAINTENANCE';
-      case ApplicationStatus.rolledBack:
-        return 'ROLLED_BACK';
-    }
-  }
-}
+  final String value;
 
-extension ApplicationStatusFromString on String {
-  ApplicationStatus toApplicationStatus() {
-    switch (this) {
-      case 'DELETING':
-        return ApplicationStatus.deleting;
-      case 'STARTING':
-        return ApplicationStatus.starting;
-      case 'STOPPING':
-        return ApplicationStatus.stopping;
-      case 'READY':
-        return ApplicationStatus.ready;
-      case 'RUNNING':
-        return ApplicationStatus.running;
-      case 'UPDATING':
-        return ApplicationStatus.updating;
-      case 'AUTOSCALING':
-        return ApplicationStatus.autoscaling;
-      case 'FORCE_STOPPING':
-        return ApplicationStatus.forceStopping;
-      case 'ROLLING_BACK':
-        return ApplicationStatus.rollingBack;
-      case 'MAINTENANCE':
-        return ApplicationStatus.maintenance;
-      case 'ROLLED_BACK':
-        return ApplicationStatus.rolledBack;
-    }
-    throw Exception('$this is not known in enum ApplicationStatus');
-  }
+  const ApplicationStatus(this.value);
+
+  static ApplicationStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ApplicationStatus'));
 }
 
 /// Provides application summary information, including the application Amazon
@@ -2960,9 +3140,9 @@ class ApplicationSummary {
   /// The runtime environment for the application.
   final RuntimeEnvironment runtimeEnvironment;
 
-  /// For a Kinesis Data Analytics for Apache Flink application, the mode is
-  /// <code>STREAMING</code>. For a Kinesis Data Analytics Studio notebook, it is
-  /// <code>INTERACTIVE</code>.
+  /// For a Managed Service for Apache Flink application, the mode is
+  /// <code>STREAMING</code>. For a Managed Service for Apache Flink Studio
+  /// notebook, it is <code>INTERACTIVE</code>.
   final ApplicationMode? applicationMode;
 
   ApplicationSummary({
@@ -2979,12 +3159,12 @@ class ApplicationSummary {
       applicationARN: json['ApplicationARN'] as String,
       applicationName: json['ApplicationName'] as String,
       applicationStatus:
-          (json['ApplicationStatus'] as String).toApplicationStatus(),
+          ApplicationStatus.fromString((json['ApplicationStatus'] as String)),
       applicationVersionId: json['ApplicationVersionId'] as int,
       runtimeEnvironment:
-          (json['RuntimeEnvironment'] as String).toRuntimeEnvironment(),
+          RuntimeEnvironment.fromString((json['RuntimeEnvironment'] as String)),
       applicationMode:
-          (json['ApplicationMode'] as String?)?.toApplicationMode(),
+          (json['ApplicationMode'] as String?)?.let(ApplicationMode.fromString),
     );
   }
 
@@ -2998,10 +3178,107 @@ class ApplicationSummary {
     return {
       'ApplicationARN': applicationARN,
       'ApplicationName': applicationName,
-      'ApplicationStatus': applicationStatus.toValue(),
+      'ApplicationStatus': applicationStatus.value,
       'ApplicationVersionId': applicationVersionId,
-      'RuntimeEnvironment': runtimeEnvironment.toValue(),
-      if (applicationMode != null) 'ApplicationMode': applicationMode.toValue(),
+      'RuntimeEnvironment': runtimeEnvironment.value,
+      if (applicationMode != null) 'ApplicationMode': applicationMode.value,
+    };
+  }
+}
+
+/// Describes system rollback configuration for a Managed Service for Apache
+/// Flink application
+class ApplicationSystemRollbackConfiguration {
+  /// Describes whether system rollbacks are enabled for a Managed Service for
+  /// Apache Flink application
+  final bool rollbackEnabled;
+
+  ApplicationSystemRollbackConfiguration({
+    required this.rollbackEnabled,
+  });
+
+  Map<String, dynamic> toJson() {
+    final rollbackEnabled = this.rollbackEnabled;
+    return {
+      'RollbackEnabled': rollbackEnabled,
+    };
+  }
+}
+
+/// Describes system rollback configuration for a Managed Service for Apache
+/// Flink application
+class ApplicationSystemRollbackConfigurationDescription {
+  /// Describes whether system rollbacks are enabled for a Managed Service for
+  /// Apache Flink application
+  final bool rollbackEnabled;
+
+  ApplicationSystemRollbackConfigurationDescription({
+    required this.rollbackEnabled,
+  });
+
+  factory ApplicationSystemRollbackConfigurationDescription.fromJson(
+      Map<String, dynamic> json) {
+    return ApplicationSystemRollbackConfigurationDescription(
+      rollbackEnabled: json['RollbackEnabled'] as bool,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final rollbackEnabled = this.rollbackEnabled;
+    return {
+      'RollbackEnabled': rollbackEnabled,
+    };
+  }
+}
+
+/// Describes system rollback configuration for a Managed Service for Apache
+/// Flink application
+class ApplicationSystemRollbackConfigurationUpdate {
+  /// Describes whether system rollbacks are enabled for a Managed Service for
+  /// Apache Flink application
+  final bool rollbackEnabledUpdate;
+
+  ApplicationSystemRollbackConfigurationUpdate({
+    required this.rollbackEnabledUpdate,
+  });
+
+  Map<String, dynamic> toJson() {
+    final rollbackEnabledUpdate = this.rollbackEnabledUpdate;
+    return {
+      'RollbackEnabledUpdate': rollbackEnabledUpdate,
+    };
+  }
+}
+
+/// Contains information about the application version changes due to an
+/// operation
+class ApplicationVersionChangeDetails {
+  /// The operation was performed on this version of the application
+  final int applicationVersionUpdatedFrom;
+
+  /// The operation execution resulted in the transition to the following version
+  /// of the application
+  final int applicationVersionUpdatedTo;
+
+  ApplicationVersionChangeDetails({
+    required this.applicationVersionUpdatedFrom,
+    required this.applicationVersionUpdatedTo,
+  });
+
+  factory ApplicationVersionChangeDetails.fromJson(Map<String, dynamic> json) {
+    return ApplicationVersionChangeDetails(
+      applicationVersionUpdatedFrom:
+          json['ApplicationVersionUpdatedFrom'] as int,
+      applicationVersionUpdatedTo: json['ApplicationVersionUpdatedTo'] as int,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final applicationVersionUpdatedFrom = this.applicationVersionUpdatedFrom;
+    final applicationVersionUpdatedTo = this.applicationVersionUpdatedTo;
+    return {
+      'ApplicationVersionUpdatedFrom': applicationVersionUpdatedFrom,
+      'ApplicationVersionUpdatedTo': applicationVersionUpdatedTo,
     };
   }
 }
@@ -3011,8 +3288,8 @@ class ApplicationVersionSummary {
   /// The status of the application.
   final ApplicationStatus applicationStatus;
 
-  /// The ID of the application version. Kinesis Data Analytics updates the
-  /// <code>ApplicationVersionId</code> each time you update the application.
+  /// The ID of the application version. Managed Service for Apache Flink updates
+  /// the <code>ApplicationVersionId</code> each time you update the application.
   final int applicationVersionId;
 
   ApplicationVersionSummary({
@@ -3023,7 +3300,7 @@ class ApplicationVersionSummary {
   factory ApplicationVersionSummary.fromJson(Map<String, dynamic> json) {
     return ApplicationVersionSummary(
       applicationStatus:
-          (json['ApplicationStatus'] as String).toApplicationStatus(),
+          ApplicationStatus.fromString((json['ApplicationStatus'] as String)),
       applicationVersionId: json['ApplicationVersionId'] as int,
     );
   }
@@ -3032,38 +3309,25 @@ class ApplicationVersionSummary {
     final applicationStatus = this.applicationStatus;
     final applicationVersionId = this.applicationVersionId;
     return {
-      'ApplicationStatus': applicationStatus.toValue(),
+      'ApplicationStatus': applicationStatus.value,
       'ApplicationVersionId': applicationVersionId,
     };
   }
 }
 
 enum ArtifactType {
-  udf,
-  dependencyJar,
-}
+  udf('UDF'),
+  dependencyJar('DEPENDENCY_JAR'),
+  ;
 
-extension ArtifactTypeValueExtension on ArtifactType {
-  String toValue() {
-    switch (this) {
-      case ArtifactType.udf:
-        return 'UDF';
-      case ArtifactType.dependencyJar:
-        return 'DEPENDENCY_JAR';
-    }
-  }
-}
+  final String value;
 
-extension ArtifactTypeFromString on String {
-  ArtifactType toArtifactType() {
-    switch (this) {
-      case 'UDF':
-        return ArtifactType.udf;
-      case 'DEPENDENCY_JAR':
-        return ArtifactType.dependencyJar;
-    }
-    throw Exception('$this is not known in enum ArtifactType');
-  }
+  const ArtifactType(this.value);
+
+  static ArtifactType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ArtifactType'));
 }
 
 /// For a SQL-based Kinesis Data Analytics application, provides additional
@@ -3107,12 +3371,12 @@ class CSVMappingParameters {
 }
 
 /// The configuration parameters for the default Amazon Glue database. You use
-/// this database for SQL queries that you write in a Kinesis Data Analytics
-/// Studio notebook.
+/// this database for SQL queries that you write in a Managed Service for Apache
+/// Flink Studio notebook.
 class CatalogConfiguration {
   /// The configuration parameters for the default Amazon Glue database. You use
   /// this database for Apache Flink SQL queries and table API transforms that you
-  /// write in a Kinesis Data Analytics Studio notebook.
+  /// write in a Managed Service for Apache Flink Studio notebook.
   final GlueDataCatalogConfiguration glueDataCatalogConfiguration;
 
   CatalogConfiguration({
@@ -3129,11 +3393,11 @@ class CatalogConfiguration {
 
 /// The configuration parameters for the default Amazon Glue database. You use
 /// this database for Apache Flink SQL queries and table API transforms that you
-/// write in a Kinesis Data Analytics Studio notebook.
+/// write in a Managed Service for Apache Flink Studio notebook.
 class CatalogConfigurationDescription {
   /// The configuration parameters for the default Amazon Glue database. You use
-  /// this database for SQL queries that you write in a Kinesis Data Analytics
-  /// Studio notebook.
+  /// this database for SQL queries that you write in a Managed Service for Apache
+  /// Flink Studio notebook.
   final GlueDataCatalogConfigurationDescription
       glueDataCatalogConfigurationDescription;
 
@@ -3161,12 +3425,12 @@ class CatalogConfigurationDescription {
 }
 
 /// Updates to the configuration parameters for the default Amazon Glue
-/// database. You use this database for SQL queries that you write in a Kinesis
-/// Data Analytics Studio notebook.
+/// database. You use this database for SQL queries that you write in a Managed
+/// Service for Apache Flink Studio notebook.
 class CatalogConfigurationUpdate {
   /// Updates to the configuration parameters for the default Amazon Glue
-  /// database. You use this database for SQL queries that you write in a Kinesis
-  /// Data Analytics Studio notebook.
+  /// database. You use this database for SQL queries that you write in a Managed
+  /// Service for Apache Flink Studio notebook.
   final GlueDataCatalogConfigurationUpdate glueDataCatalogConfigurationUpdate;
 
   CatalogConfigurationUpdate({
@@ -3185,14 +3449,14 @@ class CatalogConfigurationUpdate {
 /// Describes an application's checkpointing configuration. Checkpointing is the
 /// process of persisting application state for fault tolerance. For more
 /// information, see <a
-/// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/concepts/programming-model.html#checkpoints-for-fault-tolerance">
+/// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/dev/datastream/fault-tolerance/checkpointing/#enabling-and-configuring-checkpointing">
 /// Checkpoints for Fault Tolerance</a> in the <a
-/// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/">Apache
+/// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/">Apache
 /// Flink Documentation</a>.
 class CheckpointConfiguration {
-  /// Describes whether the application uses Kinesis Data Analytics' default
-  /// checkpointing behavior. You must set this property to <code>CUSTOM</code> in
-  /// order to set the <code>CheckpointingEnabled</code>,
+  /// Describes whether the application uses Managed Service for Apache Flink'
+  /// default checkpointing behavior. You must set this property to
+  /// <code>CUSTOM</code> in order to set the <code>CheckpointingEnabled</code>,
   /// <code>CheckpointInterval</code>, or <code>MinPauseBetweenCheckpoints</code>
   /// parameters.
   /// <note>
@@ -3222,8 +3486,8 @@ class CheckpointConfiguration {
   /// </note>
   final int? checkpointInterval;
 
-  /// Describes whether checkpointing is enabled for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// Describes whether checkpointing is enabled for a Managed Service for Apache
+  /// Flink application.
   /// <note>
   /// If <code>CheckpointConfiguration.ConfigurationType</code> is
   /// <code>DEFAULT</code>, the application will use a
@@ -3237,9 +3501,9 @@ class CheckpointConfiguration {
   /// operation takes longer than the <code>CheckpointInterval</code>, the
   /// application otherwise performs continual checkpoint operations. For more
   /// information, see <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/ops/state/large_state_tuning.html#tuning-checkpointing">
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/ops/state/large_state_tuning/#tuning-checkpointing">
   /// Tuning Checkpointing</a> in the <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/">Apache
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/">Apache
   /// Flink Documentation</a>.
   /// <note>
   /// If <code>CheckpointConfiguration.ConfigurationType</code> is
@@ -3262,7 +3526,7 @@ class CheckpointConfiguration {
     final checkpointingEnabled = this.checkpointingEnabled;
     final minPauseBetweenCheckpoints = this.minPauseBetweenCheckpoints;
     return {
-      'ConfigurationType': configurationType.toValue(),
+      'ConfigurationType': configurationType.value,
       if (checkpointInterval != null) 'CheckpointInterval': checkpointInterval,
       if (checkpointingEnabled != null)
         'CheckpointingEnabled': checkpointingEnabled,
@@ -3272,7 +3536,7 @@ class CheckpointConfiguration {
   }
 }
 
-/// Describes checkpointing parameters for a Flink-based Kinesis Data Analytics
+/// Describes checkpointing parameters for a Managed Service for Apache Flink
 /// application.
 class CheckpointConfigurationDescription {
   /// Describes the interval in milliseconds between checkpoint operations.
@@ -3284,8 +3548,8 @@ class CheckpointConfigurationDescription {
   /// </note>
   final int? checkpointInterval;
 
-  /// Describes whether checkpointing is enabled for a Flink-based Kinesis Data
-  /// Analytics application.
+  /// Describes whether checkpointing is enabled for a Managed Service for Apache
+  /// Flink application.
   /// <note>
   /// If <code>CheckpointConfiguration.ConfigurationType</code> is
   /// <code>DEFAULT</code>, the application will use a
@@ -3295,7 +3559,7 @@ class CheckpointConfigurationDescription {
   final bool? checkpointingEnabled;
 
   /// Describes whether the application uses the default checkpointing behavior in
-  /// Kinesis Data Analytics.
+  /// Managed Service for Apache Flink.
   /// <note>
   /// If this value is set to <code>DEFAULT</code>, the application will use the
   /// following values, even if they are set to other values using APIs or
@@ -3336,8 +3600,8 @@ class CheckpointConfigurationDescription {
     return CheckpointConfigurationDescription(
       checkpointInterval: json['CheckpointInterval'] as int?,
       checkpointingEnabled: json['CheckpointingEnabled'] as bool?,
-      configurationType:
-          (json['ConfigurationType'] as String?)?.toConfigurationType(),
+      configurationType: (json['ConfigurationType'] as String?)
+          ?.let(ConfigurationType.fromString),
       minPauseBetweenCheckpoints: json['MinPauseBetweenCheckpoints'] as int?,
     );
   }
@@ -3352,15 +3616,15 @@ class CheckpointConfigurationDescription {
       if (checkpointingEnabled != null)
         'CheckpointingEnabled': checkpointingEnabled,
       if (configurationType != null)
-        'ConfigurationType': configurationType.toValue(),
+        'ConfigurationType': configurationType.value,
       if (minPauseBetweenCheckpoints != null)
         'MinPauseBetweenCheckpoints': minPauseBetweenCheckpoints,
     };
   }
 }
 
-/// Describes updates to the checkpointing parameters for a Flink-based Kinesis
-/// Data Analytics application.
+/// Describes updates to the checkpointing parameters for a Managed Service for
+/// Apache Flink application.
 class CheckpointConfigurationUpdate {
   /// Describes updates to the interval in milliseconds between checkpoint
   /// operations.
@@ -3382,7 +3646,7 @@ class CheckpointConfigurationUpdate {
   final bool? checkpointingEnabledUpdate;
 
   /// Describes updates to whether the application uses the default checkpointing
-  /// behavior of Kinesis Data Analytics. You must set this property to
+  /// behavior of Managed Service for Apache Flink. You must set this property to
   /// <code>CUSTOM</code> in order to set the <code>CheckpointingEnabled</code>,
   /// <code>CheckpointInterval</code>, or <code>MinPauseBetweenCheckpoints</code>
   /// parameters.
@@ -3433,7 +3697,7 @@ class CheckpointConfigurationUpdate {
       if (checkpointingEnabledUpdate != null)
         'CheckpointingEnabledUpdate': checkpointingEnabledUpdate,
       if (configurationTypeUpdate != null)
-        'ConfigurationTypeUpdate': configurationTypeUpdate.toValue(),
+        'ConfigurationTypeUpdate': configurationTypeUpdate.value,
       if (minPauseBetweenCheckpointsUpdate != null)
         'MinPauseBetweenCheckpointsUpdate': minPauseBetweenCheckpointsUpdate,
     };
@@ -3528,15 +3792,15 @@ class CloudWatchLoggingOptionUpdate {
 }
 
 /// Specifies either the application code, or the location of the application
-/// code, for a Flink-based Kinesis Data Analytics application.
+/// code, for a Managed Service for Apache Flink application.
 class CodeContent {
   /// Information about the Amazon S3 bucket that contains the application code.
   final S3ContentLocation? s3ContentLocation;
 
-  /// The text-format code for a Flink-based Kinesis Data Analytics application.
+  /// The text-format code for a Managed Service for Apache Flink application.
   final String? textContent;
 
-  /// The zip-format code for a Flink-based Kinesis Data Analytics application.
+  /// The zip-format code for a Managed Service for Apache Flink application.
   final Uint8List? zipFileContent;
 
   CodeContent({
@@ -3558,7 +3822,8 @@ class CodeContent {
   }
 }
 
-/// Describes details about the code of a Kinesis Data Analytics application.
+/// Describes details about the code of a Managed Service for Apache Flink
+/// application.
 class CodeContentDescription {
   /// The checksum that can be used to validate zip-format code.
   final String? codeMD5;
@@ -3614,31 +3879,18 @@ class CodeContentDescription {
 }
 
 enum CodeContentType {
-  plaintext,
-  zipfile,
-}
+  plaintext('PLAINTEXT'),
+  zipfile('ZIPFILE'),
+  ;
 
-extension CodeContentTypeValueExtension on CodeContentType {
-  String toValue() {
-    switch (this) {
-      case CodeContentType.plaintext:
-        return 'PLAINTEXT';
-      case CodeContentType.zipfile:
-        return 'ZIPFILE';
-    }
-  }
-}
+  final String value;
 
-extension CodeContentTypeFromString on String {
-  CodeContentType toCodeContentType() {
-    switch (this) {
-      case 'PLAINTEXT':
-        return CodeContentType.plaintext;
-      case 'ZIPFILE':
-        return CodeContentType.zipfile;
-    }
-    throw Exception('$this is not known in enum CodeContentType');
-  }
+  const CodeContentType(this.value);
+
+  static CodeContentType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum CodeContentType'));
 }
 
 /// Describes an update to the code of an application. Not supported for Apache
@@ -3674,31 +3926,18 @@ class CodeContentUpdate {
 }
 
 enum ConfigurationType {
-  $default,
-  custom,
-}
+  $default('DEFAULT'),
+  custom('CUSTOM'),
+  ;
 
-extension ConfigurationTypeValueExtension on ConfigurationType {
-  String toValue() {
-    switch (this) {
-      case ConfigurationType.$default:
-        return 'DEFAULT';
-      case ConfigurationType.custom:
-        return 'CUSTOM';
-    }
-  }
-}
+  final String value;
 
-extension ConfigurationTypeFromString on String {
-  ConfigurationType toConfigurationType() {
-    switch (this) {
-      case 'DEFAULT':
-        return ConfigurationType.$default;
-      case 'CUSTOM':
-        return ConfigurationType.custom;
-    }
-    throw Exception('$this is not known in enum ConfigurationType');
-  }
+  const ConfigurationType(this.value);
+
+  static ConfigurationType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ConfigurationType'));
 }
 
 class CreateApplicationPresignedUrlResponse {
@@ -3725,8 +3964,9 @@ class CreateApplicationPresignedUrlResponse {
 }
 
 class CreateApplicationResponse {
-  /// In response to your <code>CreateApplication</code> request, Kinesis Data
-  /// Analytics returns a response with details of the application it created.
+  /// In response to your <code>CreateApplication</code> request, Managed Service
+  /// for Apache Flink returns a response with details of the application it
+  /// created.
   final ApplicationDetail applicationDetail;
 
   CreateApplicationResponse({
@@ -3783,7 +4023,7 @@ class CustomArtifactConfiguration {
     final mavenReference = this.mavenReference;
     final s3ContentLocation = this.s3ContentLocation;
     return {
-      'ArtifactType': artifactType.toValue(),
+      'ArtifactType': artifactType.value,
       if (mavenReference != null) 'MavenReference': mavenReference,
       if (s3ContentLocation != null) 'S3ContentLocation': s3ContentLocation,
     };
@@ -3810,7 +4050,8 @@ class CustomArtifactConfigurationDescription {
   factory CustomArtifactConfigurationDescription.fromJson(
       Map<String, dynamic> json) {
     return CustomArtifactConfigurationDescription(
-      artifactType: (json['ArtifactType'] as String?)?.toArtifactType(),
+      artifactType:
+          (json['ArtifactType'] as String?)?.let(ArtifactType.fromString),
       mavenReferenceDescription: json['MavenReferenceDescription'] != null
           ? MavenReference.fromJson(
               json['MavenReferenceDescription'] as Map<String, dynamic>)
@@ -3827,7 +4068,7 @@ class CustomArtifactConfigurationDescription {
     final mavenReferenceDescription = this.mavenReferenceDescription;
     final s3ContentLocationDescription = this.s3ContentLocationDescription;
     return {
-      if (artifactType != null) 'ArtifactType': artifactType.toValue(),
+      if (artifactType != null) 'ArtifactType': artifactType.value,
       if (mavenReferenceDescription != null)
         'MavenReferenceDescription': mavenReferenceDescription,
       if (s3ContentLocationDescription != null)
@@ -3850,10 +4091,14 @@ class DeleteApplicationCloudWatchLoggingOptionResponse {
   final List<CloudWatchLoggingOptionDescription>?
       cloudWatchLoggingOptionDescriptions;
 
+  /// Operation ID for tracking DeleteApplicationCloudWatchLoggingOption request
+  final String? operationId;
+
   DeleteApplicationCloudWatchLoggingOptionResponse({
     this.applicationARN,
     this.applicationVersionId,
     this.cloudWatchLoggingOptionDescriptions,
+    this.operationId,
   });
 
   factory DeleteApplicationCloudWatchLoggingOptionResponse.fromJson(
@@ -3863,10 +4108,11 @@ class DeleteApplicationCloudWatchLoggingOptionResponse {
       applicationVersionId: json['ApplicationVersionId'] as int?,
       cloudWatchLoggingOptionDescriptions:
           (json['CloudWatchLoggingOptionDescriptions'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => CloudWatchLoggingOptionDescription.fromJson(
                   e as Map<String, dynamic>))
               .toList(),
+      operationId: json['OperationId'] as String?,
     );
   }
 
@@ -3875,6 +4121,7 @@ class DeleteApplicationCloudWatchLoggingOptionResponse {
     final applicationVersionId = this.applicationVersionId;
     final cloudWatchLoggingOptionDescriptions =
         this.cloudWatchLoggingOptionDescriptions;
+    final operationId = this.operationId;
     return {
       if (applicationARN != null) 'ApplicationARN': applicationARN,
       if (applicationVersionId != null)
@@ -3882,6 +4129,7 @@ class DeleteApplicationCloudWatchLoggingOptionResponse {
       if (cloudWatchLoggingOptionDescriptions != null)
         'CloudWatchLoggingOptionDescriptions':
             cloudWatchLoggingOptionDescriptions,
+      if (operationId != null) 'OperationId': operationId,
     };
   }
 }
@@ -4003,15 +4251,19 @@ class DeleteApplicationSnapshotResponse {
 }
 
 class DeleteApplicationVpcConfigurationResponse {
-  /// The ARN of the Kinesis Data Analytics application.
+  /// The ARN of the Managed Service for Apache Flink application.
   final String? applicationARN;
 
   /// The updated version ID of the application.
   final int? applicationVersionId;
 
+  /// Operation ID for tracking DeleteApplicationVpcConfiguration request
+  final String? operationId;
+
   DeleteApplicationVpcConfigurationResponse({
     this.applicationARN,
     this.applicationVersionId,
+    this.operationId,
   });
 
   factory DeleteApplicationVpcConfigurationResponse.fromJson(
@@ -4019,22 +4271,25 @@ class DeleteApplicationVpcConfigurationResponse {
     return DeleteApplicationVpcConfigurationResponse(
       applicationARN: json['ApplicationARN'] as String?,
       applicationVersionId: json['ApplicationVersionId'] as int?,
+      operationId: json['OperationId'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final applicationARN = this.applicationARN;
     final applicationVersionId = this.applicationVersionId;
+    final operationId = this.operationId;
     return {
       if (applicationARN != null) 'ApplicationARN': applicationARN,
       if (applicationVersionId != null)
         'ApplicationVersionId': applicationVersionId,
+      if (operationId != null) 'OperationId': operationId,
     };
   }
 }
 
-/// The information required to deploy a Kinesis Data Analytics Studio notebook
-/// as an application with durable state.
+/// The information required to deploy a Managed Service for Apache Flink Studio
+/// notebook as an application with durable state.
 class DeployAsApplicationConfiguration {
   /// The description of an Amazon S3 object that contains the Amazon Data
   /// Analytics application, including the Amazon Resource Name (ARN) of the S3
@@ -4097,6 +4352,37 @@ class DeployAsApplicationConfigurationUpdate {
     return {
       if (s3ContentLocationUpdate != null)
         'S3ContentLocationUpdate': s3ContentLocationUpdate,
+    };
+  }
+}
+
+/// Provides details of the operation corresponding to the operation-ID on a
+/// Managed Service for Apache Flink application
+class DescribeApplicationOperationResponse {
+  final ApplicationOperationInfoDetails? applicationOperationInfoDetails;
+
+  DescribeApplicationOperationResponse({
+    this.applicationOperationInfoDetails,
+  });
+
+  factory DescribeApplicationOperationResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DescribeApplicationOperationResponse(
+      applicationOperationInfoDetails:
+          json['ApplicationOperationInfoDetails'] != null
+              ? ApplicationOperationInfoDetails.fromJson(
+                  json['ApplicationOperationInfoDetails']
+                      as Map<String, dynamic>)
+              : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final applicationOperationInfoDetails =
+        this.applicationOperationInfoDetails;
+    return {
+      if (applicationOperationInfoDetails != null)
+        'ApplicationOperationInfoDetails': applicationOperationInfoDetails,
     };
   }
 }
@@ -4188,14 +4474,14 @@ class DestinationSchema {
   factory DestinationSchema.fromJson(Map<String, dynamic> json) {
     return DestinationSchema(
       recordFormatType:
-          (json['RecordFormatType'] as String).toRecordFormatType(),
+          RecordFormatType.fromString((json['RecordFormatType'] as String)),
     );
   }
 
   Map<String, dynamic> toJson() {
     final recordFormatType = this.recordFormatType;
     return {
-      'RecordFormatType': recordFormatType.toValue(),
+      'RecordFormatType': recordFormatType.value,
     };
   }
 }
@@ -4230,16 +4516,15 @@ class DiscoverInputSchemaResponse {
           ? SourceSchema.fromJson(json['InputSchema'] as Map<String, dynamic>)
           : null,
       parsedInputRecords: (json['ParsedInputRecords'] as List?)
-          ?.whereNotNull()
-          .map((e) =>
-              (e as List).whereNotNull().map((e) => e as String).toList())
+          ?.nonNulls
+          .map((e) => (e as List).nonNulls.map((e) => e as String).toList())
           .toList(),
       processedInputRecords: (json['ProcessedInputRecords'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       rawInputRecords: (json['RawInputRecords'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -4260,7 +4545,7 @@ class DiscoverInputSchemaResponse {
   }
 }
 
-/// Describes execution properties for a Flink-based Kinesis Data Analytics
+/// Describes execution properties for a Managed Service for Apache Flink
 /// application.
 class EnvironmentProperties {
   /// Describes the execution property groups.
@@ -4290,7 +4575,7 @@ class EnvironmentPropertyDescriptions {
   factory EnvironmentPropertyDescriptions.fromJson(Map<String, dynamic> json) {
     return EnvironmentPropertyDescriptions(
       propertyGroupDescriptions: (json['PropertyGroupDescriptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => PropertyGroup.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -4305,8 +4590,8 @@ class EnvironmentPropertyDescriptions {
   }
 }
 
-/// Describes updates to the execution property groups for a Flink-based Kinesis
-/// Data Analytics application or a Studio notebook.
+/// Describes updates to the execution property groups for a Managed Service for
+/// Apache Flink application or a Studio notebook.
 class EnvironmentPropertyUpdates {
   /// Describes updates to the execution property groups.
   final List<PropertyGroup> propertyGroups;
@@ -4323,15 +4608,37 @@ class EnvironmentPropertyUpdates {
   }
 }
 
-/// Describes configuration parameters for a Flink-based Kinesis Data Analytics
+/// Provides a description of the operation failure error
+class ErrorInfo {
+  final String? errorString;
+
+  ErrorInfo({
+    this.errorString,
+  });
+
+  factory ErrorInfo.fromJson(Map<String, dynamic> json) {
+    return ErrorInfo(
+      errorString: json['ErrorString'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final errorString = this.errorString;
+    return {
+      if (errorString != null) 'ErrorString': errorString,
+    };
+  }
+}
+
+/// Describes configuration parameters for a Managed Service for Apache Flink
 /// application or a Studio notebook.
 class FlinkApplicationConfiguration {
   /// Describes an application's checkpointing configuration. Checkpointing is the
   /// process of persisting application state for fault tolerance. For more
   /// information, see <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/concepts/programming-model.html#checkpoints-for-fault-tolerance">
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/dev/datastream/fault-tolerance/checkpointing/#enabling-and-configuring-checkpointing">
   /// Checkpoints for Fault Tolerance</a> in the <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/">Apache
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/">Apache
   /// Flink Documentation</a>.
   final CheckpointConfiguration? checkpointConfiguration;
 
@@ -4364,7 +4671,7 @@ class FlinkApplicationConfiguration {
   }
 }
 
-/// Describes configuration parameters for a Flink-based Kinesis Data Analytics
+/// Describes configuration parameters for a Managed Service for Apache Flink
 /// application.
 class FlinkApplicationConfigurationDescription {
   /// Describes an application's checkpointing configuration. Checkpointing is the
@@ -4373,9 +4680,9 @@ class FlinkApplicationConfigurationDescription {
 
   /// The job plan for an application. For more information about the job plan,
   /// see <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/internals/job_scheduling.html">Jobs
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/internals/job_scheduling.html">Jobs
   /// and Scheduling</a> in the <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/">Apache
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/">Apache
   /// Flink Documentation</a>. To retrieve the job plan for the application, use
   /// the <a>DescribeApplicationRequest$IncludeAdditionalDetails</a> parameter of
   /// the <a>DescribeApplication</a> operation.
@@ -4445,8 +4752,8 @@ class FlinkApplicationConfigurationDescription {
   }
 }
 
-/// Describes updates to the configuration parameters for a Flink-based Kinesis
-/// Data Analytics application.
+/// Describes updates to the configuration parameters for a Managed Service for
+/// Apache Flink application.
 class FlinkApplicationConfigurationUpdate {
   /// Describes updates to an application's checkpointing configuration.
   /// Checkpointing is the process of persisting application state for fault
@@ -4482,7 +4789,7 @@ class FlinkApplicationConfigurationUpdate {
   }
 }
 
-/// Describes the starting parameters for a Flink-based Kinesis Data Analytics
+/// Describes the starting parameters for a Managed Service for Apache Flink
 /// application.
 class FlinkRunConfiguration {
   /// When restoring from a snapshot, specifies whether the runtime is allowed to
@@ -4490,9 +4797,9 @@ class FlinkRunConfiguration {
   /// the program is updated between snapshots to remove stateful parameters, and
   /// state data in the snapshot no longer corresponds to valid application data.
   /// For more information, see <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/ops/state/savepoints.html#allowing-non-restored-state">
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/docs/ops/state/savepoints/#allowing-non-restored-state">
   /// Allowing Non-Restored State</a> in the <a
-  /// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/">Apache
+  /// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/">Apache
   /// Flink documentation</a>.
   /// <note>
   /// This value defaults to <code>false</code>. If you update your application
@@ -4565,7 +4872,8 @@ class GlueDataCatalogConfigurationDescription {
 }
 
 /// Updates to the configuration of the Glue Data Catalog that you use for SQL
-/// queries that you write in a Kinesis Data Analytics Studio notebook.
+/// queries that you write in a Managed Service for Apache Flink Studio
+/// notebook.
 class GlueDataCatalogConfigurationUpdate {
   /// The updated Amazon Resource Name (ARN) of the database.
   final String databaseARNUpdate;
@@ -4704,7 +5012,7 @@ class InputDescription {
   factory InputDescription.fromJson(Map<String, dynamic> json) {
     return InputDescription(
       inAppStreamNames: (json['InAppStreamNames'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       inputId: json['InputId'] as String?,
@@ -5027,36 +5335,19 @@ class InputSchemaUpdate {
 }
 
 enum InputStartingPosition {
-  now,
-  trimHorizon,
-  lastStoppedPoint,
-}
+  now('NOW'),
+  trimHorizon('TRIM_HORIZON'),
+  lastStoppedPoint('LAST_STOPPED_POINT'),
+  ;
 
-extension InputStartingPositionValueExtension on InputStartingPosition {
-  String toValue() {
-    switch (this) {
-      case InputStartingPosition.now:
-        return 'NOW';
-      case InputStartingPosition.trimHorizon:
-        return 'TRIM_HORIZON';
-      case InputStartingPosition.lastStoppedPoint:
-        return 'LAST_STOPPED_POINT';
-    }
-  }
-}
+  final String value;
 
-extension InputStartingPositionFromString on String {
-  InputStartingPosition toInputStartingPosition() {
-    switch (this) {
-      case 'NOW':
-        return InputStartingPosition.now;
-      case 'TRIM_HORIZON':
-        return InputStartingPosition.trimHorizon;
-      case 'LAST_STOPPED_POINT':
-        return InputStartingPosition.lastStoppedPoint;
-    }
-    throw Exception('$this is not known in enum InputStartingPosition');
-  }
+  const InputStartingPosition(this.value);
+
+  static InputStartingPosition fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum InputStartingPosition'));
 }
 
 /// Describes the point at which the application reads from the streaming
@@ -5088,8 +5379,8 @@ class InputStartingPositionConfiguration {
   factory InputStartingPositionConfiguration.fromJson(
       Map<String, dynamic> json) {
     return InputStartingPositionConfiguration(
-      inputStartingPosition:
-          (json['InputStartingPosition'] as String?)?.toInputStartingPosition(),
+      inputStartingPosition: (json['InputStartingPosition'] as String?)
+          ?.let(InputStartingPosition.fromString),
     );
   }
 
@@ -5097,7 +5388,7 @@ class InputStartingPositionConfiguration {
     final inputStartingPosition = this.inputStartingPosition;
     return {
       if (inputStartingPosition != null)
-        'InputStartingPosition': inputStartingPosition.toValue(),
+        'InputStartingPosition': inputStartingPosition.value,
     };
   }
 }
@@ -5588,6 +5879,40 @@ class LambdaOutputUpdate {
   }
 }
 
+/// Response with the list of operations for an application
+class ListApplicationOperationsResponse {
+  final List<ApplicationOperationInfo>? applicationOperationInfoList;
+  final String? nextToken;
+
+  ListApplicationOperationsResponse({
+    this.applicationOperationInfoList,
+    this.nextToken,
+  });
+
+  factory ListApplicationOperationsResponse.fromJson(
+      Map<String, dynamic> json) {
+    return ListApplicationOperationsResponse(
+      applicationOperationInfoList:
+          (json['ApplicationOperationInfoList'] as List?)
+              ?.nonNulls
+              .map((e) =>
+                  ApplicationOperationInfo.fromJson(e as Map<String, dynamic>))
+              .toList(),
+      nextToken: json['NextToken'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final applicationOperationInfoList = this.applicationOperationInfoList;
+    final nextToken = this.nextToken;
+    return {
+      if (applicationOperationInfoList != null)
+        'ApplicationOperationInfoList': applicationOperationInfoList,
+      if (nextToken != null) 'NextToken': nextToken,
+    };
+  }
+}
+
 class ListApplicationSnapshotsResponse {
   /// The token for the next set of results, or <code>null</code> if there are no
   /// additional results.
@@ -5606,7 +5931,7 @@ class ListApplicationSnapshotsResponse {
     return ListApplicationSnapshotsResponse(
       nextToken: json['NextToken'] as String?,
       snapshotSummaries: (json['SnapshotSummaries'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => SnapshotDetails.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -5647,7 +5972,7 @@ class ListApplicationVersionsResponse {
     return ListApplicationVersionsResponse(
       applicationVersionSummaries:
           (json['ApplicationVersionSummaries'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) =>
                   ApplicationVersionSummary.fromJson(e as Map<String, dynamic>))
               .toList(),
@@ -5686,7 +6011,7 @@ class ListApplicationsResponse {
   factory ListApplicationsResponse.fromJson(Map<String, dynamic> json) {
     return ListApplicationsResponse(
       applicationSummaries: (json['ApplicationSummaries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ApplicationSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -5714,7 +6039,7 @@ class ListTagsForResourceResponse {
   factory ListTagsForResourceResponse.fromJson(Map<String, dynamic> json) {
     return ListTagsForResourceResponse(
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -5729,41 +6054,19 @@ class ListTagsForResourceResponse {
 }
 
 enum LogLevel {
-  info,
-  warn,
-  error,
-  debug,
-}
+  info('INFO'),
+  warn('WARN'),
+  error('ERROR'),
+  debug('DEBUG'),
+  ;
 
-extension LogLevelValueExtension on LogLevel {
-  String toValue() {
-    switch (this) {
-      case LogLevel.info:
-        return 'INFO';
-      case LogLevel.warn:
-        return 'WARN';
-      case LogLevel.error:
-        return 'ERROR';
-      case LogLevel.debug:
-        return 'DEBUG';
-    }
-  }
-}
+  final String value;
 
-extension LogLevelFromString on String {
-  LogLevel toLogLevel() {
-    switch (this) {
-      case 'INFO':
-        return LogLevel.info;
-      case 'WARN':
-        return LogLevel.warn;
-      case 'ERROR':
-        return LogLevel.error;
-      case 'DEBUG':
-        return LogLevel.debug;
-    }
-    throw Exception('$this is not known in enum LogLevel');
-  }
+  const LogLevel(this.value);
+
+  static LogLevel fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum LogLevel'));
 }
 
 /// When you configure a SQL-based Kinesis Data Analytics application's input at
@@ -5848,41 +6151,20 @@ class MavenReference {
 }
 
 enum MetricsLevel {
-  application,
-  task,
-  operator,
-  parallelism,
-}
+  application('APPLICATION'),
+  task('TASK'),
+  operator('OPERATOR'),
+  parallelism('PARALLELISM'),
+  ;
 
-extension MetricsLevelValueExtension on MetricsLevel {
-  String toValue() {
-    switch (this) {
-      case MetricsLevel.application:
-        return 'APPLICATION';
-      case MetricsLevel.task:
-        return 'TASK';
-      case MetricsLevel.operator:
-        return 'OPERATOR';
-      case MetricsLevel.parallelism:
-        return 'PARALLELISM';
-    }
-  }
-}
+  final String value;
 
-extension MetricsLevelFromString on String {
-  MetricsLevel toMetricsLevel() {
-    switch (this) {
-      case 'APPLICATION':
-        return MetricsLevel.application;
-      case 'TASK':
-        return MetricsLevel.task;
-      case 'OPERATOR':
-        return MetricsLevel.operator;
-      case 'PARALLELISM':
-        return MetricsLevel.parallelism;
-    }
-    throw Exception('$this is not known in enum MetricsLevel');
-  }
+  const MetricsLevel(this.value);
+
+  static MetricsLevel fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum MetricsLevel'));
 }
 
 /// Describes configuration parameters for Amazon CloudWatch logging for an
@@ -5913,9 +6195,9 @@ class MonitoringConfiguration {
     final logLevel = this.logLevel;
     final metricsLevel = this.metricsLevel;
     return {
-      'ConfigurationType': configurationType.toValue(),
-      if (logLevel != null) 'LogLevel': logLevel.toValue(),
-      if (metricsLevel != null) 'MetricsLevel': metricsLevel.toValue(),
+      'ConfigurationType': configurationType.value,
+      if (logLevel != null) 'LogLevel': logLevel.value,
+      if (metricsLevel != null) 'MetricsLevel': metricsLevel.value,
     };
   }
 }
@@ -5942,10 +6224,11 @@ class MonitoringConfigurationDescription {
   factory MonitoringConfigurationDescription.fromJson(
       Map<String, dynamic> json) {
     return MonitoringConfigurationDescription(
-      configurationType:
-          (json['ConfigurationType'] as String?)?.toConfigurationType(),
-      logLevel: (json['LogLevel'] as String?)?.toLogLevel(),
-      metricsLevel: (json['MetricsLevel'] as String?)?.toMetricsLevel(),
+      configurationType: (json['ConfigurationType'] as String?)
+          ?.let(ConfigurationType.fromString),
+      logLevel: (json['LogLevel'] as String?)?.let(LogLevel.fromString),
+      metricsLevel:
+          (json['MetricsLevel'] as String?)?.let(MetricsLevel.fromString),
     );
   }
 
@@ -5955,9 +6238,9 @@ class MonitoringConfigurationDescription {
     final metricsLevel = this.metricsLevel;
     return {
       if (configurationType != null)
-        'ConfigurationType': configurationType.toValue(),
-      if (logLevel != null) 'LogLevel': logLevel.toValue(),
-      if (metricsLevel != null) 'MetricsLevel': metricsLevel.toValue(),
+        'ConfigurationType': configurationType.value,
+      if (logLevel != null) 'LogLevel': logLevel.value,
+      if (metricsLevel != null) 'MetricsLevel': metricsLevel.value,
     };
   }
 }
@@ -5992,12 +6275,63 @@ class MonitoringConfigurationUpdate {
     final metricsLevelUpdate = this.metricsLevelUpdate;
     return {
       if (configurationTypeUpdate != null)
-        'ConfigurationTypeUpdate': configurationTypeUpdate.toValue(),
-      if (logLevelUpdate != null) 'LogLevelUpdate': logLevelUpdate.toValue(),
+        'ConfigurationTypeUpdate': configurationTypeUpdate.value,
+      if (logLevelUpdate != null) 'LogLevelUpdate': logLevelUpdate.value,
       if (metricsLevelUpdate != null)
-        'MetricsLevelUpdate': metricsLevelUpdate.toValue(),
+        'MetricsLevelUpdate': metricsLevelUpdate.value,
     };
   }
+}
+
+/// Provides a description of the operation failure
+class OperationFailureDetails {
+  final ErrorInfo? errorInfo;
+
+  /// Provides the operation ID of a system-rollback operation executed due to
+  /// failure in the current operation
+  final String? rollbackOperationId;
+
+  OperationFailureDetails({
+    this.errorInfo,
+    this.rollbackOperationId,
+  });
+
+  factory OperationFailureDetails.fromJson(Map<String, dynamic> json) {
+    return OperationFailureDetails(
+      errorInfo: json['ErrorInfo'] != null
+          ? ErrorInfo.fromJson(json['ErrorInfo'] as Map<String, dynamic>)
+          : null,
+      rollbackOperationId: json['RollbackOperationId'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final errorInfo = this.errorInfo;
+    final rollbackOperationId = this.rollbackOperationId;
+    return {
+      if (errorInfo != null) 'ErrorInfo': errorInfo,
+      if (rollbackOperationId != null)
+        'RollbackOperationId': rollbackOperationId,
+    };
+  }
+}
+
+/// Status of the operation performed on an application
+enum OperationStatus {
+  inProgress('IN_PROGRESS'),
+  cancelled('CANCELLED'),
+  successful('SUCCESSFUL'),
+  failed('FAILED'),
+  ;
+
+  final String value;
+
+  const OperationStatus(this.value);
+
+  static OperationStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum OperationStatus'));
 }
 
 /// Describes a SQL-based Kinesis Data Analytics application's output
@@ -6186,28 +6520,28 @@ class OutputUpdate {
   }
 }
 
-/// Describes parameters for how a Flink-based Kinesis Data Analytics
-/// application executes multiple tasks simultaneously. For more information
-/// about parallelism, see <a
-/// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/dev/parallel.html">Parallel
+/// Describes parameters for how a Managed Service for Apache Flink application
+/// executes multiple tasks simultaneously. For more information about
+/// parallelism, see <a
+/// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/dev/parallel.html">Parallel
 /// Execution</a> in the <a
-/// href="https://ci.apache.org/projects/flink/flink-docs-release-1.8/">Apache
+/// href="https://nightlies.apache.org/flink/flink-docs-release-1.19/">Apache
 /// Flink Documentation</a>.
 class ParallelismConfiguration {
   /// Describes whether the application uses the default parallelism for the
-  /// Kinesis Data Analytics service. You must set this property to
+  /// Managed Service for Apache Flink service. You must set this property to
   /// <code>CUSTOM</code> in order to change your application's
   /// <code>AutoScalingEnabled</code>, <code>Parallelism</code>, or
   /// <code>ParallelismPerKPU</code> properties.
   final ConfigurationType configurationType;
 
-  /// Describes whether the Kinesis Data Analytics service can increase the
-  /// parallelism of the application in response to increased throughput.
+  /// Describes whether the Managed Service for Apache Flink service can increase
+  /// the parallelism of the application in response to increased throughput.
   final bool? autoScalingEnabled;
 
-  /// Describes the initial number of parallel tasks that a Flink-based Kinesis
-  /// Data Analytics application can perform. If <code>AutoScalingEnabled</code>
-  /// is set to True, Kinesis Data Analytics increases the
+  /// Describes the initial number of parallel tasks that a Managed Service for
+  /// Apache Flink application can perform. If <code>AutoScalingEnabled</code> is
+  /// set to True, Managed Service for Apache Flink increases the
   /// <code>CurrentParallelism</code> value in response to application load. The
   /// service can increase the <code>CurrentParallelism</code> value up to the
   /// maximum parallelism, which is <code>ParalellismPerKPU</code> times the
@@ -6218,11 +6552,11 @@ class ParallelismConfiguration {
   /// setting.
   final int? parallelism;
 
-  /// Describes the number of parallel tasks that a Flink-based Kinesis Data
-  /// Analytics application can perform per Kinesis Processing Unit (KPU) used by
-  /// the application. For more information about KPUs, see <a
-  /// href="http://aws.amazon.com/kinesis/data-analytics/pricing/">Amazon Kinesis
-  /// Data Analytics Pricing</a>.
+  /// Describes the number of parallel tasks that a Managed Service for Apache
+  /// Flink application can perform per Kinesis Processing Unit (KPU) used by the
+  /// application. For more information about KPUs, see <a
+  /// href="http://aws.amazon.com/kinesis/data-analytics/pricing/">Amazon Managed
+  /// Service for Apache Flink Pricing</a>.
   final int? parallelismPerKPU;
 
   ParallelismConfiguration({
@@ -6238,7 +6572,7 @@ class ParallelismConfiguration {
     final parallelism = this.parallelism;
     final parallelismPerKPU = this.parallelismPerKPU;
     return {
-      'ConfigurationType': configurationType.toValue(),
+      'ConfigurationType': configurationType.value,
       if (autoScalingEnabled != null) 'AutoScalingEnabled': autoScalingEnabled,
       if (parallelism != null) 'Parallelism': parallelism,
       if (parallelismPerKPU != null) 'ParallelismPerKPU': parallelismPerKPU,
@@ -6246,31 +6580,32 @@ class ParallelismConfiguration {
   }
 }
 
-/// Describes parameters for how a Flink-based Kinesis Data Analytics
-/// application executes multiple tasks simultaneously.
+/// Describes parameters for how a Managed Service for Apache Flink application
+/// executes multiple tasks simultaneously.
 class ParallelismConfigurationDescription {
-  /// Describes whether the Kinesis Data Analytics service can increase the
-  /// parallelism of the application in response to increased throughput.
+  /// Describes whether the Managed Service for Apache Flink service can increase
+  /// the parallelism of the application in response to increased throughput.
   final bool? autoScalingEnabled;
 
   /// Describes whether the application uses the default parallelism for the
-  /// Kinesis Data Analytics service.
+  /// Managed Service for Apache Flink service.
   final ConfigurationType? configurationType;
 
-  /// Describes the current number of parallel tasks that a Flink-based Kinesis
-  /// Data Analytics application can perform. If <code>AutoScalingEnabled</code>
-  /// is set to True, Kinesis Data Analytics can increase this value in response
-  /// to application load. The service can increase this value up to the maximum
-  /// parallelism, which is <code>ParalellismPerKPU</code> times the maximum KPUs
-  /// for the application. The maximum KPUs for an application is 32 by default,
-  /// and can be increased by requesting a limit increase. If application load is
-  /// reduced, the service can reduce the <code>CurrentParallelism</code> value
-  /// down to the <code>Parallelism</code> setting.
+  /// Describes the current number of parallel tasks that a Managed Service for
+  /// Apache Flink application can perform. If <code>AutoScalingEnabled</code> is
+  /// set to True, Managed Service for Apache Flink can increase this value in
+  /// response to application load. The service can increase this value up to the
+  /// maximum parallelism, which is <code>ParalellismPerKPU</code> times the
+  /// maximum KPUs for the application. The maximum KPUs for an application is 32
+  /// by default, and can be increased by requesting a limit increase. If
+  /// application load is reduced, the service can reduce the
+  /// <code>CurrentParallelism</code> value down to the <code>Parallelism</code>
+  /// setting.
   final int? currentParallelism;
 
-  /// Describes the initial number of parallel tasks that a Flink-based Kinesis
-  /// Data Analytics application can perform. If <code>AutoScalingEnabled</code>
-  /// is set to True, then Kinesis Data Analytics can increase the
+  /// Describes the initial number of parallel tasks that a Managed Service for
+  /// Apache Flink application can perform. If <code>AutoScalingEnabled</code> is
+  /// set to True, then Managed Service for Apache Flink can increase the
   /// <code>CurrentParallelism</code> value in response to application load. The
   /// service can increase <code>CurrentParallelism</code> up to the maximum
   /// parallelism, which is <code>ParalellismPerKPU</code> times the maximum KPUs
@@ -6280,9 +6615,9 @@ class ParallelismConfigurationDescription {
   /// down to the <code>Parallelism</code> setting.
   final int? parallelism;
 
-  /// Describes the number of parallel tasks that a Flink-based Kinesis Data
-  /// Analytics application can perform per Kinesis Processing Unit (KPU) used by
-  /// the application.
+  /// Describes the number of parallel tasks that a Managed Service for Apache
+  /// Flink application can perform per Kinesis Processing Unit (KPU) used by the
+  /// application.
   final int? parallelismPerKPU;
 
   ParallelismConfigurationDescription({
@@ -6297,8 +6632,8 @@ class ParallelismConfigurationDescription {
       Map<String, dynamic> json) {
     return ParallelismConfigurationDescription(
       autoScalingEnabled: json['AutoScalingEnabled'] as bool?,
-      configurationType:
-          (json['ConfigurationType'] as String?)?.toConfigurationType(),
+      configurationType: (json['ConfigurationType'] as String?)
+          ?.let(ConfigurationType.fromString),
       currentParallelism: json['CurrentParallelism'] as int?,
       parallelism: json['Parallelism'] as int?,
       parallelismPerKPU: json['ParallelismPerKPU'] as int?,
@@ -6314,7 +6649,7 @@ class ParallelismConfigurationDescription {
     return {
       if (autoScalingEnabled != null) 'AutoScalingEnabled': autoScalingEnabled,
       if (configurationType != null)
-        'ConfigurationType': configurationType.toValue(),
+        'ConfigurationType': configurationType.value,
       if (currentParallelism != null) 'CurrentParallelism': currentParallelism,
       if (parallelism != null) 'Parallelism': parallelism,
       if (parallelismPerKPU != null) 'ParallelismPerKPU': parallelismPerKPU,
@@ -6325,16 +6660,16 @@ class ParallelismConfigurationDescription {
 /// Describes updates to parameters for how an application executes multiple
 /// tasks simultaneously.
 class ParallelismConfigurationUpdate {
-  /// Describes updates to whether the Kinesis Data Analytics service can increase
-  /// the parallelism of a Flink-based Kinesis Data Analytics application in
-  /// response to increased throughput.
+  /// Describes updates to whether the Managed Service for Apache Flink service
+  /// can increase the parallelism of a Managed Service for Apache Flink
+  /// application in response to increased throughput.
   final bool? autoScalingEnabledUpdate;
 
   /// Describes updates to whether the application uses the default parallelism
-  /// for the Kinesis Data Analytics service, or if a custom parallelism is used.
-  /// You must set this property to <code>CUSTOM</code> in order to change your
-  /// application's <code>AutoScalingEnabled</code>, <code>Parallelism</code>, or
-  /// <code>ParallelismPerKPU</code> properties.
+  /// for the Managed Service for Apache Flink service, or if a custom parallelism
+  /// is used. You must set this property to <code>CUSTOM</code> in order to
+  /// change your application's <code>AutoScalingEnabled</code>,
+  /// <code>Parallelism</code>, or <code>ParallelismPerKPU</code> properties.
   final ConfigurationType? configurationTypeUpdate;
 
   /// Describes updates to the number of parallel tasks an application can perform
@@ -6342,9 +6677,9 @@ class ParallelismConfigurationUpdate {
   final int? parallelismPerKPUUpdate;
 
   /// Describes updates to the initial number of parallel tasks an application can
-  /// perform. If <code>AutoScalingEnabled</code> is set to True, then Kinesis
-  /// Data Analytics can increase the <code>CurrentParallelism</code> value in
-  /// response to application load. The service can increase
+  /// perform. If <code>AutoScalingEnabled</code> is set to True, then Managed
+  /// Service for Apache Flink can increase the <code>CurrentParallelism</code>
+  /// value in response to application load. The service can increase
   /// <code>CurrentParallelism</code> up to the maximum parallelism, which is
   /// <code>ParalellismPerKPU</code> times the maximum KPUs for the application.
   /// The maximum KPUs for an application is 32 by default, and can be increased
@@ -6369,7 +6704,7 @@ class ParallelismConfigurationUpdate {
       if (autoScalingEnabledUpdate != null)
         'AutoScalingEnabledUpdate': autoScalingEnabledUpdate,
       if (configurationTypeUpdate != null)
-        'ConfigurationTypeUpdate': configurationTypeUpdate.toValue(),
+        'ConfigurationTypeUpdate': configurationTypeUpdate.value,
       if (parallelismPerKPUUpdate != null)
         'ParallelismPerKPUUpdate': parallelismPerKPUUpdate,
       if (parallelismUpdate != null) 'ParallelismUpdate': parallelismUpdate,
@@ -6473,7 +6808,7 @@ class RecordFormat {
   factory RecordFormat.fromJson(Map<String, dynamic> json) {
     return RecordFormat(
       recordFormatType:
-          (json['RecordFormatType'] as String).toRecordFormatType(),
+          RecordFormatType.fromString((json['RecordFormatType'] as String)),
       mappingParameters: json['MappingParameters'] != null
           ? MappingParameters.fromJson(
               json['MappingParameters'] as Map<String, dynamic>)
@@ -6485,38 +6820,25 @@ class RecordFormat {
     final recordFormatType = this.recordFormatType;
     final mappingParameters = this.mappingParameters;
     return {
-      'RecordFormatType': recordFormatType.toValue(),
+      'RecordFormatType': recordFormatType.value,
       if (mappingParameters != null) 'MappingParameters': mappingParameters,
     };
   }
 }
 
 enum RecordFormatType {
-  json,
-  csv,
-}
+  json('JSON'),
+  csv('CSV'),
+  ;
 
-extension RecordFormatTypeValueExtension on RecordFormatType {
-  String toValue() {
-    switch (this) {
-      case RecordFormatType.json:
-        return 'JSON';
-      case RecordFormatType.csv:
-        return 'CSV';
-    }
-  }
-}
+  final String value;
 
-extension RecordFormatTypeFromString on String {
-  RecordFormatType toRecordFormatType() {
-    switch (this) {
-      case 'JSON':
-        return RecordFormatType.json;
-      case 'CSV':
-        return RecordFormatType.csv;
-    }
-    throw Exception('$this is not known in enum RecordFormatType');
-  }
+  const RecordFormatType(this.value);
+
+  static RecordFormatType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum RecordFormatType'));
 }
 
 /// For a SQL-based Kinesis Data Analytics application, describes the reference
@@ -6533,9 +6855,9 @@ class ReferenceDataSource {
   final String tableName;
 
   /// Identifies the S3 bucket and object that contains the reference data. A
-  /// Kinesis Data Analytics application loads reference data only once. If the
-  /// data changes, you call the <a>UpdateApplication</a> operation to trigger
-  /// reloading of data into your application.
+  /// SQL-based Kinesis Data Analytics application loads reference data only once.
+  /// If the data changes, you call the <a>UpdateApplication</a> operation to
+  /// trigger reloading of data into your application.
   final S3ReferenceDataSource? s3ReferenceDataSource;
 
   ReferenceDataSource({
@@ -6662,31 +6984,39 @@ class ReferenceDataSourceUpdate {
 class RollbackApplicationResponse {
   final ApplicationDetail applicationDetail;
 
+  /// Operation ID for tracking RollbackApplication request
+  final String? operationId;
+
   RollbackApplicationResponse({
     required this.applicationDetail,
+    this.operationId,
   });
 
   factory RollbackApplicationResponse.fromJson(Map<String, dynamic> json) {
     return RollbackApplicationResponse(
       applicationDetail: ApplicationDetail.fromJson(
           json['ApplicationDetail'] as Map<String, dynamic>),
+      operationId: json['OperationId'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final applicationDetail = this.applicationDetail;
+    final operationId = this.operationId;
     return {
       'ApplicationDetail': applicationDetail,
+      if (operationId != null) 'OperationId': operationId,
     };
   }
 }
 
-/// Describes the starting parameters for an Kinesis Data Analytics application.
+/// Describes the starting parameters for an Managed Service for Apache Flink
+/// application.
 class RunConfiguration {
   /// Describes the restore behavior of a restarting application.
   final ApplicationRestoreConfiguration? applicationRestoreConfiguration;
 
-  /// Describes the starting parameters for a Flink-based Kinesis Data Analytics
+  /// Describes the starting parameters for a Managed Service for Apache Flink
   /// application.
   final FlinkRunConfiguration? flinkRunConfiguration;
 
@@ -6716,7 +7046,8 @@ class RunConfiguration {
   }
 }
 
-/// Describes the starting properties for a Kinesis Data Analytics application.
+/// Describes the starting properties for a Managed Service for Apache Flink
+/// application.
 class RunConfigurationDescription {
   /// Describes the restore behavior of a restarting application.
   final ApplicationRestoreConfiguration?
@@ -6760,13 +7091,13 @@ class RunConfigurationDescription {
   }
 }
 
-/// Describes the updates to the starting parameters for a Kinesis Data
-/// Analytics application.
+/// Describes the updates to the starting parameters for a Managed Service for
+/// Apache Flink application.
 class RunConfigurationUpdate {
   /// Describes updates to the restore behavior of a restarting application.
   final ApplicationRestoreConfiguration? applicationRestoreConfiguration;
 
-  /// Describes the starting parameters for a Flink-based Kinesis Data Analytics
+  /// Describes the starting parameters for a Managed Service for Apache Flink
   /// application.
   final FlinkRunConfiguration? flinkRunConfiguration;
 
@@ -6789,61 +7120,28 @@ class RunConfigurationUpdate {
 }
 
 enum RuntimeEnvironment {
-  sql_1_0,
-  flink_1_6,
-  flink_1_8,
-  zeppelinFlink_1_0,
-  flink_1_11,
-  flink_1_13,
-  zeppelinFlink_2_0,
-  flink_1_15,
-}
+  sql_1_0('SQL-1_0'),
+  flink_1_6('FLINK-1_6'),
+  flink_1_8('FLINK-1_8'),
+  zeppelinFlink_1_0('ZEPPELIN-FLINK-1_0'),
+  flink_1_11('FLINK-1_11'),
+  flink_1_13('FLINK-1_13'),
+  zeppelinFlink_2_0('ZEPPELIN-FLINK-2_0'),
+  flink_1_15('FLINK-1_15'),
+  zeppelinFlink_3_0('ZEPPELIN-FLINK-3_0'),
+  flink_1_18('FLINK-1_18'),
+  flink_1_19('FLINK-1_19'),
+  flink_1_20('FLINK-1_20'),
+  ;
 
-extension RuntimeEnvironmentValueExtension on RuntimeEnvironment {
-  String toValue() {
-    switch (this) {
-      case RuntimeEnvironment.sql_1_0:
-        return 'SQL-1_0';
-      case RuntimeEnvironment.flink_1_6:
-        return 'FLINK-1_6';
-      case RuntimeEnvironment.flink_1_8:
-        return 'FLINK-1_8';
-      case RuntimeEnvironment.zeppelinFlink_1_0:
-        return 'ZEPPELIN-FLINK-1_0';
-      case RuntimeEnvironment.flink_1_11:
-        return 'FLINK-1_11';
-      case RuntimeEnvironment.flink_1_13:
-        return 'FLINK-1_13';
-      case RuntimeEnvironment.zeppelinFlink_2_0:
-        return 'ZEPPELIN-FLINK-2_0';
-      case RuntimeEnvironment.flink_1_15:
-        return 'FLINK-1_15';
-    }
-  }
-}
+  final String value;
 
-extension RuntimeEnvironmentFromString on String {
-  RuntimeEnvironment toRuntimeEnvironment() {
-    switch (this) {
-      case 'SQL-1_0':
-        return RuntimeEnvironment.sql_1_0;
-      case 'FLINK-1_6':
-        return RuntimeEnvironment.flink_1_6;
-      case 'FLINK-1_8':
-        return RuntimeEnvironment.flink_1_8;
-      case 'ZEPPELIN-FLINK-1_0':
-        return RuntimeEnvironment.zeppelinFlink_1_0;
-      case 'FLINK-1_11':
-        return RuntimeEnvironment.flink_1_11;
-      case 'FLINK-1_13':
-        return RuntimeEnvironment.flink_1_13;
-      case 'ZEPPELIN-FLINK-2_0':
-        return RuntimeEnvironment.zeppelinFlink_2_0;
-      case 'FLINK-1_15':
-        return RuntimeEnvironment.flink_1_15;
-    }
-    throw Exception('$this is not known in enum RuntimeEnvironment');
-  }
+  const RuntimeEnvironment(this.value);
+
+  static RuntimeEnvironment fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum RuntimeEnvironment'));
 }
 
 /// Describes the location of an application's code stored in an S3 bucket.
@@ -6987,10 +7285,10 @@ class S3ContentBaseLocationUpdate {
   }
 }
 
-/// For a Kinesis Data Analytics application provides a description of an Amazon
-/// S3 object, including the Amazon Resource Name (ARN) of the S3 bucket, the
-/// name of the Amazon S3 object that contains the data, and the version number
-/// of the Amazon S3 object that contains the data.
+/// For a Managed Service for Apache Flink application provides a description of
+/// an Amazon S3 object, including the Amazon Resource Name (ARN) of the S3
+/// bucket, the name of the Amazon S3 object that contains the data, and the
+/// version number of the Amazon S3 object that contains the data.
 class S3ContentLocation {
   /// The Amazon Resource Name (ARN) for the S3 bucket containing the application
   /// code.
@@ -7063,9 +7361,9 @@ class S3ContentLocationUpdate {
 /// For a SQL-based Kinesis Data Analytics application, identifies the Amazon S3
 /// bucket and object that contains the reference data.
 ///
-/// A Kinesis Data Analytics application loads reference data only once. If the
-/// data changes, you call the <a>UpdateApplication</a> operation to trigger
-/// reloading of data into your application.
+/// A SQL-based Kinesis Data Analytics application loads reference data only
+/// once. If the data changes, you call the <a>UpdateApplication</a> operation
+/// to trigger reloading of data into your application.
 class S3ReferenceDataSource {
   /// The Amazon Resource Name (ARN) of the S3 bucket.
   final String? bucketARN;
@@ -7168,6 +7466,9 @@ class SnapshotDetails {
   /// The status of the application snapshot.
   final SnapshotStatus snapshotStatus;
 
+  /// The Flink Runtime for the application snapshot.
+  final RuntimeEnvironment? runtimeEnvironment;
+
   /// The timestamp of the application snapshot.
   final DateTime? snapshotCreationTimestamp;
 
@@ -7175,6 +7476,7 @@ class SnapshotDetails {
     required this.applicationVersionId,
     required this.snapshotName,
     required this.snapshotStatus,
+    this.runtimeEnvironment,
     this.snapshotCreationTimestamp,
   });
 
@@ -7182,7 +7484,10 @@ class SnapshotDetails {
     return SnapshotDetails(
       applicationVersionId: json['ApplicationVersionId'] as int,
       snapshotName: json['SnapshotName'] as String,
-      snapshotStatus: (json['SnapshotStatus'] as String).toSnapshotStatus(),
+      snapshotStatus:
+          SnapshotStatus.fromString((json['SnapshotStatus'] as String)),
+      runtimeEnvironment: (json['RuntimeEnvironment'] as String?)
+          ?.let(RuntimeEnvironment.fromString),
       snapshotCreationTimestamp:
           timeStampFromJson(json['SnapshotCreationTimestamp']),
     );
@@ -7192,11 +7497,14 @@ class SnapshotDetails {
     final applicationVersionId = this.applicationVersionId;
     final snapshotName = this.snapshotName;
     final snapshotStatus = this.snapshotStatus;
+    final runtimeEnvironment = this.runtimeEnvironment;
     final snapshotCreationTimestamp = this.snapshotCreationTimestamp;
     return {
       'ApplicationVersionId': applicationVersionId,
       'SnapshotName': snapshotName,
-      'SnapshotStatus': snapshotStatus.toValue(),
+      'SnapshotStatus': snapshotStatus.value,
+      if (runtimeEnvironment != null)
+        'RuntimeEnvironment': runtimeEnvironment.value,
       if (snapshotCreationTimestamp != null)
         'SnapshotCreationTimestamp':
             unixTimestampToJson(snapshotCreationTimestamp),
@@ -7205,41 +7513,20 @@ class SnapshotDetails {
 }
 
 enum SnapshotStatus {
-  creating,
-  ready,
-  deleting,
-  failed,
-}
+  creating('CREATING'),
+  ready('READY'),
+  deleting('DELETING'),
+  failed('FAILED'),
+  ;
 
-extension SnapshotStatusValueExtension on SnapshotStatus {
-  String toValue() {
-    switch (this) {
-      case SnapshotStatus.creating:
-        return 'CREATING';
-      case SnapshotStatus.ready:
-        return 'READY';
-      case SnapshotStatus.deleting:
-        return 'DELETING';
-      case SnapshotStatus.failed:
-        return 'FAILED';
-    }
-  }
-}
+  final String value;
 
-extension SnapshotStatusFromString on String {
-  SnapshotStatus toSnapshotStatus() {
-    switch (this) {
-      case 'CREATING':
-        return SnapshotStatus.creating;
-      case 'READY':
-        return SnapshotStatus.ready;
-      case 'DELETING':
-        return SnapshotStatus.deleting;
-      case 'FAILED':
-        return SnapshotStatus.failed;
-    }
-    throw Exception('$this is not known in enum SnapshotStatus');
-  }
+  const SnapshotStatus(this.value);
+
+  static SnapshotStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum SnapshotStatus'));
 }
 
 /// For a SQL-based Kinesis Data Analytics application, describes the format of
@@ -7265,7 +7552,7 @@ class SourceSchema {
   factory SourceSchema.fromJson(Map<String, dynamic> json) {
     return SourceSchema(
       recordColumns: (json['RecordColumns'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => RecordColumn.fromJson(e as Map<String, dynamic>))
           .toList(),
       recordFormat:
@@ -7345,16 +7632,16 @@ class SqlApplicationConfigurationDescription {
       Map<String, dynamic> json) {
     return SqlApplicationConfigurationDescription(
       inputDescriptions: (json['InputDescriptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => InputDescription.fromJson(e as Map<String, dynamic>))
           .toList(),
       outputDescriptions: (json['OutputDescriptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => OutputDescription.fromJson(e as Map<String, dynamic>))
           .toList(),
       referenceDataSourceDescriptions:
           (json['ReferenceDataSourceDescriptions'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => ReferenceDataSourceDescription.fromJson(
                   e as Map<String, dynamic>))
               .toList(),
@@ -7437,26 +7724,46 @@ class SqlRunConfiguration {
 }
 
 class StartApplicationResponse {
-  StartApplicationResponse();
+  /// Operation ID for tracking StartApplication request
+  final String? operationId;
 
-  factory StartApplicationResponse.fromJson(Map<String, dynamic> _) {
-    return StartApplicationResponse();
+  StartApplicationResponse({
+    this.operationId,
+  });
+
+  factory StartApplicationResponse.fromJson(Map<String, dynamic> json) {
+    return StartApplicationResponse(
+      operationId: json['OperationId'] as String?,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {};
+    final operationId = this.operationId;
+    return {
+      if (operationId != null) 'OperationId': operationId,
+    };
   }
 }
 
 class StopApplicationResponse {
-  StopApplicationResponse();
+  /// Operation ID for tracking StopApplication request
+  final String? operationId;
 
-  factory StopApplicationResponse.fromJson(Map<String, dynamic> _) {
-    return StopApplicationResponse();
+  StopApplicationResponse({
+    this.operationId,
+  });
+
+  factory StopApplicationResponse.fromJson(Map<String, dynamic> json) {
+    return StopApplicationResponse(
+      operationId: json['OperationId'] as String?,
+    );
   }
 
   Map<String, dynamic> toJson() {
-    return {};
+    final operationId = this.operationId;
+    return {
+      if (operationId != null) 'OperationId': operationId,
+    };
   }
 }
 
@@ -7563,51 +7870,44 @@ class UpdateApplicationResponse {
   /// Describes application updates.
   final ApplicationDetail applicationDetail;
 
+  /// Operation ID for tracking UpdateApplication request
+  final String? operationId;
+
   UpdateApplicationResponse({
     required this.applicationDetail,
+    this.operationId,
   });
 
   factory UpdateApplicationResponse.fromJson(Map<String, dynamic> json) {
     return UpdateApplicationResponse(
       applicationDetail: ApplicationDetail.fromJson(
           json['ApplicationDetail'] as Map<String, dynamic>),
+      operationId: json['OperationId'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final applicationDetail = this.applicationDetail;
+    final operationId = this.operationId;
     return {
       'ApplicationDetail': applicationDetail,
+      if (operationId != null) 'OperationId': operationId,
     };
   }
 }
 
 enum UrlType {
-  flinkDashboardUrl,
-  zeppelinUiUrl,
-}
+  flinkDashboardUrl('FLINK_DASHBOARD_URL'),
+  zeppelinUiUrl('ZEPPELIN_UI_URL'),
+  ;
 
-extension UrlTypeValueExtension on UrlType {
-  String toValue() {
-    switch (this) {
-      case UrlType.flinkDashboardUrl:
-        return 'FLINK_DASHBOARD_URL';
-      case UrlType.zeppelinUiUrl:
-        return 'ZEPPELIN_UI_URL';
-    }
-  }
-}
+  final String value;
 
-extension UrlTypeFromString on String {
-  UrlType toUrlType() {
-    switch (this) {
-      case 'FLINK_DASHBOARD_URL':
-        return UrlType.flinkDashboardUrl;
-      case 'ZEPPELIN_UI_URL':
-        return UrlType.zeppelinUiUrl;
-    }
-    throw Exception('$this is not known in enum UrlType');
-  }
+  const UrlType(this.value);
+
+  static UrlType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum UrlType'));
 }
 
 /// Describes the parameters of a VPC used by the application.
@@ -7665,13 +7965,11 @@ class VpcConfigurationDescription {
   factory VpcConfigurationDescription.fromJson(Map<String, dynamic> json) {
     return VpcConfigurationDescription(
       securityGroupIds: (json['SecurityGroupIds'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as String)
           .toList(),
-      subnetIds: (json['SubnetIds'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      subnetIds:
+          (json['SubnetIds'] as List).nonNulls.map((e) => e as String).toList(),
       vpcConfigurationId: json['VpcConfigurationId'] as String,
       vpcId: json['VpcId'] as String,
     );
@@ -7725,20 +8023,21 @@ class VpcConfigurationUpdate {
   }
 }
 
-/// The configuration of a Kinesis Data Analytics Studio notebook.
+/// The configuration of a Managed Service for Apache Flink Studio notebook.
 class ZeppelinApplicationConfiguration {
-  /// The Amazon Glue Data Catalog that you use in queries in a Kinesis Data
-  /// Analytics Studio notebook.
+  /// The Amazon Glue Data Catalog that you use in queries in a Managed Service
+  /// for Apache Flink Studio notebook.
   final CatalogConfiguration? catalogConfiguration;
 
   /// Custom artifacts are dependency JARs and user-defined functions (UDF).
   final List<CustomArtifactConfiguration>? customArtifactsConfiguration;
 
-  /// The information required to deploy a Kinesis Data Analytics Studio notebook
-  /// as an application with durable state.
+  /// The information required to deploy a Managed Service for Apache Flink Studio
+  /// notebook as an application with durable state.
   final DeployAsApplicationConfiguration? deployAsApplicationConfiguration;
 
-  /// The monitoring configuration of a Kinesis Data Analytics Studio notebook.
+  /// The monitoring configuration of a Managed Service for Apache Flink Studio
+  /// notebook.
   final ZeppelinMonitoringConfiguration? monitoringConfiguration;
 
   ZeppelinApplicationConfiguration({
@@ -7767,22 +8066,23 @@ class ZeppelinApplicationConfiguration {
   }
 }
 
-/// The configuration of a Kinesis Data Analytics Studio notebook.
+/// The configuration of a Managed Service for Apache Flink Studio notebook.
 class ZeppelinApplicationConfigurationDescription {
-  /// The monitoring configuration of a Kinesis Data Analytics Studio notebook.
+  /// The monitoring configuration of a Managed Service for Apache Flink Studio
+  /// notebook.
   final ZeppelinMonitoringConfigurationDescription
       monitoringConfigurationDescription;
 
-  /// The Amazon Glue Data Catalog that is associated with the Kinesis Data
-  /// Analytics Studio notebook.
+  /// The Amazon Glue Data Catalog that is associated with the Managed Service for
+  /// Apache Flink Studio notebook.
   final CatalogConfigurationDescription? catalogConfigurationDescription;
 
   /// Custom artifacts are dependency JARs and user-defined functions (UDF).
   final List<CustomArtifactConfigurationDescription>?
       customArtifactsConfigurationDescription;
 
-  /// The parameters required to deploy a Kinesis Data Analytics Studio notebook
-  /// as an application with durable state.
+  /// The parameters required to deploy a Managed Service for Apache Flink Studio
+  /// notebook as an application with durable state.
   final DeployAsApplicationConfigurationDescription?
       deployAsApplicationConfigurationDescription;
 
@@ -7808,7 +8108,7 @@ class ZeppelinApplicationConfigurationDescription {
               : null,
       customArtifactsConfigurationDescription:
           (json['CustomArtifactsConfigurationDescription'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => CustomArtifactConfigurationDescription.fromJson(
                   e as Map<String, dynamic>))
               .toList(),
@@ -7844,10 +8144,11 @@ class ZeppelinApplicationConfigurationDescription {
   }
 }
 
-/// Updates to the configuration of Kinesis Data Analytics Studio notebook.
+/// Updates to the configuration of Managed Service for Apache Flink Studio
+/// notebook.
 class ZeppelinApplicationConfigurationUpdate {
   /// Updates to the configuration of the Amazon Glue Data Catalog that is
-  /// associated with the Kinesis Data Analytics Studio notebook.
+  /// associated with the Managed Service for Apache Flink Studio notebook.
   final CatalogConfigurationUpdate? catalogConfigurationUpdate;
 
   /// Updates to the customer artifacts. Custom artifacts are dependency JAR files
@@ -7856,8 +8157,8 @@ class ZeppelinApplicationConfigurationUpdate {
   final DeployAsApplicationConfigurationUpdate?
       deployAsApplicationConfigurationUpdate;
 
-  /// Updates to the monitoring configuration of a Kinesis Data Analytics Studio
-  /// notebook.
+  /// Updates to the monitoring configuration of a Managed Service for Apache
+  /// Flink Studio notebook.
   final ZeppelinMonitoringConfigurationUpdate? monitoringConfigurationUpdate;
 
   ZeppelinApplicationConfigurationUpdate({
@@ -7890,7 +8191,7 @@ class ZeppelinApplicationConfigurationUpdate {
 }
 
 /// Describes configuration parameters for Amazon CloudWatch logging for a
-/// Kinesis Data Analytics Studio notebook. For more information about
+/// Managed Service for Apache Flink Studio notebook. For more information about
 /// CloudWatch logging, see <a
 /// href="https://docs.aws.amazon.com/kinesisanalytics/latest/java/monitoring-overview.html">Monitoring</a>.
 class ZeppelinMonitoringConfiguration {
@@ -7904,13 +8205,13 @@ class ZeppelinMonitoringConfiguration {
   Map<String, dynamic> toJson() {
     final logLevel = this.logLevel;
     return {
-      'LogLevel': logLevel.toValue(),
+      'LogLevel': logLevel.value,
     };
   }
 }
 
-/// The monitoring configuration for Apache Zeppelin within a Kinesis Data
-/// Analytics Studio notebook.
+/// The monitoring configuration for Apache Zeppelin within a Managed Service
+/// for Apache Flink Studio notebook.
 class ZeppelinMonitoringConfigurationDescription {
   /// Describes the verbosity of the CloudWatch Logs for an application.
   final LogLevel? logLevel;
@@ -7922,23 +8223,23 @@ class ZeppelinMonitoringConfigurationDescription {
   factory ZeppelinMonitoringConfigurationDescription.fromJson(
       Map<String, dynamic> json) {
     return ZeppelinMonitoringConfigurationDescription(
-      logLevel: (json['LogLevel'] as String?)?.toLogLevel(),
+      logLevel: (json['LogLevel'] as String?)?.let(LogLevel.fromString),
     );
   }
 
   Map<String, dynamic> toJson() {
     final logLevel = this.logLevel;
     return {
-      if (logLevel != null) 'LogLevel': logLevel.toValue(),
+      if (logLevel != null) 'LogLevel': logLevel.value,
     };
   }
 }
 
-/// Updates to the monitoring configuration for Apache Zeppelin within a Kinesis
-/// Data Analytics Studio notebook.
+/// Updates to the monitoring configuration for Apache Zeppelin within a Managed
+/// Service for Apache Flink Studio notebook.
 class ZeppelinMonitoringConfigurationUpdate {
-  /// Updates to the logging level for Apache Zeppelin within a Kinesis Data
-  /// Analytics Studio notebook.
+  /// Updates to the logging level for Apache Zeppelin within a Managed Service
+  /// for Apache Flink Studio notebook.
   final LogLevel logLevelUpdate;
 
   ZeppelinMonitoringConfigurationUpdate({
@@ -7948,7 +8249,7 @@ class ZeppelinMonitoringConfigurationUpdate {
   Map<String, dynamic> toJson() {
     final logLevelUpdate = this.logLevelUpdate;
     return {
-      'LogLevelUpdate': logLevelUpdate.toValue(),
+      'LogLevelUpdate': logLevelUpdate.value,
     };
   }
 }

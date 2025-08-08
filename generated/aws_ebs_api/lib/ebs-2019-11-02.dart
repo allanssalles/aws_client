@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -80,6 +81,14 @@ class EBS {
   /// have been written to it. Completing the snapshot changes the status to
   /// <code>completed</code>. You cannot write new blocks to a snapshot after it
   /// has been completed.
+  /// <note>
+  /// You should always retry requests that receive server (<code>5xx</code>)
+  /// error responses, and <code>ThrottlingException</code> and
+  /// <code>RequestThrottledException</code> client error responses. For more
+  /// information see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html">Error
+  /// retries</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.
+  /// </note>
   ///
   /// May throw [AccessDeniedException].
   /// May throw [ValidationException].
@@ -128,10 +137,9 @@ class EBS {
       'x-amz-ChangedBlocksCount': changedBlocksCount.toString(),
       if (checksum != null) 'x-amz-Checksum': checksum.toString(),
       if (checksumAggregationMethod != null)
-        'x-amz-Checksum-Aggregation-Method':
-            checksumAggregationMethod.toValue(),
+        'x-amz-Checksum-Aggregation-Method': checksumAggregationMethod.value,
       if (checksumAlgorithm != null)
-        'x-amz-Checksum-Algorithm': checksumAlgorithm.toValue(),
+        'x-amz-Checksum-Algorithm': checksumAlgorithm.value,
     };
     final response = await _protocol.send(
       payload: null,
@@ -144,6 +152,14 @@ class EBS {
   }
 
   /// Returns the data in a block in an Amazon Elastic Block Store snapshot.
+  /// <note>
+  /// You should always retry requests that receive server (<code>5xx</code>)
+  /// error responses, and <code>ThrottlingException</code> and
+  /// <code>RequestThrottledException</code> client error responses. For more
+  /// information see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html">Error
+  /// retries</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.
+  /// </note>
   ///
   /// May throw [AccessDeniedException].
   /// May throw [ValidationException].
@@ -203,7 +219,7 @@ class EBS {
       checksumAlgorithm: _s
           .extractHeaderStringValue(
               response.headers, 'x-amz-Checksum-Algorithm')
-          ?.toChecksumAlgorithm(),
+          ?.let(ChecksumAlgorithm.fromString),
       dataLength:
           _s.extractHeaderIntValue(response.headers, 'x-amz-Data-Length'),
     );
@@ -211,6 +227,14 @@ class EBS {
 
   /// Returns information about the blocks that are different between two Amazon
   /// Elastic Block Store snapshots of the same volume/snapshot lineage.
+  /// <note>
+  /// You should always retry requests that receive server (<code>5xx</code>)
+  /// error responses, and <code>ThrottlingException</code> and
+  /// <code>RequestThrottledException</code> client error responses. For more
+  /// information see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html">Error
+  /// retries</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.
+  /// </note>
   ///
   /// May throw [AccessDeniedException].
   /// May throw [ValidationException].
@@ -296,6 +320,14 @@ class EBS {
 
   /// Returns information about the blocks in an Amazon Elastic Block Store
   /// snapshot.
+  /// <note>
+  /// You should always retry requests that receive server (<code>5xx</code>)
+  /// error responses, and <code>ThrottlingException</code> and
+  /// <code>RequestThrottledException</code> client error responses. For more
+  /// information see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html">Error
+  /// retries</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.
+  /// </note>
   ///
   /// May throw [AccessDeniedException].
   /// May throw [ValidationException].
@@ -369,6 +401,14 @@ class EBS {
   /// <code>pending</code> state.
   ///
   /// Data written to a snapshot must be aligned with 512-KiB sectors.
+  /// <note>
+  /// You should always retry requests that receive server (<code>5xx</code>)
+  /// error responses, and <code>ThrottlingException</code> and
+  /// <code>RequestThrottledException</code> client error responses. For more
+  /// information see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html">Error
+  /// retries</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.
+  /// </note>
   ///
   /// May throw [AccessDeniedException].
   /// May throw [ValidationException].
@@ -451,7 +491,7 @@ class EBS {
     );
     final headers = <String, String>{
       'x-amz-Checksum': checksum.toString(),
-      'x-amz-Checksum-Algorithm': checksumAlgorithm.toValue(),
+      'x-amz-Checksum-Algorithm': checksumAlgorithm.value,
       'x-amz-Data-Length': dataLength.toString(),
       if (progress != null) 'x-amz-Progress': progress.toString(),
     };
@@ -469,7 +509,7 @@ class EBS {
       checksumAlgorithm: _s
           .extractHeaderStringValue(
               response.headers, 'x-amz-Checksum-Algorithm')
-          ?.toChecksumAlgorithm(),
+          ?.let(ChecksumAlgorithm.fromString),
     );
   }
 
@@ -479,6 +519,14 @@ class EBS {
   /// After creating the snapshot, use <a
   /// href="https://docs.aws.amazon.com/ebs/latest/APIReference/API_PutSnapshotBlock.html">
   /// PutSnapshotBlock</a> to write blocks of data to the snapshot.
+  /// <note>
+  /// You should always retry requests that receive server (<code>5xx</code>)
+  /// error responses, and <code>ThrottlingException</code> and
+  /// <code>RequestThrottledException</code> client error responses. For more
+  /// information see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/error-retries.html">Error
+  /// retries</a> in the <i>Amazon Elastic Compute Cloud User Guide</i>.
+  /// </note>
   ///
   /// May throw [AccessDeniedException].
   /// May throw [ValidationException].
@@ -696,49 +744,31 @@ class ChangedBlock {
 }
 
 enum ChecksumAggregationMethod {
-  linear,
-}
+  linear('LINEAR'),
+  ;
 
-extension ChecksumAggregationMethodValueExtension on ChecksumAggregationMethod {
-  String toValue() {
-    switch (this) {
-      case ChecksumAggregationMethod.linear:
-        return 'LINEAR';
-    }
-  }
-}
+  final String value;
 
-extension ChecksumAggregationMethodFromString on String {
-  ChecksumAggregationMethod toChecksumAggregationMethod() {
-    switch (this) {
-      case 'LINEAR':
-        return ChecksumAggregationMethod.linear;
-    }
-    throw Exception('$this is not known in enum ChecksumAggregationMethod');
-  }
+  const ChecksumAggregationMethod(this.value);
+
+  static ChecksumAggregationMethod fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ChecksumAggregationMethod'));
 }
 
 enum ChecksumAlgorithm {
-  sha256,
-}
+  sha256('SHA256'),
+  ;
 
-extension ChecksumAlgorithmValueExtension on ChecksumAlgorithm {
-  String toValue() {
-    switch (this) {
-      case ChecksumAlgorithm.sha256:
-        return 'SHA256';
-    }
-  }
-}
+  final String value;
 
-extension ChecksumAlgorithmFromString on String {
-  ChecksumAlgorithm toChecksumAlgorithm() {
-    switch (this) {
-      case 'SHA256':
-        return ChecksumAlgorithm.sha256;
-    }
-    throw Exception('$this is not known in enum ChecksumAlgorithm');
-  }
+  const ChecksumAlgorithm(this.value);
+
+  static ChecksumAlgorithm fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ChecksumAlgorithm'));
 }
 
 class CompleteSnapshotResponse {
@@ -751,7 +781,7 @@ class CompleteSnapshotResponse {
 
   factory CompleteSnapshotResponse.fromJson(Map<String, dynamic> json) {
     return CompleteSnapshotResponse(
-      status: (json['Status'] as String?)?.toStatus(),
+      status: (json['Status'] as String?)?.let(Status.fromString),
     );
   }
 }
@@ -806,7 +836,7 @@ class ListChangedBlocksResponse {
     return ListChangedBlocksResponse(
       blockSize: json['BlockSize'] as int?,
       changedBlocks: (json['ChangedBlocks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ChangedBlock.fromJson(e as Map<String, dynamic>))
           .toList(),
       expiryTime: timeStampFromJson(json['ExpiryTime']),
@@ -845,7 +875,7 @@ class ListSnapshotBlocksResponse {
     return ListSnapshotBlocksResponse(
       blockSize: json['BlockSize'] as int?,
       blocks: (json['Blocks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Block.fromJson(e as Map<String, dynamic>))
           .toList(),
       expiryTime: timeStampFromJson(json['ExpiryTime']),
@@ -868,6 +898,21 @@ class PutSnapshotBlockResponse {
   });
 }
 
+enum SSEType {
+  sseEbs('sse-ebs'),
+  sseKms('sse-kms'),
+  none('none'),
+  ;
+
+  final String value;
+
+  const SSEType(this.value);
+
+  static SSEType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum SSEType'));
+}
+
 class StartSnapshotResponse {
   /// The size of the blocks in the snapshot, in bytes.
   final int? blockSize;
@@ -887,6 +932,9 @@ class StartSnapshotResponse {
 
   /// The ID of the snapshot.
   final String? snapshotId;
+
+  /// Reserved for future use.
+  final SSEType? sseType;
 
   /// The timestamp when the snapshot was created.
   final DateTime? startTime;
@@ -911,6 +959,7 @@ class StartSnapshotResponse {
     this.ownerId,
     this.parentSnapshotId,
     this.snapshotId,
+    this.sseType,
     this.startTime,
     this.status,
     this.tags,
@@ -925,10 +974,11 @@ class StartSnapshotResponse {
       ownerId: json['OwnerId'] as String?,
       parentSnapshotId: json['ParentSnapshotId'] as String?,
       snapshotId: json['SnapshotId'] as String?,
+      sseType: (json['SseType'] as String?)?.let(SSEType.fromString),
       startTime: timeStampFromJson(json['StartTime']),
-      status: (json['Status'] as String?)?.toStatus(),
+      status: (json['Status'] as String?)?.let(Status.fromString),
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       volumeSize: json['VolumeSize'] as int?,
@@ -937,36 +987,18 @@ class StartSnapshotResponse {
 }
 
 enum Status {
-  completed,
-  pending,
-  error,
-}
+  completed('completed'),
+  pending('pending'),
+  error('error'),
+  ;
 
-extension StatusValueExtension on Status {
-  String toValue() {
-    switch (this) {
-      case Status.completed:
-        return 'completed';
-      case Status.pending:
-        return 'pending';
-      case Status.error:
-        return 'error';
-    }
-  }
-}
+  final String value;
 
-extension StatusFromString on String {
-  Status toStatus() {
-    switch (this) {
-      case 'completed':
-        return Status.completed;
-      case 'pending':
-        return Status.pending;
-      case 'error':
-        return Status.error;
-    }
-    throw Exception('$this is not known in enum Status');
-  }
+  const Status(this.value);
+
+  static Status fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum Status'));
 }
 
 /// Describes a tag.

@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'flattened_list.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Flattened list
 class FlattenedList {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   FlattenedList({
     required String region,
@@ -31,7 +30,7 @@ class FlattenedList {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'FlattenedList',
@@ -40,9 +39,7 @@ class FlattenedList {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -58,10 +55,21 @@ class FlattenedList {
     List<String>? namedListArg,
     String? scalarArg,
   }) async {
-    final $request = <String, dynamic>{};
-    listArg?.also((arg) => $request['ListArg'] = arg);
-    namedListArg?.also((arg) => $request['NamedListArg'] = arg);
-    scalarArg?.also((arg) => $request['ScalarArg'] = arg);
+    final $request = <String, String>{
+      if (listArg != null)
+        if (listArg.isEmpty)
+          'ListArg': ''
+        else
+          for (var i1 = 0; i1 < listArg.length; i1++)
+            'ListArg.${i1 + 1}': listArg[i1],
+      if (namedListArg != null)
+        if (namedListArg.isEmpty)
+          'NamedListArg': ''
+        else
+          for (var i1 = 0; i1 < namedListArg.length; i1++)
+            'Foo.${i1 + 1}': namedListArg[i1],
+      if (scalarArg != null) 'ScalarArg': scalarArg,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -69,8 +77,6 @@ class FlattenedList {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 
@@ -79,10 +85,21 @@ class FlattenedList {
     List<String>? namedListArg,
     String? scalarArg,
   }) async {
-    final $request = <String, dynamic>{};
-    listArg?.also((arg) => $request['ListArg'] = arg);
-    namedListArg?.also((arg) => $request['NamedListArg'] = arg);
-    scalarArg?.also((arg) => $request['ScalarArg'] = arg);
+    final $request = <String, String>{
+      if (listArg != null)
+        if (listArg.isEmpty)
+          'ListArg': ''
+        else
+          for (var i1 = 0; i1 < listArg.length; i1++)
+            'ListArg.${i1 + 1}': listArg[i1],
+      if (namedListArg != null)
+        if (namedListArg.isEmpty)
+          'NamedListArg': ''
+        else
+          for (var i1 = 0; i1 < namedListArg.length; i1++)
+            'Foo.${i1 + 1}': namedListArg[i1],
+      if (scalarArg != null) 'ScalarArg': scalarArg,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -90,8 +107,6 @@ class FlattenedList {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }

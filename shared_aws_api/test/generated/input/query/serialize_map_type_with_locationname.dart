@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'serialize_map_type_with_locationname.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Serialize map type with locationName
 class SerializeMapTypeWithLocationName {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   SerializeMapTypeWithLocationName({
     required String region,
@@ -31,7 +30,7 @@ class SerializeMapTypeWithLocationName {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'SerializeMapTypeWithLocationName',
@@ -40,9 +39,7 @@ class SerializeMapTypeWithLocationName {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -56,8 +53,13 @@ class SerializeMapTypeWithLocationName {
   Future<void> operationName0({
     Map<String, String>? mapArg,
   }) async {
-    final $request = <String, dynamic>{};
-    mapArg?.also((arg) => $request['MapArg'] = arg);
+    final $request = <String, String>{
+      if (mapArg != null)
+        for (var e1 in mapArg.entries.toList().asMap().entries) ...{
+          'MapArg.entry.${e1.key + 1}.TheKey': e1.value.key,
+          'MapArg.entry.${e1.key + 1}.TheValue': e1.value.value,
+        },
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -65,8 +67,6 @@ class SerializeMapTypeWithLocationName {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }

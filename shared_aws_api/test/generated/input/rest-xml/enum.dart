@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -56,15 +57,15 @@ class Enum {
     List<EnumType>? uRIListEnums,
   }) async {
     final headers = <String, String>{
-      if (headerEnum != null) 'x-amz-enum': headerEnum.toValue(),
+      if (headerEnum != null) 'x-amz-enum': headerEnum.value,
     };
     final $query = <String, List<String>>{
       if (uRIListEnums != null)
-        'ListEnums': uRIListEnums.map((e) => e.toValue()).toList(),
+        'ListEnums': uRIListEnums.map((e) => e.value).toList(),
     };
     await _protocol.send(
       method: 'POST',
-      requestUri: '/Enum/${Uri.encodeComponent(uRIFooEnum.toValue())}',
+      requestUri: '/Enum/${Uri.encodeComponent(uRIFooEnum.value)}',
       queryParams: $query,
       headers: headers,
       payload: InputShape(
@@ -86,11 +87,11 @@ class Enum {
     List<EnumType>? uRIListEnums,
   }) async {
     final headers = <String, String>{
-      if (headerEnum != null) 'x-amz-enum': headerEnum.toValue(),
+      if (headerEnum != null) 'x-amz-enum': headerEnum.value,
     };
     final $query = <String, List<String>>{
       if (uRIListEnums != null)
-        'ListEnums': uRIListEnums.map((e) => e.toValue()).toList(),
+        'ListEnums': uRIListEnums.map((e) => e.value).toList(),
     };
     await _protocol.send(
       method: 'POST',
@@ -130,14 +131,10 @@ class InputShape {
     final listEnums = this.listEnums;
     final uRIListEnums = this.uRIListEnums;
     final $children = <_s.XmlNode>[
-      if (fooEnum != null)
-        _s.encodeXmlStringValue('FooEnum', fooEnum.toValue()),
+      if (fooEnum != null) _s.encodeXmlStringValue('FooEnum', fooEnum.value),
       if (listEnums != null)
-        _s.XmlElement(
-            _s.XmlName('ListEnums'),
-            [],
-            listEnums
-                .map((e) => _s.encodeXmlStringValue('member', e.toValue()))),
+        _s.XmlElement(_s.XmlName('ListEnums'), [],
+            listEnums.map((e) => _s.encodeXmlStringValue('member', e.value))),
     ];
     final $attributes = <_s.XmlAttribute>[
       ...?attributes,
@@ -151,46 +148,20 @@ class InputShape {
 }
 
 enum EnumType {
-  foo,
-  bar,
-  baz,
-  $0,
-  $1,
-}
+  foo('foo'),
+  bar('bar'),
+  baz('baz'),
+  $0('0'),
+  $1('1'),
+  ;
 
-extension EnumTypeValueExtension on EnumType {
-  String toValue() {
-    switch (this) {
-      case EnumType.foo:
-        return 'foo';
-      case EnumType.bar:
-        return 'bar';
-      case EnumType.baz:
-        return 'baz';
-      case EnumType.$0:
-        return '0';
-      case EnumType.$1:
-        return '1';
-    }
-  }
-}
+  final String value;
 
-extension EnumTypeFromString on String {
-  EnumType toEnumType() {
-    switch (this) {
-      case 'foo':
-        return EnumType.foo;
-      case 'bar':
-        return EnumType.bar;
-      case 'baz':
-        return EnumType.baz;
-      case '0':
-        return EnumType.$0;
-      case '1':
-        return EnumType.$1;
-    }
-    throw Exception('$this is not known in enum EnumType');
-  }
+  const EnumType(this.value);
+
+  static EnumType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum EnumType'));
 }
 
 final _exceptionFns = <String, _s.AwsExceptionFn>{};

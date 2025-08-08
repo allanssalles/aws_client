@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'enum.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Enum
 class Enum {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   Enum({
     required String region,
@@ -31,7 +30,7 @@ class Enum {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'Enum',
@@ -40,9 +39,7 @@ class Enum {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -57,10 +54,15 @@ class Enum {
     EnumType? fooEnum,
     List<EnumType>? listEnums,
   }) async {
-    final $request = <String, dynamic>{};
-    fooEnum?.also((arg) => $request['FooEnum'] = arg.toValue());
-    listEnums?.also(
-        (arg) => $request['ListEnums'] = arg.map((e) => e.toValue()).toList());
+    final $request = <String, String>{
+      if (fooEnum != null) 'FooEnum': fooEnum.value,
+      if (listEnums != null)
+        if (listEnums.isEmpty)
+          'ListEnums': ''
+        else
+          for (var i1 = 0; i1 < listEnums.length; i1++)
+            'ListEnums.member.${i1 + 1}': listEnums[i1].value,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -68,8 +70,6 @@ class Enum {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 
@@ -77,10 +77,15 @@ class Enum {
     EnumType? fooEnum,
     List<EnumType>? listEnums,
   }) async {
-    final $request = <String, dynamic>{};
-    fooEnum?.also((arg) => $request['FooEnum'] = arg.toValue());
-    listEnums?.also(
-        (arg) => $request['ListEnums'] = arg.map((e) => e.toValue()).toList());
+    final $request = <String, String>{
+      if (fooEnum != null) 'FooEnum': fooEnum.value,
+      if (listEnums != null)
+        if (listEnums.isEmpty)
+          'ListEnums': ''
+        else
+          for (var i1 = 0; i1 < listEnums.length; i1++)
+            'ListEnums.member.${i1 + 1}': listEnums[i1].value,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -88,8 +93,6 @@ class Enum {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 
@@ -97,10 +100,15 @@ class Enum {
     EnumType? fooEnum,
     List<EnumType>? listEnums,
   }) async {
-    final $request = <String, dynamic>{};
-    fooEnum?.also((arg) => $request['FooEnum'] = arg.toValue());
-    listEnums?.also(
-        (arg) => $request['ListEnums'] = arg.map((e) => e.toValue()).toList());
+    final $request = <String, String>{
+      if (fooEnum != null) 'FooEnum': fooEnum.value,
+      if (listEnums != null)
+        if (listEnums.isEmpty)
+          'ListEnums': ''
+        else
+          for (var i1 = 0; i1 < listEnums.length; i1++)
+            'ListEnums.member.${i1 + 1}': listEnums[i1].value,
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -108,38 +116,22 @@ class Enum {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }
 
 enum EnumType {
-  foo,
-  bar,
-}
+  foo('foo'),
+  bar('bar'),
+  ;
 
-extension EnumTypeValueExtension on EnumType {
-  String toValue() {
-    switch (this) {
-      case EnumType.foo:
-        return 'foo';
-      case EnumType.bar:
-        return 'bar';
-    }
-  }
-}
+  final String value;
 
-extension EnumTypeFromString on String {
-  EnumType toEnumType() {
-    switch (this) {
-      case 'foo':
-        return EnumType.foo;
-      case 'bar':
-        return EnumType.bar;
-    }
-    throw Exception('$this is not known in enum EnumType');
-  }
+  const EnumType(this.value);
+
+  static EnumType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum EnumType'));
 }
 
 final _exceptionFns = <String, _s.AwsExceptionFn>{};

@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -145,15 +146,15 @@ class ECS {
 
   /// Creates a new Amazon ECS cluster. By default, your account receives a
   /// <code>default</code> cluster when you launch your first container
-  /// instance. However, you can create your own cluster with a unique name with
-  /// the <code>CreateCluster</code> action.
+  /// instance. However, you can create your own cluster with a unique name.
   /// <note>
-  /// When you call the <a>CreateCluster</a> API operation, Amazon ECS attempts
-  /// to create the Amazon ECS service-linked role for your account. This is so
-  /// that it can manage required resources in other Amazon Web Services
-  /// services on your behalf. However, if the user that makes the call doesn't
-  /// have permissions to create the service-linked role, it isn't created. For
-  /// more information, see <a
+  /// When you call the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateCluster.html">CreateCluster</a>
+  /// API operation, Amazon ECS attempts to create the Amazon ECS service-linked
+  /// role for your account. This is so that it can manage required resources in
+  /// other Amazon Web Services services on your behalf. However, if the user
+  /// that makes the call doesn't have permissions to create the service-linked
+  /// role, it isn't created. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html">Using
   /// service-linked roles for Amazon ECS</a> in the <i>Amazon Elastic Container
   /// Service Developer Guide</i>.
@@ -209,8 +210,9 @@ class ECS {
   /// default capacity provider strategy for the cluster is used.
   ///
   /// If a default capacity provider strategy isn't defined for a cluster when
-  /// it was created, it can be defined later with the
-  /// <a>PutClusterCapacityProviders</a> API operation.
+  /// it was created, it can be defined later with the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>
+  /// API operation.
   ///
   /// Parameter [serviceConnectDefaults] :
   /// Use this parameter to set a default Service Connect namespace. After you
@@ -236,7 +238,10 @@ class ECS {
   /// The setting to use when creating a cluster. This parameter is used to turn
   /// on CloudWatch Container Insights for a cluster. If this value is
   /// specified, it overrides the <code>containerInsights</code> value set with
-  /// <a>PutAccountSetting</a> or <a>PutAccountSettingDefault</a>.
+  /// <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAccountSetting.html">PutAccountSetting</a>
+  /// or <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAccountSettingDefault.html">PutAccountSettingDefault</a>.
   ///
   /// Parameter [tags] :
   /// The metadata that you apply to the cluster to help you categorize and
@@ -314,17 +319,13 @@ class ECS {
   /// Runs and maintains your desired number of tasks from a specified task
   /// definition. If the number of tasks running in a service drops below the
   /// <code>desiredCount</code>, Amazon ECS runs another copy of the task in the
-  /// specified cluster. To update an existing service, see the
-  /// <a>UpdateService</a> action.
+  /// specified cluster. To update an existing service, use <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>.
   /// <note>
-  /// Starting April 15, 2023, Amazon Web Services will not onboard new
-  /// customers to Amazon Elastic Inference (EI), and will help current
-  /// customers migrate their workloads to options that offer better price and
-  /// performance. After April 15, 2023, new customers will not be able to
-  /// launch instances with Amazon EI accelerators in Amazon SageMaker, Amazon
-  /// ECS, or Amazon EC2. However, customers who have used Amazon EI at least
-  /// once during the past 30-day period are considered current customers and
-  /// will be able to continue using the service.
+  /// On March 21, 2024, a change was made to resolve the task definition
+  /// revision before authorization. When a task definition revision is not
+  /// specified, authorization will occur using the latest revision of a task
+  /// definition.
   /// </note>
   /// In addition to maintaining the desired count of tasks in your service, you
   /// can optionally run your service behind one or more load balancers. The
@@ -332,6 +333,14 @@ class ECS {
   /// with the service. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-load-balancing.html">Service
   /// load balancing</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
+  ///
+  /// You can attach Amazon EBS volumes to Amazon ECS tasks by configuring the
+  /// volume when creating or updating a service.
+  /// <code>volumeConfigurations</code> is only supported for REPLICA service
+  /// and not DAEMON service. For more infomation, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volume-types">Amazon
+  /// EBS volumes</a> in the <i>Amazon Elastic Container Service Developer
   /// Guide</i>.
   ///
   /// Tasks for services that don't use a load balancer are considered healthy
@@ -370,7 +379,8 @@ class ECS {
   /// You can optionally specify a deployment configuration for your service.
   /// The deployment is initiated by changing properties. For example, the
   /// deployment might be initiated by the task definition or by your desired
-  /// count of a service. This is done with an <a>UpdateService</a> operation.
+  /// count of a service. You can use <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>.
   /// The default value for a replica service for
   /// <code>minimumHealthyPercent</code> is 100%. The default value for a daemon
   /// service for <code>minimumHealthyPercent</code> is 0%.
@@ -420,8 +430,9 @@ class ECS {
   /// When creating a service that uses the <code>EXTERNAL</code> deployment
   /// controller, you can specify only parameters that aren't controlled at the
   /// task set level. The only required parameter is the service name. You
-  /// control your services using the <a>CreateTaskSet</a> operation. For more
-  /// information, see <a
+  /// control your services using the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateTaskSet.html">CreateTaskSet</a>.
+  /// For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html">Amazon
   /// ECS deployment types</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
@@ -431,7 +442,16 @@ class ECS {
   /// strategies, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement.html">Amazon
   /// ECS task placement</a> in the <i>Amazon Elastic Container Service
-  /// Developer Guide</i>.
+  /// Developer Guide</i>
+  ///
+  /// Starting April 15, 2023, Amazon Web Services will not onboard new
+  /// customers to Amazon Elastic Inference (EI), and will help current
+  /// customers migrate their workloads to options that offer better price and
+  /// performance. After April 15, 2023, new customers will not be able to
+  /// launch instances with Amazon EI accelerators in Amazon SageMaker, Amazon
+  /// ECS, or Amazon EC2. However, customers who have used Amazon EI at least
+  /// once during the past 30-day period are considered current customers and
+  /// will be able to continue using the service.
   ///
   /// May throw [ServerException].
   /// May throw [ClientException].
@@ -463,8 +483,8 @@ class ECS {
   ///
   /// Parameter [clientToken] :
   /// An identifier that you provide to ensure the idempotency of the request.
-  /// It must be unique and is case sensitive. Up to 32 ASCII characters are
-  /// allowed.
+  /// It must be unique and is case sensitive. Up to 36 ASCII characters in the
+  /// range of 33-126 (inclusive) are allowed.
   ///
   /// Parameter [cluster] :
   /// The short name or full Amazon Resource Name (ARN) of the cluster that you
@@ -494,6 +514,9 @@ class ECS {
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-using-tags.html">Tagging
   /// your Amazon ECS resources</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
+  ///
+  /// When you use Amazon ECS managed tags, you need to set the
+  /// <code>propagateTags</code> request parameter.
   ///
   /// Parameter [enableExecuteCommand] :
   /// Determines whether the execute command functionality is turned on for the
@@ -533,8 +556,8 @@ class ECS {
   /// <note>
   /// Fargate Spot infrastructure is available for use but a capacity provider
   /// strategy must be used. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-capacity-providers.html">Fargate
-  /// capacity providers</a> in the <i>Amazon ECS User Guide for Fargate</i>.
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-capacity-providers.html">Fargate
+  /// capacity providers</a> in the <i>Amazon ECS Developer Guide</i>.
   /// </note>
   /// The <code>EC2</code> launch type runs your tasks on Amazon EC2 instances
   /// registered to your cluster.
@@ -635,6 +658,14 @@ class ECS {
   /// after task creation, use the <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TagResource.html">TagResource</a>
   /// API action.
+  ///
+  /// You must set this to a value other than <code>NONE</code> when you use
+  /// Cost Explorer. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/usage-reports.html">Amazon
+  /// ECS usage reports</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
+  ///
+  /// The default is <code>NONE</code>.
   ///
   /// Parameter [role] :
   /// The name or full Amazon Resource Name (ARN) of the IAM role that allows
@@ -772,6 +803,11 @@ class ECS {
   /// For more information about deployment types, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html">Amazon
   /// ECS deployment types</a>.
+  ///
+  /// Parameter [volumeConfigurations] :
+  /// The configuration for a volume specified in the task definition as a
+  /// volume that is configured at launch time. Currently, the only supported
+  /// volume type is an Amazon EBS volume.
   Future<CreateServiceResponse> createService({
     required String serviceName,
     List<CapacityProviderStrategyItem>? capacityProviderStrategy,
@@ -796,6 +832,7 @@ class ECS {
     List<ServiceRegistry>? serviceRegistries,
     List<Tag>? tags,
     String? taskDefinition,
+    List<ServiceVolumeConfiguration>? volumeConfigurations,
   }) async {
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -824,7 +861,7 @@ class ECS {
           'enableExecuteCommand': enableExecuteCommand,
         if (healthCheckGracePeriodSeconds != null)
           'healthCheckGracePeriodSeconds': healthCheckGracePeriodSeconds,
-        if (launchType != null) 'launchType': launchType.toValue(),
+        if (launchType != null) 'launchType': launchType.value,
         if (loadBalancers != null) 'loadBalancers': loadBalancers,
         if (networkConfiguration != null)
           'networkConfiguration': networkConfiguration,
@@ -832,15 +869,17 @@ class ECS {
           'placementConstraints': placementConstraints,
         if (placementStrategy != null) 'placementStrategy': placementStrategy,
         if (platformVersion != null) 'platformVersion': platformVersion,
-        if (propagateTags != null) 'propagateTags': propagateTags.toValue(),
+        if (propagateTags != null) 'propagateTags': propagateTags.value,
         if (role != null) 'role': role,
         if (schedulingStrategy != null)
-          'schedulingStrategy': schedulingStrategy.toValue(),
+          'schedulingStrategy': schedulingStrategy.value,
         if (serviceConnectConfiguration != null)
           'serviceConnectConfiguration': serviceConnectConfiguration,
         if (serviceRegistries != null) 'serviceRegistries': serviceRegistries,
         if (tags != null) 'tags': tags,
         if (taskDefinition != null) 'taskDefinition': taskDefinition,
+        if (volumeConfigurations != null)
+          'volumeConfigurations': volumeConfigurations,
       },
     );
 
@@ -852,6 +891,17 @@ class ECS {
   /// more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-types.html">Amazon
   /// ECS deployment types</a> in the <i>Amazon Elastic Container Service
+  /// Developer Guide</i>.
+  /// <note>
+  /// On March 21, 2024, a change was made to resolve the task definition
+  /// revision before authorization. When a task definition revision is not
+  /// specified, authorization will occur using the latest revision of a task
+  /// definition.
+  /// </note>
+  /// For information about the maximum number of task sets and other quotas,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-quotas.html">Amazon
+  /// ECS service quotas</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
   ///
   /// May throw [ServerException].
@@ -875,7 +925,8 @@ class ECS {
   /// the task set in.
   ///
   /// Parameter [taskDefinition] :
-  /// The task definition for the tasks in the task set to use.
+  /// The task definition for the tasks in the task set to use. If a revision
+  /// isn't specified, the latest <code>ACTIVE</code> revision is used.
   ///
   /// Parameter [capacityProviderStrategy] :
   /// The capacity provider strategy to use for the task set.
@@ -883,7 +934,8 @@ class ECS {
   /// A capacity provider strategy consists of one or more capacity providers
   /// along with the <code>base</code> and <code>weight</code> to assign to
   /// them. A capacity provider must be associated with the cluster to be used
-  /// in a capacity provider strategy. The <a>PutClusterCapacityProviders</a>
+  /// in a capacity provider strategy. The <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>
   /// API is used to associate a capacity provider with a cluster. Only capacity
   /// providers with an <code>ACTIVE</code> or <code>UPDATING</code> status can
   /// be used.
@@ -896,21 +948,24 @@ class ECS {
   ///
   /// If specifying a capacity provider that uses an Auto Scaling group, the
   /// capacity provider must already be created. New capacity providers can be
-  /// created with the <a>CreateCapacityProvider</a> API operation.
+  /// created with the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateCapacityProviderProvider.html">CreateCapacityProviderProvider</a>API
+  /// operation.
   ///
   /// To use a Fargate capacity provider, specify either the
   /// <code>FARGATE</code> or <code>FARGATE_SPOT</code> capacity providers. The
   /// Fargate capacity providers are available to all accounts and only need to
   /// be associated with a cluster to be used.
   ///
-  /// The <a>PutClusterCapacityProviders</a> API operation is used to update the
-  /// list of available capacity providers for a cluster after the cluster is
-  /// created.
+  /// The <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>
+  /// API operation is used to update the list of available capacity providers
+  /// for a cluster after the cluster is created.
   ///
   /// Parameter [clientToken] :
-  /// The identifier that you provide to ensure the idempotency of the request.
-  /// It's case sensitive and must be unique. It can be up to 32 ASCII
-  /// characters are allowed.
+  /// An identifier that you provide to ensure the idempotency of the request.
+  /// It must be unique and is case sensitive. Up to 36 ASCII characters in the
+  /// range of 33-126 (inclusive) are allowed.
   ///
   /// Parameter [externalId] :
   /// An optional non-unique tag that identifies this task set in external
@@ -1023,7 +1078,7 @@ class ECS {
           'capacityProviderStrategy': capacityProviderStrategy,
         if (clientToken != null) 'clientToken': clientToken,
         if (externalId != null) 'externalId': externalId,
-        if (launchType != null) 'launchType': launchType.toValue(),
+        if (launchType != null) 'launchType': launchType.value,
         if (loadBalancers != null) 'loadBalancers': loadBalancers,
         if (networkConfiguration != null)
           'networkConfiguration': networkConfiguration,
@@ -1075,7 +1130,7 @@ class ECS {
       // TODO queryParams
       headers: headers,
       payload: {
-        'name': name.toValue(),
+        'name': name.value,
         if (principalArn != null) 'principalArn': principalArn,
       },
     );
@@ -1126,19 +1181,23 @@ class ECS {
   /// <note>
   /// The <code>FARGATE</code> and <code>FARGATE_SPOT</code> capacity providers
   /// are reserved and can't be deleted. You can disassociate them from a
-  /// cluster using either the <a>PutClusterCapacityProviders</a> API or by
-  /// deleting the cluster.
+  /// cluster using either <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutCapacityProviderProviders.html">PutCapacityProviderProviders</a>
+  /// or by deleting the cluster.
   /// </note>
   /// Prior to a capacity provider being deleted, the capacity provider must be
-  /// removed from the capacity provider strategy from all services. The
-  /// <a>UpdateService</a> API can be used to remove a capacity provider from a
-  /// service's capacity provider strategy. When updating a service, the
+  /// removed from the capacity provider strategy from all services. The <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>
+  /// API can be used to remove a capacity provider from a service's capacity
+  /// provider strategy. When updating a service, the
   /// <code>forceNewDeployment</code> option can be used to ensure that any
   /// tasks using the Amazon EC2 instance capacity provided by the capacity
   /// provider are transitioned to use the capacity from the remaining capacity
   /// providers. Only capacity providers that aren't associated with a cluster
   /// can be deleted. To remove a capacity provider from a cluster, you can
-  /// either use <a>PutClusterCapacityProviders</a> or delete the cluster.
+  /// either use <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutCapacityProviderProviders.html">PutCapacityProviderProviders</a>
+  /// or delete the cluster.
   ///
   /// May throw [ServerException].
   /// May throw [ClientException].
@@ -1176,9 +1235,10 @@ class ECS {
   /// you rely on <code>INACTIVE</code> clusters persisting.
   ///
   /// You must deregister all container instances from this cluster before you
-  /// may delete it. You can list the container instances in a cluster with
-  /// <a>ListContainerInstances</a> and deregister them with
-  /// <a>DeregisterContainerInstance</a>.
+  /// may delete it. You can list the container instances in a cluster with <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListContainerInstances.html">ListContainerInstances</a>
+  /// and deregister them with <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeregisterContainerInstance.html">DeregisterContainerInstance</a>.
   ///
   /// May throw [ServerException].
   /// May throw [ClientException].
@@ -1217,20 +1277,25 @@ class ECS {
   /// you have no running tasks in it and the desired task count is zero. If the
   /// service is actively maintaining tasks, you can't delete it, and you must
   /// update the service to a desired task count of zero. For more information,
-  /// see <a>UpdateService</a>.
+  /// see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>.
   /// <note>
   /// When you delete a service, if there are still running tasks that require
   /// cleanup, the service status moves from <code>ACTIVE</code> to
   /// <code>DRAINING</code>, and the service is no longer visible in the console
-  /// or in the <a>ListServices</a> API operation. After all tasks have
-  /// transitioned to either <code>STOPPING</code> or <code>STOPPED</code>
-  /// status, the service status moves from <code>DRAINING</code> to
-  /// <code>INACTIVE</code>. Services in the <code>DRAINING</code> or
-  /// <code>INACTIVE</code> status can still be viewed with the
-  /// <a>DescribeServices</a> API operation. However, in the future,
-  /// <code>INACTIVE</code> services may be cleaned up and purged from Amazon
-  /// ECS record keeping, and <a>DescribeServices</a> calls on those services
-  /// return a <code>ServiceNotFoundException</code> error.
+  /// or in the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListServices.html">ListServices</a>
+  /// API operation. After all tasks have transitioned to either
+  /// <code>STOPPING</code> or <code>STOPPED</code> status, the service status
+  /// moves from <code>DRAINING</code> to <code>INACTIVE</code>. Services in the
+  /// <code>DRAINING</code> or <code>INACTIVE</code> status can still be viewed
+  /// with the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeServices.html">DescribeServices</a>
+  /// API operation. However, in the future, <code>INACTIVE</code> services may
+  /// be cleaned up and purged from Amazon ECS record keeping, and <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeServices.html">DescribeServices</a>
+  /// calls on those services return a <code>ServiceNotFoundException</code>
+  /// error.
   /// </note> <important>
   /// If you attempt to create a new service with the same name as an existing
   /// service in either <code>ACTIVE</code> or <code>DRAINING</code> status, you
@@ -1301,6 +1366,14 @@ class ECS {
   ///
   /// A task definition revision will stay in <code>DELETE_IN_PROGRESS</code>
   /// status until all the associated tasks and services have been terminated.
+  ///
+  /// When you delete all <code>INACTIVE</code> task definition revisions, the
+  /// task definition name is not displayed in the console and not returned in
+  /// the API. If a task definition revisions are in the
+  /// <code>DELETE_IN_PROGRESS</code> state, the task definition name is
+  /// displayed in the console and returned in the API. The task definition name
+  /// is retained by Amazon ECS and the revision is incremented the next time
+  /// you create a task definition with that name.
   ///
   /// May throw [AccessDeniedException].
   /// May throw [ClientException].
@@ -1581,8 +1654,7 @@ class ECS {
       headers: headers,
       payload: {
         if (capacityProviders != null) 'capacityProviders': capacityProviders,
-        if (include != null)
-          'include': include.map((e) => e.toValue()).toList(),
+        if (include != null) 'include': include.map((e) => e.value).toList(),
         if (maxResults != null) 'maxResults': maxResults,
         if (nextToken != null) 'nextToken': nextToken,
       },
@@ -1637,8 +1709,7 @@ class ECS {
       headers: headers,
       payload: {
         if (clusters != null) 'clusters': clusters,
-        if (include != null)
-          'include': include.map((e) => e.toValue()).toList(),
+        if (include != null) 'include': include.map((e) => e.value).toList(),
       },
     );
 
@@ -1690,8 +1761,7 @@ class ECS {
       payload: {
         'containerInstances': containerInstances,
         if (cluster != null) 'cluster': cluster,
-        if (include != null)
-          'include': include.map((e) => e.toValue()).toList(),
+        if (include != null) 'include': include.map((e) => e.value).toList(),
       },
     );
 
@@ -1738,8 +1808,7 @@ class ECS {
       payload: {
         'services': services,
         if (cluster != null) 'cluster': cluster,
-        if (include != null)
-          'include': include.map((e) => e.toValue()).toList(),
+        if (include != null) 'include': include.map((e) => e.value).toList(),
       },
     );
 
@@ -1786,8 +1855,7 @@ class ECS {
       headers: headers,
       payload: {
         'taskDefinition': taskDefinition,
-        if (include != null)
-          'include': include.map((e) => e.toValue()).toList(),
+        if (include != null) 'include': include.map((e) => e.value).toList(),
       },
     );
 
@@ -1844,8 +1912,7 @@ class ECS {
       payload: {
         'cluster': cluster,
         'service': service,
-        if (include != null)
-          'include': include.map((e) => e.toValue()).toList(),
+        if (include != null) 'include': include.map((e) => e.value).toList(),
         if (taskSets != null) 'taskSets': taskSets,
       },
     );
@@ -1857,6 +1924,11 @@ class ECS {
   ///
   /// Currently, stopped tasks appear in the returned results for at least one
   /// hour.
+  ///
+  /// If you have tasks with tags, and then delete the cluster, the tagged tasks
+  /// are returned in the response. If you create a new cluster with the same
+  /// name as the deleted cluster, the tagged tasks are not included in the
+  /// response.
   ///
   /// May throw [ServerException].
   /// May throw [ClientException].
@@ -1895,8 +1967,7 @@ class ECS {
       payload: {
         'tasks': tasks,
         if (cluster != null) 'cluster': cluster,
-        if (include != null)
-          'include': include.map((e) => e.toValue()).toList(),
+        if (include != null) 'include': include.map((e) => e.value).toList(),
       },
     );
 
@@ -2120,7 +2191,7 @@ class ECS {
       payload: {
         if (effectiveSettings != null) 'effectiveSettings': effectiveSettings,
         if (maxResults != null) 'maxResults': maxResults,
-        if (name != null) 'name': name.toValue(),
+        if (name != null) 'name': name.value,
         if (nextToken != null) 'nextToken': nextToken,
         if (principalArn != null) 'principalArn': principalArn,
         if (value != null) 'value': value,
@@ -2197,7 +2268,7 @@ class ECS {
       // TODO queryParams
       headers: headers,
       payload: {
-        'targetType': targetType.toValue(),
+        'targetType': targetType.value,
         if (attributeName != null) 'attributeName': attributeName,
         if (attributeValue != null) 'attributeValue': attributeValue,
         if (cluster != null) 'cluster': cluster,
@@ -2311,10 +2382,10 @@ class ECS {
   /// Parameter [status] :
   /// Filters the container instances by status. For example, if you specify the
   /// <code>DRAINING</code> status, the results include only container instances
-  /// that have been set to <code>DRAINING</code> using
-  /// <a>UpdateContainerInstancesState</a>. If you don't specify this parameter,
-  /// the default is to include container instances set to all states other than
-  /// <code>INACTIVE</code>.
+  /// that have been set to <code>DRAINING</code> using <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateContainerInstancesState.html">UpdateContainerInstancesState</a>.
+  /// If you don't specify this parameter, the default is to include container
+  /// instances set to all states other than <code>INACTIVE</code>.
   Future<ListContainerInstancesResponse> listContainerInstances({
     String? cluster,
     String? filter,
@@ -2338,7 +2409,7 @@ class ECS {
         if (filter != null) 'filter': filter,
         if (maxResults != null) 'maxResults': maxResults,
         if (nextToken != null) 'nextToken': nextToken,
-        if (status != null) 'status': status.toValue(),
+        if (status != null) 'status': status.value,
       },
     );
 
@@ -2406,11 +2477,11 @@ class ECS {
       headers: headers,
       payload: {
         if (cluster != null) 'cluster': cluster,
-        if (launchType != null) 'launchType': launchType.toValue(),
+        if (launchType != null) 'launchType': launchType.value,
         if (maxResults != null) 'maxResults': maxResults,
         if (nextToken != null) 'nextToken': nextToken,
         if (schedulingStrategy != null)
-          'schedulingStrategy': schedulingStrategy.toValue(),
+          'schedulingStrategy': schedulingStrategy.value,
       },
     );
 
@@ -2596,7 +2667,7 @@ class ECS {
         if (familyPrefix != null) 'familyPrefix': familyPrefix,
         if (maxResults != null) 'maxResults': maxResults,
         if (nextToken != null) 'nextToken': nextToken,
-        if (status != null) 'status': status.toValue(),
+        if (status != null) 'status': status.value,
       },
     );
 
@@ -2678,8 +2749,8 @@ class ECS {
         if (familyPrefix != null) 'familyPrefix': familyPrefix,
         if (maxResults != null) 'maxResults': maxResults,
         if (nextToken != null) 'nextToken': nextToken,
-        if (sort != null) 'sort': sort.toValue(),
-        if (status != null) 'status': status.toValue(),
+        if (sort != null) 'sort': sort.value,
+        if (status != null) 'status': status.value,
       },
     );
 
@@ -2690,8 +2761,7 @@ class ECS {
   /// definition family, container instance, launch type, what IAM principal
   /// started the task, or by the desired status of the task.
   ///
-  /// Recently stopped tasks might appear in the returned results. Currently,
-  /// stopped tasks appear in the returned results for at least one hour.
+  /// Recently stopped tasks might appear in the returned results.
   ///
   /// May throw [ServerException].
   /// May throw [ClientException].
@@ -2791,9 +2861,9 @@ class ECS {
       payload: {
         if (cluster != null) 'cluster': cluster,
         if (containerInstance != null) 'containerInstance': containerInstance,
-        if (desiredStatus != null) 'desiredStatus': desiredStatus.toValue(),
+        if (desiredStatus != null) 'desiredStatus': desiredStatus.value,
         if (family != null) 'family': family,
-        if (launchType != null) 'launchType': launchType.toValue(),
+        if (launchType != null) 'launchType': launchType.value,
         if (maxResults != null) 'maxResults': maxResults,
         if (nextToken != null) 'nextToken': nextToken,
         if (serviceName != null) 'serviceName': serviceName,
@@ -2814,8 +2884,36 @@ class ECS {
   /// Settings</a> in the <i>Amazon Elastic Container Service Developer
   /// Guide</i>.
   ///
-  /// When <code>serviceLongArnFormat</code>, <code>taskLongArnFormat</code>, or
-  /// <code>containerInstanceLongArnFormat</code> are specified, the Amazon
+  /// May throw [ServerException].
+  /// May throw [ClientException].
+  /// May throw [InvalidParameterException].
+  ///
+  /// Parameter [name] :
+  /// The Amazon ECS account setting name to modify.
+  ///
+  /// The following are the valid values for the account setting name.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>serviceLongArnFormat</code> - When modified, the Amazon Resource
+  /// Name (ARN) and resource ID format of the resource type for a specified
+  /// user, role, or the root user for an account is affected. The opt-in and
+  /// opt-out account setting must be set for each Amazon ECS resource
+  /// separately. The ARN and resource ID format of a resource is defined by the
+  /// opt-in status of the user or role that created the resource. You must turn
+  /// on this setting to use Amazon ECS features such as resource tagging.
+  /// </li>
+  /// <li>
+  /// <code>taskLongArnFormat</code> - When modified, the Amazon Resource Name
+  /// (ARN) and resource ID format of the resource type for a specified user,
+  /// role, or the root user for an account is affected. The opt-in and opt-out
+  /// account setting must be set for each Amazon ECS resource separately. The
+  /// ARN and resource ID format of a resource is defined by the opt-in status
+  /// of the user or role that created the resource. You must turn on this
+  /// setting to use Amazon ECS features such as resource tagging.
+  /// </li>
+  /// <li>
+  /// <code>containerInstanceLongArnFormat</code> - When modified, the Amazon
   /// Resource Name (ARN) and resource ID format of the resource type for a
   /// specified user, role, or the root user for an account is affected. The
   /// opt-in and opt-out account setting must be set for each Amazon ECS
@@ -2823,17 +2921,19 @@ class ECS {
   /// defined by the opt-in status of the user or role that created the
   /// resource. You must turn on this setting to use Amazon ECS features such as
   /// resource tagging.
-  ///
-  /// When <code>awsvpcTrunking</code> is specified, the elastic network
-  /// interface (ENI) limit for any new container instances that support the
-  /// feature is changed. If <code>awsvpcTrunking</code> is turned on, any new
-  /// container instances that support the feature are launched have the
-  /// increased ENI limits available to them. For more information, see <a
+  /// </li>
+  /// <li>
+  /// <code>awsvpcTrunking</code> - When modified, the elastic network interface
+  /// (ENI) limit for any new container instances that support the feature is
+  /// changed. If <code>awsvpcTrunking</code> is turned on, any new container
+  /// instances that support the feature are launched have the increased ENI
+  /// limits available to them. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-instance-eni.html">Elastic
   /// Network Interface Trunking</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
-  ///
-  /// When <code>containerInsights</code> is specified, the default setting
+  /// </li>
+  /// <li>
+  /// <code>containerInsights</code> - When modified, the default setting
   /// indicating whether Amazon Web Services CloudWatch Container Insights is
   /// turned on for your clusters is changed. If <code>containerInsights</code>
   /// is turned on, any new clusters that are created will have Container
@@ -2842,44 +2942,80 @@ class ECS {
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-container-insights.html">CloudWatch
   /// Container Insights</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
-  ///
-  /// Amazon ECS is introducing tagging authorization for resource creation.
-  /// Users must have permissions for actions that create the resource, such as
-  /// <code>ecsCreateCluster</code>. If tags are specified when you create a
-  /// resource, Amazon Web Services performs additional authorization to verify
-  /// if users or roles have permissions to create tags. Therefore, you must
-  /// grant explicit permissions to use the <code>ecs:TagResource</code> action.
-  /// For more information, see <a
+  /// </li>
+  /// <li>
+  /// <code>dualStackIPv6</code> - When turned on, when using a VPC in dual
+  /// stack mode, your tasks using the <code>awsvpc</code> network mode can have
+  /// an IPv6 address assigned. For more information on using IPv6 with tasks
+  /// launched on Amazon EC2 instances, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking-awsvpc.html#task-networking-vpc-dual-stack">Using
+  /// a VPC in dual-stack mode</a>. For more information on using IPv6 with
+  /// tasks launched on Fargate, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-networking.html#fargate-task-networking-vpc-dual-stack">Using
+  /// a VPC in dual-stack mode</a>.
+  /// </li>
+  /// <li>
+  /// <code>fargateFIPSMode</code> - If you specify
+  /// <code>fargateFIPSMode</code>, Fargate FIPS 140 compliance is affected.
+  /// </li>
+  /// <li>
+  /// <code>fargateTaskRetirementWaitPeriod</code> - When Amazon Web Services
+  /// determines that a security or infrastructure update is needed for an
+  /// Amazon ECS task hosted on Fargate, the tasks need to be stopped and new
+  /// tasks launched to replace them. Use
+  /// <code>fargateTaskRetirementWaitPeriod</code> to configure the wait time to
+  /// retire a Fargate task. For information about the Fargate tasks
+  /// maintenance, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-maintenance.html">Amazon
+  /// Web Services Fargate task maintenance</a> in the <i>Amazon ECS Developer
+  /// Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>tagResourceAuthorization</code> - Amazon ECS is introducing tagging
+  /// authorization for resource creation. Users must have permissions for
+  /// actions that create the resource, such as <code>ecsCreateCluster</code>.
+  /// If tags are specified when you create a resource, Amazon Web Services
+  /// performs additional authorization to verify if users or roles have
+  /// permissions to create tags. Therefore, you must grant explicit permissions
+  /// to use the <code>ecs:TagResource</code> action. For more information, see
+  /// <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/supported-iam-actions-tagging.html">Grant
   /// permission to tag resources on creation</a> in the <i>Amazon ECS Developer
   /// Guide</i>.
-  ///
-  /// May throw [ServerException].
-  /// May throw [ClientException].
-  /// May throw [InvalidParameterException].
-  ///
-  /// Parameter [name] :
-  /// The Amazon ECS resource name for which to modify the account setting. If
-  /// <code>serviceLongArnFormat</code> is specified, the ARN for your Amazon
-  /// ECS services is affected. If <code>taskLongArnFormat</code> is specified,
-  /// the ARN and resource ID for your Amazon ECS tasks is affected. If
-  /// <code>containerInstanceLongArnFormat</code> is specified, the ARN and
-  /// resource ID for your Amazon ECS container instances is affected. If
-  /// <code>awsvpcTrunking</code> is specified, the elastic network interface
-  /// (ENI) limit for your Amazon ECS container instances is affected. If
-  /// <code>containerInsights</code> is specified, the default setting for
-  /// Amazon Web Services CloudWatch Container Insights for your clusters is
-  /// affected. If <code>fargateFIPSMode</code> is specified, Fargate FIPS 140
-  /// compliance is affected. If <code>tagResourceAuthorization</code> is
-  /// specified, the opt-in option for tagging resources on creation is
-  /// affected. For information about the opt-in timeline, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-account-settings.html#tag-resources">Tagging
-  /// authorization timeline</a> in the <i>Amazon ECS Developer Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>guardDutyActivate</code> - The <code>guardDutyActivate</code>
+  /// parameter is read-only in Amazon ECS and indicates whether Amazon ECS
+  /// Runtime Monitoring is enabled or disabled by your security administrator
+  /// in your Amazon ECS account. Amazon GuardDuty controls this account setting
+  /// on your behalf. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-guard-duty-integration.html">Protecting
+  /// Amazon ECS workloads with Amazon ECS Runtime Monitoring</a>.
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [value] :
   /// The account setting value for the specified principal ARN. Accepted values
   /// are <code>enabled</code>, <code>disabled</code>, <code>on</code>, and
   /// <code>off</code>.
+  ///
+  /// When you specify <code>fargateTaskRetirementWaitPeriod</code> for the
+  /// <code>name</code>, the following are the valid values:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>0</code> - Amazon Web Services sends the notification, and
+  /// immediately retires the affected tasks.
+  /// </li>
+  /// <li>
+  /// <code>7</code> - Amazon Web Services sends the notification, and waits 7
+  /// calendar days to retire the tasks.
+  /// </li>
+  /// <li>
+  /// <code>14</code> - Amazon Web Services sends the notification, and waits 14
+  /// calendar days to retire the tasks.
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [principalArn] :
   /// The ARN of the principal, which can be a user, role, or the root user. If
@@ -2888,6 +3024,9 @@ class ECS {
   /// overrides these settings. If this field is omitted, the setting is changed
   /// only for the authenticated user.
   /// <note>
+  /// You must use the root user when you set the Fargate wait time
+  /// (<code>fargateTaskRetirementWaitPeriod</code>).
+  ///
   /// Federated users assume the account setting of the root user and can't have
   /// explicit account settings set for them.
   /// </note>
@@ -2907,7 +3046,7 @@ class ECS {
       // TODO queryParams
       headers: headers,
       payload: {
-        'name': name.toValue(),
+        'name': name.value,
         'value': value,
         if (principalArn != null) 'principalArn': principalArn,
       },
@@ -2925,35 +3064,133 @@ class ECS {
   /// May throw [InvalidParameterException].
   ///
   /// Parameter [name] :
-  /// The resource name for which to modify the account setting. If
-  /// <code>serviceLongArnFormat</code> is specified, the ARN for your Amazon
-  /// ECS services is affected. If <code>taskLongArnFormat</code> is specified,
-  /// the ARN and resource ID for your Amazon ECS tasks is affected. If
-  /// <code>containerInstanceLongArnFormat</code> is specified, the ARN and
-  /// resource ID for your Amazon ECS container instances is affected. If
-  /// <code>awsvpcTrunking</code> is specified, the ENI limit for your Amazon
-  /// ECS container instances is affected. If <code>containerInsights</code> is
-  /// specified, the default setting for Amazon Web Services CloudWatch
-  /// Container Insights for your clusters is affected. If
-  /// <code>tagResourceAuthorization</code> is specified, the opt-in option for
-  /// tagging resources on creation is affected. For information about the
-  /// opt-in timeline, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-account-settings.html#tag-resources">Tagging
-  /// authorization timeline</a> in the <i>Amazon ECS Developer Guide</i>.
+  /// The resource name for which to modify the account setting.
   ///
-  /// When you specify <code>fargateFIPSMode</code> for the <code>name</code>
-  /// and <code>enabled</code> for the <code>value</code>, Fargate uses FIPS-140
-  /// compliant cryptographic algorithms on your tasks. For more information
-  /// about FIPS-140 compliance with Fargate, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-fips-compliance.html">
-  /// Amazon Web Services Fargate Federal Information Processing Standard (FIPS)
-  /// 140-2 compliance</a> in the <i>Amazon Elastic Container Service Developer
+  /// The following are the valid values for the account setting name.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>serviceLongArnFormat</code> - When modified, the Amazon Resource
+  /// Name (ARN) and resource ID format of the resource type for a specified
+  /// user, role, or the root user for an account is affected. The opt-in and
+  /// opt-out account setting must be set for each Amazon ECS resource
+  /// separately. The ARN and resource ID format of a resource is defined by the
+  /// opt-in status of the user or role that created the resource. You must turn
+  /// on this setting to use Amazon ECS features such as resource tagging.
+  /// </li>
+  /// <li>
+  /// <code>taskLongArnFormat</code> - When modified, the Amazon Resource Name
+  /// (ARN) and resource ID format of the resource type for a specified user,
+  /// role, or the root user for an account is affected. The opt-in and opt-out
+  /// account setting must be set for each Amazon ECS resource separately. The
+  /// ARN and resource ID format of a resource is defined by the opt-in status
+  /// of the user or role that created the resource. You must turn on this
+  /// setting to use Amazon ECS features such as resource tagging.
+  /// </li>
+  /// <li>
+  /// <code>containerInstanceLongArnFormat</code> - When modified, the Amazon
+  /// Resource Name (ARN) and resource ID format of the resource type for a
+  /// specified user, role, or the root user for an account is affected. The
+  /// opt-in and opt-out account setting must be set for each Amazon ECS
+  /// resource separately. The ARN and resource ID format of a resource is
+  /// defined by the opt-in status of the user or role that created the
+  /// resource. You must turn on this setting to use Amazon ECS features such as
+  /// resource tagging.
+  /// </li>
+  /// <li>
+  /// <code>awsvpcTrunking</code> - When modified, the elastic network interface
+  /// (ENI) limit for any new container instances that support the feature is
+  /// changed. If <code>awsvpcTrunking</code> is turned on, any new container
+  /// instances that support the feature are launched have the increased ENI
+  /// limits available to them. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-instance-eni.html">Elastic
+  /// Network Interface Trunking</a> in the <i>Amazon Elastic Container Service
+  /// Developer Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>containerInsights</code> - When modified, the default setting
+  /// indicating whether Amazon Web Services CloudWatch Container Insights is
+  /// turned on for your clusters is changed. If <code>containerInsights</code>
+  /// is turned on, any new clusters that are created will have Container
+  /// Insights turned on unless you disable it during cluster creation. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-container-insights.html">CloudWatch
+  /// Container Insights</a> in the <i>Amazon Elastic Container Service
+  /// Developer Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>dualStackIPv6</code> - When turned on, when using a VPC in dual
+  /// stack mode, your tasks using the <code>awsvpc</code> network mode can have
+  /// an IPv6 address assigned. For more information on using IPv6 with tasks
+  /// launched on Amazon EC2 instances, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking-awsvpc.html#task-networking-vpc-dual-stack">Using
+  /// a VPC in dual-stack mode</a>. For more information on using IPv6 with
+  /// tasks launched on Fargate, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-task-networking.html#fargate-task-networking-vpc-dual-stack">Using
+  /// a VPC in dual-stack mode</a>.
+  /// </li>
+  /// <li>
+  /// <code>fargateFIPSMode</code> - If you specify
+  /// <code>fargateFIPSMode</code>, Fargate FIPS 140 compliance is affected.
+  /// </li>
+  /// <li>
+  /// <code>fargateTaskRetirementWaitPeriod</code> - When Amazon Web Services
+  /// determines that a security or infrastructure update is needed for an
+  /// Amazon ECS task hosted on Fargate, the tasks need to be stopped and new
+  /// tasks launched to replace them. Use
+  /// <code>fargateTaskRetirementWaitPeriod</code> to configure the wait time to
+  /// retire a Fargate task. For information about the Fargate tasks
+  /// maintenance, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-maintenance.html">Amazon
+  /// Web Services Fargate task maintenance</a> in the <i>Amazon ECS Developer
   /// Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>tagResourceAuthorization</code> - Amazon ECS is introducing tagging
+  /// authorization for resource creation. Users must have permissions for
+  /// actions that create the resource, such as <code>ecsCreateCluster</code>.
+  /// If tags are specified when you create a resource, Amazon Web Services
+  /// performs additional authorization to verify if users or roles have
+  /// permissions to create tags. Therefore, you must grant explicit permissions
+  /// to use the <code>ecs:TagResource</code> action. For more information, see
+  /// <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/supported-iam-actions-tagging.html">Grant
+  /// permission to tag resources on creation</a> in the <i>Amazon ECS Developer
+  /// Guide</i>.
+  /// </li>
+  /// <li>
+  /// <code>guardDutyActivate</code> - The <code>guardDutyActivate</code>
+  /// parameter is read-only in Amazon ECS and indicates whether Amazon ECS
+  /// Runtime Monitoring is enabled or disabled by your security administrator
+  /// in your Amazon ECS account. Amazon GuardDuty controls this account setting
+  /// on your behalf. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-guard-duty-integration.html">Protecting
+  /// Amazon ECS workloads with Amazon ECS Runtime Monitoring</a>.
+  /// </li>
+  /// </ul>
   ///
   /// Parameter [value] :
   /// The account setting value for the specified principal ARN. Accepted values
   /// are <code>enabled</code>, <code>disabled</code>, <code>on</code>, and
   /// <code>off</code>.
+  ///
+  /// When you specify <code>fargateTaskRetirementWaitPeriod</code> for the
+  /// <code>name</code>, the following are the valid values:
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>0</code> - Amazon Web Services sends the notification, and
+  /// immediately retires the affected tasks.
+  /// </li>
+  /// <li>
+  /// <code>7</code> - Amazon Web Services sends the notification, and waits 7
+  /// calendar days to retire the tasks.
+  /// </li>
+  /// <li>
+  /// <code>14</code> - Amazon Web Services sends the notification, and waits 14
+  /// calendar days to retire the tasks.
+  /// </li>
+  /// </ul>
   Future<PutAccountSettingDefaultResponse> putAccountSettingDefault({
     required SettingName name,
     required String value,
@@ -2970,7 +3207,7 @@ class ECS {
       // TODO queryParams
       headers: headers,
       payload: {
-        'name': name.toValue(),
+        'name': name.value,
         'value': value,
       },
     );
@@ -2980,8 +3217,9 @@ class ECS {
 
   /// Create or update an attribute on an Amazon ECS resource. If the attribute
   /// doesn't exist, it's created. If the attribute exists, its value is
-  /// replaced with the specified value. To delete an attribute, use
-  /// <a>DeleteAttributes</a>. For more information, see <a
+  /// replaced with the specified value. To delete an attribute, use <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeleteAttributes.html">DeleteAttributes</a>.
+  /// For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html#attributes">Attributes</a>
   /// in the <i>Amazon Elastic Container Service Developer Guide</i>.
   ///
@@ -3030,10 +3268,11 @@ class ECS {
   /// existing capacity providers associated with it, you must specify all
   /// existing capacity providers in addition to any new ones you want to add.
   /// Any existing capacity providers that are associated with a cluster that
-  /// are omitted from a <a>PutClusterCapacityProviders</a> API call will be
-  /// disassociated with the cluster. You can only disassociate an existing
-  /// capacity provider from a cluster if it's not being used by any existing
-  /// tasks.
+  /// are omitted from a <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>
+  /// API call will be disassociated with the cluster. You can only disassociate
+  /// an existing capacity provider from a cluster if it's not being used by any
+  /// existing tasks.
   ///
   /// When creating a service or running a task on a cluster, if no capacity
   /// provider or launch type is specified, then the cluster's default capacity
@@ -3053,7 +3292,9 @@ class ECS {
   ///
   /// If specifying a capacity provider that uses an Auto Scaling group, the
   /// capacity provider must already be created. New capacity providers can be
-  /// created with the <a>CreateCapacityProvider</a> API operation.
+  /// created with the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateCapacityProvider.html">CreateCapacityProvider</a>
+  /// API operation.
   ///
   /// To use a Fargate capacity provider, specify either the
   /// <code>FARGATE</code> or <code>FARGATE_SPOT</code> capacity providers. The
@@ -3075,14 +3316,17 @@ class ECS {
   /// A capacity provider strategy consists of one or more capacity providers
   /// along with the <code>base</code> and <code>weight</code> to assign to
   /// them. A capacity provider must be associated with the cluster to be used
-  /// in a capacity provider strategy. The <a>PutClusterCapacityProviders</a>
+  /// in a capacity provider strategy. The <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>
   /// API is used to associate a capacity provider with a cluster. Only capacity
   /// providers with an <code>ACTIVE</code> or <code>UPDATING</code> status can
   /// be used.
   ///
   /// If specifying a capacity provider that uses an Auto Scaling group, the
   /// capacity provider must already be created. New capacity providers can be
-  /// created with the <a>CreateCapacityProvider</a> API operation.
+  /// created with the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateCapacityProvider.html">CreateCapacityProvider</a>
+  /// API operation.
   ///
   /// To use a Fargate capacity provider, specify either the
   /// <code>FARGATE</code> or <code>FARGATE_SPOT</code> capacity providers. The
@@ -3257,13 +3501,11 @@ class ECS {
   /// Guide</i>.
   ///
   /// You can specify a Docker networking mode for the containers in your task
-  /// definition with the <code>networkMode</code> parameter. The available
-  /// network modes correspond to those described in <a
-  /// href="https://docs.docker.com/engine/reference/run/#/network-settings">Network
-  /// settings</a> in the Docker run reference. If you specify the
+  /// definition with the <code>networkMode</code> parameter. If you specify the
   /// <code>awsvpc</code> network mode, the task is allocated an elastic network
-  /// interface, and you must specify a <a>NetworkConfiguration</a> when you
-  /// create a service or run a task with the task definition. For more
+  /// interface, and you must specify a <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_NetworkConfiguration.html">NetworkConfiguration</a>
+  /// when you create a service or run a task with the task definition. For more
   /// information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html">Task
   /// Networking</a> in the <i>Amazon Elastic Container Service Developer
@@ -3346,8 +3588,8 @@ class ECS {
   /// is used to expand the total amount of ephemeral storage available, beyond
   /// the default amount, for tasks hosted on Fargate. For more information, see
   /// <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/userguide/using_data_volumes.html">Fargate
-  /// task storage</a> in the <i>Amazon ECS User Guide for Fargate</i>.
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_data_volumes.html">Using
+  /// data volumes in tasks</a> in the <i>Amazon ECS Developer Guide</i>.
   /// <note>
   /// For tasks using the Fargate launch type, the task requires the following
   /// platforms:
@@ -3364,10 +3606,10 @@ class ECS {
   /// Parameter [executionRoleArn] :
   /// The Amazon Resource Name (ARN) of the task execution role that grants the
   /// Amazon ECS container agent permission to make Amazon Web Services API
-  /// calls on your behalf. The task execution IAM role is required depending on
-  /// the requirements of your task. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html">Amazon
-  /// ECS task execution IAM role</a> in the <i>Amazon Elastic Container Service
+  /// calls on your behalf. For informationabout the required IAM roles for
+  /// Amazon ECS, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-ecs-iam-role-overview.html">IAM
+  /// roles for Amazon ECS</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
   ///
   /// Parameter [inferenceAccelerators] :
@@ -3385,14 +3627,9 @@ class ECS {
   /// and not shared with other containers in a task or on the container
   /// instance. If no value is specified, then the IPC resource namespace
   /// sharing depends on the Docker daemon setting on the container instance.
-  /// For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#ipc-settings---ipc">IPC
-  /// settings</a> in the <i>Docker run reference</i>.
   ///
   /// If the <code>host</code> IPC mode is used, be aware that there is a
-  /// heightened risk of undesired IPC namespace expose. For more information,
-  /// see <a href="https://docs.docker.com/engine/security/security/">Docker
-  /// security</a>.
+  /// heightened risk of undesired IPC namespace expose.
   ///
   /// If you are setting namespaced kernel parameters using
   /// <code>systemControls</code> for the containers in the task, the following
@@ -3497,9 +3734,10 @@ class ECS {
   /// use a non-root user.
   /// </important>
   /// If the network mode is <code>awsvpc</code>, the task is allocated an
-  /// elastic network interface, and you must specify a
-  /// <a>NetworkConfiguration</a> value when you create a service or run a task
-  /// with the task definition. For more information, see <a
+  /// elastic network interface, and you must specify a <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_NetworkConfiguration.html">NetworkConfiguration</a>
+  /// value when you create a service or run a task with the task definition.
+  /// For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html">Task
   /// Networking</a> in the <i>Amazon Elastic Container Service Developer
   /// Guide</i>.
@@ -3508,30 +3746,31 @@ class ECS {
   /// instantiations of the same task on a single container instance when port
   /// mappings are used.
   ///
-  /// For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#network-settings">Network
-  /// settings</a> in the <i>Docker run reference</i>.
-  ///
   /// Parameter [pidMode] :
   /// The process namespace to use for the containers in the task. The valid
-  /// values are <code>host</code> or <code>task</code>. If <code>host</code> is
-  /// specified, then all containers within the tasks that specified the
-  /// <code>host</code> PID mode on the same container instance share the same
-  /// process namespace with the host Amazon EC2 instance. If <code>task</code>
-  /// is specified, all containers within the specified task share the same
-  /// process namespace. If no value is specified, the default is a private
-  /// namespace. For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#pid-settings---pid">PID
-  /// settings</a> in the <i>Docker run reference</i>.
+  /// values are <code>host</code> or <code>task</code>. On Fargate for Linux
+  /// containers, the only valid value is <code>task</code>. For example,
+  /// monitoring sidecars might need <code>pidMode</code> to access information
+  /// about other containers running in the same task.
   ///
-  /// If the <code>host</code> PID mode is used, be aware that there is a
-  /// heightened risk of undesired process namespace expose. For more
-  /// information, see <a
-  /// href="https://docs.docker.com/engine/security/security/">Docker
-  /// security</a>.
+  /// If <code>host</code> is specified, all containers within the tasks that
+  /// specified the <code>host</code> PID mode on the same container instance
+  /// share the same process namespace with the host Amazon EC2 instance.
+  ///
+  /// If <code>task</code> is specified, all containers within the specified
+  /// task share the same process namespace.
+  ///
+  /// If no value is specified, the default is a private namespace for each
+  /// container.
+  ///
+  /// If the <code>host</code> PID mode is used, there's a heightened risk of
+  /// undesired process namespace exposure.
   /// <note>
-  /// This parameter is not supported for Windows containers or tasks run on
-  /// Fargate.
+  /// This parameter is not supported for Windows containers.
+  /// </note> <note>
+  /// This parameter is only supported for tasks that are hosted on Fargate if
+  /// the tasks are using platform version <code>1.4.0</code> or later (Linux).
+  /// This isn't supported for Windows containers on Fargate.
   /// </note>
   ///
   /// Parameter [placementConstraints] :
@@ -3562,9 +3801,6 @@ class ECS {
   /// Parameter [runtimePlatform] :
   /// The operating system that your tasks definitions run on. A platform family
   /// is specified only for tasks using the Fargate launch type.
-  ///
-  /// When you specify a task definition in a service, this value must match the
-  /// <code>runtimePlatform</code> value of the service.
   ///
   /// Parameter [tags] :
   /// The metadata that you apply to the task definition to help you categorize
@@ -3655,17 +3891,17 @@ class ECS {
         if (executionRoleArn != null) 'executionRoleArn': executionRoleArn,
         if (inferenceAccelerators != null)
           'inferenceAccelerators': inferenceAccelerators,
-        if (ipcMode != null) 'ipcMode': ipcMode.toValue(),
+        if (ipcMode != null) 'ipcMode': ipcMode.value,
         if (memory != null) 'memory': memory,
-        if (networkMode != null) 'networkMode': networkMode.toValue(),
-        if (pidMode != null) 'pidMode': pidMode.toValue(),
+        if (networkMode != null) 'networkMode': networkMode.value,
+        if (pidMode != null) 'pidMode': pidMode.value,
         if (placementConstraints != null)
           'placementConstraints': placementConstraints,
         if (proxyConfiguration != null)
           'proxyConfiguration': proxyConfiguration,
         if (requiresCompatibilities != null)
           'requiresCompatibilities':
-              requiresCompatibilities.map((e) => e.toValue()).toList(),
+              requiresCompatibilities.map((e) => e.value).toList(),
         if (runtimePlatform != null) 'runtimePlatform': runtimePlatform,
         if (tags != null) 'tags': tags,
         if (taskRoleArn != null) 'taskRoleArn': taskRoleArn,
@@ -3677,16 +3913,21 @@ class ECS {
   }
 
   /// Starts a new task using the specified task definition.
-  ///
+  /// <note>
+  /// On March 21, 2024, a change was made to resolve the task definition
+  /// revision before authorization. When a task definition revision is not
+  /// specified, authorization will occur using the latest revision of a task
+  /// definition.
+  /// </note>
   /// You can allow Amazon ECS to place tasks for you, or you can customize how
   /// Amazon ECS places tasks using placement constraints and placement
   /// strategies. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html">Scheduling
   /// Tasks</a> in the <i>Amazon Elastic Container Service Developer Guide</i>.
   ///
-  /// Alternatively, you can use <a>StartTask</a> to use your own scheduler or
-  /// place tasks manually on specific container instances.
-  /// <note>
+  /// Alternatively, you can use <code>StartTask</code> to use your own
+  /// scheduler or place tasks manually on specific container instances.
+  ///
   /// Starting April 15, 2023, Amazon Web Services will not onboard new
   /// customers to Amazon Elastic Inference (EI), and will help current
   /// customers migrate their workloads to options that offer better price and
@@ -3695,7 +3936,13 @@ class ECS {
   /// ECS, or Amazon EC2. However, customers who have used Amazon EI at least
   /// once during the past 30-day period are considered current customers and
   /// will be able to continue using the service.
-  /// </note>
+  ///
+  /// You can attach Amazon EBS volumes to Amazon ECS tasks by configuring the
+  /// volume when creating or updating a service. For more infomation, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volume-types">Amazon
+  /// EBS volumes</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
+  ///
   /// The Amazon ECS API follows an eventual consistency model. This is because
   /// of the distributed nature of the system supporting the API. This means
   /// that the result of an API command you run that affects your Amazon ECS
@@ -3731,6 +3978,7 @@ class ECS {
   /// May throw [PlatformTaskDefinitionIncompatibilityException].
   /// May throw [AccessDeniedException].
   /// May throw [BlockedException].
+  /// May throw [ConflictException].
   ///
   /// Parameter [taskDefinition] :
   /// The <code>family</code> and <code>revision</code>
@@ -3738,30 +3986,24 @@ class ECS {
   /// If a <code>revision</code> isn't specified, the latest <code>ACTIVE</code>
   /// revision is used.
   ///
-  /// When you create a policy for run-task, you can set the resource to be the
-  /// latest task definition revision, or a specific revision.
-  ///
   /// The full ARN value must match the value that you specified as the
   /// <code>Resource</code> of the principal's permissions policy.
   ///
-  /// When you specify the policy resource as the latest task definition version
-  /// (by setting the <code>Resource</code> in the policy to
-  /// <code>arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName</code>),
-  /// then set this value to
-  /// <code>arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName</code>.
+  /// When you specify a task definition, you must either specify a specific
+  /// revision, or all revisions in the ARN.
   ///
-  /// When you specify the policy resource as a specific task definition version
-  /// (by setting the <code>Resource</code> in the policy to
-  /// <code>arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName:1</code>
-  /// or
-  /// <code>arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName:*</code>),
-  /// then set this value to
-  /// <code>arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName:1</code>.
+  /// To specify a specific revision, include the revision number in the ARN.
+  /// For example, to specify revision 2, use
+  /// <code>arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName:2</code>.
+  ///
+  /// To specify all revisions, use the wildcard (*) in the ARN. For example, to
+  /// specify all revisions, use
+  /// <code>arn:aws:ecs:us-east-1:111122223333:task-definition/TaskFamilyName:*</code>.
   ///
   /// For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security_iam_service-with-iam.html#security_iam_service-with-iam-id-based-policies-resources">Policy
   /// Resources for Amazon ECS</a> in the Amazon Elastic Container Service
-  /// developer Guide.
+  /// Developer Guide.
   ///
   /// Parameter [capacityProviderStrategy] :
   /// The capacity provider strategy to use for the task.
@@ -3777,6 +4019,14 @@ class ECS {
   ///
   /// A capacity provider strategy may contain a maximum of 6 capacity
   /// providers.
+  ///
+  /// Parameter [clientToken] :
+  /// An identifier that you provide to ensure the idempotency of the request.
+  /// It must be unique and is case sensitive. Up to 64 characters are allowed.
+  /// The valid characters are characters in the range of 33-126, inclusive. For
+  /// more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/ECS_Idempotency.html">Ensuring
+  /// idempotency</a>.
   ///
   /// Parameter [cluster] :
   /// The short name or full Amazon Resource Name (ARN) of the cluster to run
@@ -3819,8 +4069,8 @@ class ECS {
   /// <note>
   /// Fargate Spot infrastructure is available for use but a capacity provider
   /// strategy must be used. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/userguide/fargate-capacity-providers.html">Fargate
-  /// capacity providers</a> in the <i>Amazon ECS User Guide for Fargate</i>.
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/fargate-capacity-providers.html">Fargate
+  /// capacity providers</a> in the <i>Amazon ECS Developer Guide</i>.
   /// </note>
   /// The <code>EC2</code> launch type runs your tasks on Amazon EC2 instances
   /// registered to your cluster.
@@ -3878,7 +4128,9 @@ class ECS {
   /// Specifies whether to propagate the tags from the task definition to the
   /// task. If no value is specified, the tags aren't propagated. Tags can only
   /// be propagated to the task during task creation. To add tags to a task
-  /// after task creation, use the <a>TagResource</a> API action.
+  /// after task creation, use the<a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TagResource.html">TagResource</a>
+  /// API action.
   /// <note>
   /// An error will be received if you specify the <code>SERVICE</code> option
   /// when running a task.
@@ -3893,9 +4145,11 @@ class ECS {
   /// automatically trigger a task to run a batch process job, you could apply a
   /// unique identifier for that job to your task with the
   /// <code>startedBy</code> parameter. You can then identify which tasks belong
-  /// to that job by filtering the results of a <a>ListTasks</a> call with the
-  /// <code>startedBy</code> value. Up to 36 letters (uppercase and lowercase),
-  /// numbers, hyphens (-), and underscores (_) are allowed.
+  /// to that job by filtering the results of a <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListTasks.html">ListTasks</a>
+  /// call with the <code>startedBy</code> value. Up to 128 letters (uppercase
+  /// and lowercase), numbers, hyphens (-), forward slash (/), and underscores
+  /// (_) are allowed.
   ///
   /// If a task is started by an Amazon ECS service, then the
   /// <code>startedBy</code> parameter contains the deployment ID of the service
@@ -3939,9 +4193,18 @@ class ECS {
   /// your tags per resource limit.
   /// </li>
   /// </ul>
+  ///
+  /// Parameter [volumeConfigurations] :
+  /// The details of the volume that was <code>configuredAtLaunch</code>. You
+  /// can configure the size, volumeType, IOPS, throughput, snapshot and
+  /// encryption in in <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TaskManagedEBSVolumeConfiguration.html">TaskManagedEBSVolumeConfiguration</a>.
+  /// The <code>name</code> of the volume must match the <code>name</code> from
+  /// the task definition.
   Future<RunTaskResponse> runTask({
     required String taskDefinition,
     List<CapacityProviderStrategyItem>? capacityProviderStrategy,
+    String? clientToken,
     String? cluster,
     int? count,
     bool? enableECSManagedTags,
@@ -3957,6 +4220,7 @@ class ECS {
     String? referenceId,
     String? startedBy,
     List<Tag>? tags,
+    List<TaskVolumeConfiguration>? volumeConfigurations,
   }) async {
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -3972,6 +4236,7 @@ class ECS {
         'taskDefinition': taskDefinition,
         if (capacityProviderStrategy != null)
           'capacityProviderStrategy': capacityProviderStrategy,
+        'clientToken': clientToken ?? _s.generateIdempotencyToken(),
         if (cluster != null) 'cluster': cluster,
         if (count != null) 'count': count,
         if (enableECSManagedTags != null)
@@ -3979,7 +4244,7 @@ class ECS {
         if (enableExecuteCommand != null)
           'enableExecuteCommand': enableExecuteCommand,
         if (group != null) 'group': group,
-        if (launchType != null) 'launchType': launchType.toValue(),
+        if (launchType != null) 'launchType': launchType.value,
         if (networkConfiguration != null)
           'networkConfiguration': networkConfiguration,
         if (overrides != null) 'overrides': overrides,
@@ -3987,10 +4252,12 @@ class ECS {
           'placementConstraints': placementConstraints,
         if (placementStrategy != null) 'placementStrategy': placementStrategy,
         if (platformVersion != null) 'platformVersion': platformVersion,
-        if (propagateTags != null) 'propagateTags': propagateTags.toValue(),
+        if (propagateTags != null) 'propagateTags': propagateTags.value,
         if (referenceId != null) 'referenceId': referenceId,
         if (startedBy != null) 'startedBy': startedBy,
         if (tags != null) 'tags': tags,
+        if (volumeConfigurations != null)
+          'volumeConfigurations': volumeConfigurations,
       },
     );
 
@@ -4000,6 +4267,11 @@ class ECS {
   /// Starts a new task from the specified task definition on the specified
   /// container instance or instances.
   /// <note>
+  /// On March 21, 2024, a change was made to resolve the task definition
+  /// revision before authorization. When a task definition revision is not
+  /// specified, authorization will occur using the latest revision of a task
+  /// definition.
+  /// </note>
   /// Starting April 15, 2023, Amazon Web Services will not onboard new
   /// customers to Amazon Elastic Inference (EI), and will help current
   /// customers migrate their workloads to options that offer better price and
@@ -4008,16 +4280,23 @@ class ECS {
   /// ECS, or Amazon EC2. However, customers who have used Amazon EI at least
   /// once during the past 30-day period are considered current customers and
   /// will be able to continue using the service.
-  /// </note>
-  /// Alternatively, you can use <a>RunTask</a> to place tasks for you. For more
-  /// information, see <a
+  ///
+  /// Alternatively, you can use<code>RunTask</code> to place tasks for you. For
+  /// more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/scheduling_tasks.html">Scheduling
   /// Tasks</a> in the <i>Amazon Elastic Container Service Developer Guide</i>.
+  ///
+  /// You can attach Amazon EBS volumes to Amazon ECS tasks by configuring the
+  /// volume when creating or updating a service. For more infomation, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volume-types">Amazon
+  /// EBS volumes</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
   ///
   /// May throw [ServerException].
   /// May throw [ClientException].
   /// May throw [InvalidParameterException].
   /// May throw [ClusterNotFoundException].
+  /// May throw [UnsupportedFeatureException].
   ///
   /// Parameter [containerInstances] :
   /// The container instance IDs or full ARN entries for the container instances
@@ -4082,9 +4361,11 @@ class ECS {
   /// automatically trigger a task to run a batch process job, you could apply a
   /// unique identifier for that job to your task with the
   /// <code>startedBy</code> parameter. You can then identify which tasks belong
-  /// to that job by filtering the results of a <a>ListTasks</a> call with the
-  /// <code>startedBy</code> value. Up to 36 letters (uppercase and lowercase),
-  /// numbers, hyphens (-), and underscores (_) are allowed.
+  /// to that job by filtering the results of a <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListTasks.html">ListTasks</a>
+  /// call with the <code>startedBy</code> value. Up to 36 letters (uppercase
+  /// and lowercase), numbers, hyphens (-), forward slash (/), and underscores
+  /// (_) are allowed.
   ///
   /// If a task is started by an Amazon ECS service, the <code>startedBy</code>
   /// parameter contains the deployment ID of the service that starts it.
@@ -4127,6 +4408,14 @@ class ECS {
   /// your tags per resource limit.
   /// </li>
   /// </ul>
+  ///
+  /// Parameter [volumeConfigurations] :
+  /// The details of the volume that was <code>configuredAtLaunch</code>. You
+  /// can configure the size, volumeType, IOPS, throughput, snapshot and
+  /// encryption in <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_TaskManagedEBSVolumeConfiguration.html">TaskManagedEBSVolumeConfiguration</a>.
+  /// The <code>name</code> of the volume must match the <code>name</code> from
+  /// the task definition.
   Future<StartTaskResponse> startTask({
     required List<String> containerInstances,
     required String taskDefinition,
@@ -4140,6 +4429,7 @@ class ECS {
     String? referenceId,
     String? startedBy,
     List<Tag>? tags,
+    List<TaskVolumeConfiguration>? volumeConfigurations,
   }) async {
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -4163,10 +4453,12 @@ class ECS {
         if (networkConfiguration != null)
           'networkConfiguration': networkConfiguration,
         if (overrides != null) 'overrides': overrides,
-        if (propagateTags != null) 'propagateTags': propagateTags.toValue(),
+        if (propagateTags != null) 'propagateTags': propagateTags.value,
         if (referenceId != null) 'referenceId': referenceId,
         if (startedBy != null) 'startedBy': startedBy,
         if (tags != null) 'tags': tags,
+        if (volumeConfigurations != null)
+          'volumeConfigurations': volumeConfigurations,
       },
     );
 
@@ -4175,13 +4467,19 @@ class ECS {
 
   /// Stops a running task. Any tags associated with the task will be deleted.
   ///
-  /// When <a>StopTask</a> is called on a task, the equivalent of <code>docker
-  /// stop</code> is issued to the containers running in the task. This results
-  /// in a <code>SIGTERM</code> value and a default 30-second timeout, after
-  /// which the <code>SIGKILL</code> value is sent and the containers are
-  /// forcibly stopped. If the container handles the <code>SIGTERM</code> value
-  /// gracefully and exits within 30 seconds from receiving it, no
-  /// <code>SIGKILL</code> value is sent.
+  /// When you call <code>StopTask</code> on a task, the equivalent of
+  /// <code>docker stop</code> is issued to the containers running in the task.
+  /// This results in a <code>SIGTERM</code> value and a default 30-second
+  /// timeout, after which the <code>SIGKILL</code> value is sent and the
+  /// containers are forcibly stopped. If the container handles the
+  /// <code>SIGTERM</code> value gracefully and exits within 30 seconds from
+  /// receiving it, no <code>SIGKILL</code> value is sent.
+  ///
+  /// For Windows containers, POSIX signals do not work and runtime stops the
+  /// container by sending a <code>CTRL_SHUTDOWN_EVENT</code>. For more
+  /// information, see <a
+  /// href="https://github.com/moby/moby/issues/25982">Unable to react to
+  /// graceful shutdown of (Windows) container #25982</a> on GitHub.
   /// <note>
   /// The default 30-second timeout can be configured on the Amazon ECS
   /// container agent with the <code>ECS_CONTAINER_STOP_TIMEOUT</code> variable.
@@ -4208,8 +4506,9 @@ class ECS {
   /// An optional message specified when a task is stopped. For example, if
   /// you're using a custom scheduler, you can use this parameter to specify the
   /// reason for stopping the task here, and the message appears in subsequent
-  /// <a>DescribeTasks</a> API operations on this task. Up to 255 characters are
-  /// allowed in this message.
+  /// <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTasks.html">DescribeTasks</a>&gt;
+  /// API operations on this task.
   Future<StopTaskResponse> stopTask({
     required String task,
     String? cluster,
@@ -4653,7 +4952,10 @@ class ECS {
   /// The setting to use by default for a cluster. This parameter is used to
   /// turn on CloudWatch Container Insights for a cluster. If this value is
   /// specified, it overrides the <code>containerInsights</code> value set with
-  /// <a>PutAccountSetting</a> or <a>PutAccountSettingDefault</a>.
+  /// <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAccountSetting.html">PutAccountSetting</a>
+  /// or <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAccountSettingDefault.html">PutAccountSettingDefault</a>.
   /// <important>
   /// Currently, if you delete an existing cluster that does not have Container
   /// Insights turned on, and then create a new cluster with the same name with
@@ -4772,8 +5074,8 @@ class ECS {
   /// <code>RUNNING</code> state are stopped and replaced according to the
   /// service's deployment configuration parameters,
   /// <code>minimumHealthyPercent</code> and <code>maximumPercent</code>. You
-  /// can change the deployment configuration of your service using
-  /// <a>UpdateService</a>.
+  /// can change the deployment configuration of your service using <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>.
   ///
   /// <ul>
   /// <li>
@@ -4804,7 +5106,8 @@ class ECS {
   /// them manually.
   ///
   /// A container instance has completed draining when it has no more
-  /// <code>RUNNING</code> tasks. You can verify this using <a>ListTasks</a>.
+  /// <code>RUNNING</code> tasks. You can verify this using <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListTasks.html">ListTasks</a>.
   ///
   /// When a container instance has been drained, you can set a container
   /// instance to <code>ACTIVE</code> status and once it has reached that status
@@ -4850,7 +5153,7 @@ class ECS {
       headers: headers,
       payload: {
         'containerInstances': containerInstances,
-        'status': status.toValue(),
+        'status': status.value,
         if (cluster != null) 'cluster': cluster,
       },
     );
@@ -4859,13 +5162,32 @@ class ECS {
   }
 
   /// Modifies the parameters of a service.
-  ///
+  /// <note>
+  /// On March 21, 2024, a change was made to resolve the task definition
+  /// revision before authorization. When a task definition revision is not
+  /// specified, authorization will occur using the latest revision of a task
+  /// definition.
+  /// </note>
   /// For services using the rolling update (<code>ECS</code>) you can update
   /// the desired count, deployment configuration, network configuration, load
   /// balancers, service registries, enable ECS managed tags option, propagate
   /// tags option, task placement constraints and strategies, and task
   /// definition. When you update any of these parameters, Amazon ECS starts new
   /// tasks with the new configuration.
+  ///
+  /// You can attach Amazon EBS volumes to Amazon ECS tasks by configuring the
+  /// volume when starting or running a task, or when creating or updating a
+  /// service. For more infomation, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volume-types">Amazon
+  /// EBS volumes</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>. You can update your volume configurations and trigger a new
+  /// deployment. <code>volumeConfigurations</code> is only supported for
+  /// REPLICA service and not DAEMON service. If you leave
+  /// <code>volumeConfigurations</code> <code>null</code>, it doesn't trigger a
+  /// new deployment. For more infomation on volumes, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volume-types">Amazon
+  /// EBS volumes</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
   ///
   /// For services using the blue/green (<code>CODE_DEPLOY</code>) deployment
   /// controller, only the desired count, deployment configuration, health check
@@ -4882,17 +5204,25 @@ class ECS {
   /// grace period, enable ECS managed tags option, and propagate tags option,
   /// using this API. If the launch type, load balancer, network configuration,
   /// platform version, or task definition need to be updated, create a new task
-  /// set For more information, see <a>CreateTaskSet</a>.
+  /// set For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateTaskSet.html">CreateTaskSet</a>.
   ///
   /// You can add to or subtract from the number of instantiations of a task
   /// definition in a service by specifying the cluster that the service is
   /// running in and a new <code>desiredCount</code> parameter.
   ///
-  /// If you have updated the Docker image of your application, you can create a
-  /// new task definition with that image and deploy it to your service. The
-  /// service scheduler uses the minimum healthy percent and maximum percent
-  /// parameters (in the service's deployment configuration) to determine the
-  /// deployment strategy.
+  /// You can attach Amazon EBS volumes to Amazon ECS tasks by configuring the
+  /// volume when starting or running a task, or when creating or updating a
+  /// service. For more infomation, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volume-types">Amazon
+  /// EBS volumes</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
+  ///
+  /// If you have updated the container image of your application, you can
+  /// create a new task definition with that image and deploy it to your
+  /// service. The service scheduler uses the minimum healthy percent and
+  /// maximum percent parameters (in the service's deployment configuration) to
+  /// determine the deployment strategy.
   /// <note>
   /// If your updated Docker image uses the same tag as what is in the existing
   /// task definition for your service (for example,
@@ -4929,13 +5259,14 @@ class ECS {
   /// available).
   /// </li>
   /// </ul>
-  /// When <a>UpdateService</a> stops a task during a deployment, the equivalent
-  /// of <code>docker stop</code> is issued to the containers running in the
-  /// task. This results in a <code>SIGTERM</code> and a 30-second timeout.
-  /// After this, <code>SIGKILL</code> is sent and the containers are forcibly
-  /// stopped. If the container handles the <code>SIGTERM</code> gracefully and
-  /// exits within 30 seconds from receiving it, no <code>SIGKILL</code> is
-  /// sent.
+  /// When <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>
+  /// stops a task during a deployment, the equivalent of <code>docker
+  /// stop</code> is issued to the containers running in the task. This results
+  /// in a <code>SIGTERM</code> and a 30-second timeout. After this,
+  /// <code>SIGKILL</code> is sent and the containers are forcibly stopped. If
+  /// the container handles the <code>SIGTERM</code> gracefully and exits within
+  /// 30 seconds from receiving it, no <code>SIGKILL</code> is sent.
   ///
   /// When the service scheduler launches new tasks, it determines task
   /// placement in your cluster with the following logic.
@@ -4985,22 +5316,21 @@ class ECS {
   /// </li>
   /// </ul> <note>
   /// You must have a service-linked role when you update any of the following
-  /// service properties. If you specified a custom role when you created the
-  /// service, Amazon ECS automatically replaces the <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Service.html#ECS-Type-Service-roleArn">roleARN</a>
-  /// associated with the service with the ARN of your service-linked role. For
-  /// more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using-service-linked-roles.html">Service-linked
-  /// roles</a> in the <i>Amazon Elastic Container Service Developer Guide</i>.
+  /// service properties:
   ///
   /// <ul>
   /// <li>
-  /// <code>loadBalancers,</code>
+  /// <code>loadBalancers</code>,
   /// </li>
   /// <li>
   /// <code>serviceRegistries</code>
   /// </li>
-  /// </ul> </note>
+  /// </ul>
+  /// For more information about the role see the <code>CreateService</code>
+  /// request parameter <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateService.html#ECS-CreateService-request-role">
+  /// <code>role</code> </a>.
+  /// </note>
   ///
   /// May throw [ServerException].
   /// May throw [ClientException].
@@ -5012,6 +5342,7 @@ class ECS {
   /// May throw [PlatformTaskDefinitionIncompatibilityException].
   /// May throw [AccessDeniedException].
   /// May throw [NamespaceNotFoundException].
+  /// May throw [UnsupportedFeatureException].
   ///
   /// Parameter [service] :
   /// The name of the service to update.
@@ -5029,23 +5360,27 @@ class ECS {
   /// A capacity provider strategy consists of one or more capacity providers
   /// along with the <code>base</code> and <code>weight</code> to assign to
   /// them. A capacity provider must be associated with the cluster to be used
-  /// in a capacity provider strategy. The <a>PutClusterCapacityProviders</a>
+  /// in a capacity provider strategy. The <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>
   /// API is used to associate a capacity provider with a cluster. Only capacity
   /// providers with an <code>ACTIVE</code> or <code>UPDATING</code> status can
   /// be used.
   ///
   /// If specifying a capacity provider that uses an Auto Scaling group, the
   /// capacity provider must already be created. New capacity providers can be
-  /// created with the <a>CreateCapacityProvider</a> API operation.
+  /// created with the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateClusterCapacityProvider.html">CreateClusterCapacityProvider</a>
+  /// API operation.
   ///
   /// To use a Fargate capacity provider, specify either the
   /// <code>FARGATE</code> or <code>FARGATE_SPOT</code> capacity providers. The
   /// Fargate capacity providers are available to all accounts and only need to
   /// be associated with a cluster to be used.
   ///
-  /// The <a>PutClusterCapacityProviders</a> API operation is used to update the
-  /// list of available capacity providers for a cluster after the cluster is
-  /// created.
+  /// The <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>API
+  /// operation is used to update the list of available capacity providers for a
+  /// cluster after the cluster is created.
   /// <p/>
   ///
   /// Parameter [cluster] :
@@ -5215,6 +5550,16 @@ class ECS {
   /// with <code>UpdateService</code>, Amazon ECS spawns a task with the new
   /// version of the task definition and then stops an old task after the new
   /// version is running.
+  ///
+  /// Parameter [volumeConfigurations] :
+  /// The details of the volume that was <code>configuredAtLaunch</code>. You
+  /// can configure the size, volumeType, IOPS, throughput, snapshot and
+  /// encryption in <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ServiceManagedEBSVolumeConfiguration.html">ServiceManagedEBSVolumeConfiguration</a>.
+  /// The <code>name</code> of the volume must match the <code>name</code> from
+  /// the task definition. If set to null, no new deployment is triggered.
+  /// Otherwise, if this configuration differs from the existing one, it
+  /// triggers a new deployment.
   Future<UpdateServiceResponse> updateService({
     required String service,
     List<CapacityProviderStrategyItem>? capacityProviderStrategy,
@@ -5234,6 +5579,7 @@ class ECS {
     ServiceConnectConfiguration? serviceConnectConfiguration,
     List<ServiceRegistry>? serviceRegistries,
     String? taskDefinition,
+    List<ServiceVolumeConfiguration>? volumeConfigurations,
   }) async {
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -5268,11 +5614,13 @@ class ECS {
           'placementConstraints': placementConstraints,
         if (placementStrategy != null) 'placementStrategy': placementStrategy,
         if (platformVersion != null) 'platformVersion': platformVersion,
-        if (propagateTags != null) 'propagateTags': propagateTags.toValue(),
+        if (propagateTags != null) 'propagateTags': propagateTags.value,
         if (serviceConnectConfiguration != null)
           'serviceConnectConfiguration': serviceConnectConfiguration,
         if (serviceRegistries != null) 'serviceRegistries': serviceRegistries,
         if (taskDefinition != null) 'taskDefinition': taskDefinition,
+        if (volumeConfigurations != null)
+          'volumeConfigurations': volumeConfigurations,
       },
     );
 
@@ -5489,119 +5837,70 @@ class ECS {
 }
 
 enum AgentUpdateStatus {
-  pending,
-  staging,
-  staged,
-  updating,
-  updated,
-  failed,
-}
+  pending('PENDING'),
+  staging('STAGING'),
+  staged('STAGED'),
+  updating('UPDATING'),
+  updated('UPDATED'),
+  failed('FAILED'),
+  ;
 
-extension AgentUpdateStatusValueExtension on AgentUpdateStatus {
-  String toValue() {
-    switch (this) {
-      case AgentUpdateStatus.pending:
-        return 'PENDING';
-      case AgentUpdateStatus.staging:
-        return 'STAGING';
-      case AgentUpdateStatus.staged:
-        return 'STAGED';
-      case AgentUpdateStatus.updating:
-        return 'UPDATING';
-      case AgentUpdateStatus.updated:
-        return 'UPDATED';
-      case AgentUpdateStatus.failed:
-        return 'FAILED';
-    }
-  }
-}
+  final String value;
 
-extension AgentUpdateStatusFromString on String {
-  AgentUpdateStatus toAgentUpdateStatus() {
-    switch (this) {
-      case 'PENDING':
-        return AgentUpdateStatus.pending;
-      case 'STAGING':
-        return AgentUpdateStatus.staging;
-      case 'STAGED':
-        return AgentUpdateStatus.staged;
-      case 'UPDATING':
-        return AgentUpdateStatus.updating;
-      case 'UPDATED':
-        return AgentUpdateStatus.updated;
-      case 'FAILED':
-        return AgentUpdateStatus.failed;
-    }
-    throw Exception('$this is not known in enum AgentUpdateStatus');
-  }
+  const AgentUpdateStatus(this.value);
+
+  static AgentUpdateStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum AgentUpdateStatus'));
 }
 
 enum ApplicationProtocol {
-  http,
-  http2,
-  grpc,
-}
+  http('http'),
+  http2('http2'),
+  grpc('grpc'),
+  ;
 
-extension ApplicationProtocolValueExtension on ApplicationProtocol {
-  String toValue() {
-    switch (this) {
-      case ApplicationProtocol.http:
-        return 'http';
-      case ApplicationProtocol.http2:
-        return 'http2';
-      case ApplicationProtocol.grpc:
-        return 'grpc';
-    }
-  }
-}
+  final String value;
 
-extension ApplicationProtocolFromString on String {
-  ApplicationProtocol toApplicationProtocol() {
-    switch (this) {
-      case 'http':
-        return ApplicationProtocol.http;
-      case 'http2':
-        return ApplicationProtocol.http2;
-      case 'grpc':
-        return ApplicationProtocol.grpc;
-    }
-    throw Exception('$this is not known in enum ApplicationProtocol');
-  }
+  const ApplicationProtocol(this.value);
+
+  static ApplicationProtocol fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ApplicationProtocol'));
 }
 
 enum AssignPublicIp {
-  enabled,
-  disabled,
-}
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
 
-extension AssignPublicIpValueExtension on AssignPublicIp {
-  String toValue() {
-    switch (this) {
-      case AssignPublicIp.enabled:
-        return 'ENABLED';
-      case AssignPublicIp.disabled:
-        return 'DISABLED';
-    }
-  }
-}
+  final String value;
 
-extension AssignPublicIpFromString on String {
-  AssignPublicIp toAssignPublicIp() {
-    switch (this) {
-      case 'ENABLED':
-        return AssignPublicIp.enabled;
-      case 'DISABLED':
-        return AssignPublicIp.disabled;
-    }
-    throw Exception('$this is not known in enum AssignPublicIp');
-  }
+  const AssignPublicIp(this.value);
+
+  static AssignPublicIp fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum AssignPublicIp'));
 }
 
 /// An object representing a container instance or task attachment.
 class Attachment {
-  /// Details of the attachment. For elastic network interfaces, this includes the
-  /// network interface ID, the MAC address, the subnet ID, and the private IPv4
-  /// address.
+  /// Details of the attachment.
+  ///
+  /// For elastic network interfaces, this includes the network interface ID, the
+  /// MAC address, the subnet ID, and the private IPv4 address.
+  ///
+  /// For Service Connect services, this includes <code>portName</code>,
+  /// <code>clientAliases</code>, <code>discoveryName</code>, and
+  /// <code>ingressPortOverride</code>.
+  ///
+  /// For Elastic Block Storage, this includes <code>roleArn</code>,
+  /// <code>deleteOnTermination</code>, <code>volumeName</code>,
+  /// <code>volumeId</code>, and <code>statusReason</code> (only when the
+  /// attachment fails to create or attach).
   final List<KeyValuePair>? details;
 
   /// The unique identifier for the attachment.
@@ -5613,7 +5912,8 @@ class Attachment {
   /// <code>FAILED</code>.
   final String? status;
 
-  /// The type of the attachment, such as <code>ElasticNetworkInterface</code>.
+  /// The type of the attachment, such as <code>ElasticNetworkInterface</code>,
+  /// <code>Service Connect</code>, and <code>AmazonElasticBlockStorage</code>.
   final String? type;
 
   Attachment({
@@ -5626,7 +5926,7 @@ class Attachment {
   factory Attachment.fromJson(Map<String, dynamic> json) {
     return Attachment(
       details: (json['details'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => KeyValuePair.fromJson(e as Map<String, dynamic>))
           .toList(),
       id: json['id'] as String?,
@@ -5698,7 +5998,7 @@ class Attribute {
     return Attribute(
       name: json['name'] as String,
       targetId: json['targetId'] as String?,
-      targetType: (json['targetType'] as String?)?.toTargetType(),
+      targetType: (json['targetType'] as String?)?.let(TargetType.fromString),
       value: json['value'] as String?,
     );
   }
@@ -5711,7 +6011,7 @@ class Attribute {
     return {
       'name': name,
       if (targetId != null) 'targetId': targetId,
-      if (targetType != null) 'targetType': targetType.toValue(),
+      if (targetType != null) 'targetType': targetType.value,
       if (value != null) 'value': value,
     };
   }
@@ -5719,8 +6019,14 @@ class Attribute {
 
 /// The details of the Auto Scaling group for the capacity provider.
 class AutoScalingGroupProvider {
-  /// The Amazon Resource Name (ARN) that identifies the Auto Scaling group.
+  /// The Amazon Resource Name (ARN) that identifies the Auto Scaling group, or
+  /// the Auto Scaling group name.
   final String autoScalingGroupArn;
+
+  /// The managed draining option for the Auto Scaling group capacity provider.
+  /// When you enable this, Amazon ECS manages and gracefully drains the EC2
+  /// container instances that are in the Auto Scaling group capacity provider.
+  final ManagedDraining? managedDraining;
 
   /// The managed scaling settings for the Auto Scaling group capacity provider.
   final ManagedScaling? managedScaling;
@@ -5746,6 +6052,7 @@ class AutoScalingGroupProvider {
 
   AutoScalingGroupProvider({
     required this.autoScalingGroupArn,
+    this.managedDraining,
     this.managedScaling,
     this.managedTerminationProtection,
   });
@@ -5753,31 +6060,40 @@ class AutoScalingGroupProvider {
   factory AutoScalingGroupProvider.fromJson(Map<String, dynamic> json) {
     return AutoScalingGroupProvider(
       autoScalingGroupArn: json['autoScalingGroupArn'] as String,
+      managedDraining:
+          (json['managedDraining'] as String?)?.let(ManagedDraining.fromString),
       managedScaling: json['managedScaling'] != null
           ? ManagedScaling.fromJson(
               json['managedScaling'] as Map<String, dynamic>)
           : null,
       managedTerminationProtection:
           (json['managedTerminationProtection'] as String?)
-              ?.toManagedTerminationProtection(),
+              ?.let(ManagedTerminationProtection.fromString),
     );
   }
 
   Map<String, dynamic> toJson() {
     final autoScalingGroupArn = this.autoScalingGroupArn;
+    final managedDraining = this.managedDraining;
     final managedScaling = this.managedScaling;
     final managedTerminationProtection = this.managedTerminationProtection;
     return {
       'autoScalingGroupArn': autoScalingGroupArn,
+      if (managedDraining != null) 'managedDraining': managedDraining.value,
       if (managedScaling != null) 'managedScaling': managedScaling,
       if (managedTerminationProtection != null)
-        'managedTerminationProtection': managedTerminationProtection.toValue(),
+        'managedTerminationProtection': managedTerminationProtection.value,
     };
   }
 }
 
 /// The details of the Auto Scaling group capacity provider to update.
 class AutoScalingGroupProviderUpdate {
+  /// The managed draining option for the Auto Scaling group capacity provider.
+  /// When you enable this, Amazon ECS manages and gracefully drains the EC2
+  /// container instances that are in the Auto Scaling group capacity provider.
+  final ManagedDraining? managedDraining;
+
   /// The managed scaling settings for the Auto Scaling group capacity provider.
   final ManagedScaling? managedScaling;
 
@@ -5801,25 +6117,30 @@ class AutoScalingGroupProviderUpdate {
   final ManagedTerminationProtection? managedTerminationProtection;
 
   AutoScalingGroupProviderUpdate({
+    this.managedDraining,
     this.managedScaling,
     this.managedTerminationProtection,
   });
 
   Map<String, dynamic> toJson() {
+    final managedDraining = this.managedDraining;
     final managedScaling = this.managedScaling;
     final managedTerminationProtection = this.managedTerminationProtection;
     return {
+      if (managedDraining != null) 'managedDraining': managedDraining.value,
       if (managedScaling != null) 'managedScaling': managedScaling,
       if (managedTerminationProtection != null)
-        'managedTerminationProtection': managedTerminationProtection.toValue(),
+        'managedTerminationProtection': managedTerminationProtection.value,
     };
   }
 }
 
-/// An object representing the networking details for a task or service.
+/// An object representing the networking details for a task or service. For
+/// example
+/// <code>awsVpcConfiguration={subnets=["subnet-12344321"],securityGroups=["sg-12344321"]}</code>.
 class AwsVpcConfiguration {
   /// The IDs of the subnets associated with the task or service. There's a limit
-  /// of 16 subnets that can be specified per <code>AwsVpcConfiguration</code>.
+  /// of 16 subnets that can be specified per <code>awsvpcConfiguration</code>.
   /// <note>
   /// All specified subnets must be from the same VPC.
   /// </note>
@@ -5832,7 +6153,7 @@ class AwsVpcConfiguration {
   /// The IDs of the security groups associated with the task or service. If you
   /// don't specify a security group, the default security group for the VPC is
   /// used. There's a limit of 5 security groups that can be specified per
-  /// <code>AwsVpcConfiguration</code>.
+  /// <code>awsvpcConfiguration</code>.
   /// <note>
   /// All specified security groups must be from the same VPC.
   /// </note>
@@ -5846,13 +6167,12 @@ class AwsVpcConfiguration {
 
   factory AwsVpcConfiguration.fromJson(Map<String, dynamic> json) {
     return AwsVpcConfiguration(
-      subnets: (json['subnets'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
-      assignPublicIp: (json['assignPublicIp'] as String?)?.toAssignPublicIp(),
+      subnets:
+          (json['subnets'] as List).nonNulls.map((e) => e as String).toList(),
+      assignPublicIp:
+          (json['assignPublicIp'] as String?)?.let(AssignPublicIp.fromString),
       securityGroups: (json['securityGroups'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -5864,38 +6184,25 @@ class AwsVpcConfiguration {
     final securityGroups = this.securityGroups;
     return {
       'subnets': subnets,
-      if (assignPublicIp != null) 'assignPublicIp': assignPublicIp.toValue(),
+      if (assignPublicIp != null) 'assignPublicIp': assignPublicIp.value,
       if (securityGroups != null) 'securityGroups': securityGroups,
     };
   }
 }
 
 enum CPUArchitecture {
-  x86_64,
-  arm64,
-}
+  x86_64('X86_64'),
+  arm64('ARM64'),
+  ;
 
-extension CPUArchitectureValueExtension on CPUArchitecture {
-  String toValue() {
-    switch (this) {
-      case CPUArchitecture.x86_64:
-        return 'X86_64';
-      case CPUArchitecture.arm64:
-        return 'ARM64';
-    }
-  }
-}
+  final String value;
 
-extension CPUArchitectureFromString on String {
-  CPUArchitecture toCPUArchitecture() {
-    switch (this) {
-      case 'X86_64':
-        return CPUArchitecture.x86_64;
-      case 'ARM64':
-        return CPUArchitecture.arm64;
-    }
-    throw Exception('$this is not known in enum CPUArchitecture');
-  }
+  const CPUArchitecture(this.value);
+
+  static CPUArchitecture fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum CPUArchitecture'));
 }
 
 /// The details for a capacity provider.
@@ -5988,88 +6295,79 @@ class CapacityProvider {
           : null,
       capacityProviderArn: json['capacityProviderArn'] as String?,
       name: json['name'] as String?,
-      status: (json['status'] as String?)?.toCapacityProviderStatus(),
+      status:
+          (json['status'] as String?)?.let(CapacityProviderStatus.fromString),
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
-      updateStatus:
-          (json['updateStatus'] as String?)?.toCapacityProviderUpdateStatus(),
+      updateStatus: (json['updateStatus'] as String?)
+          ?.let(CapacityProviderUpdateStatus.fromString),
       updateStatusReason: json['updateStatusReason'] as String?,
     );
   }
 }
 
 enum CapacityProviderField {
-  tags,
-}
+  tags('TAGS'),
+  ;
 
-extension CapacityProviderFieldValueExtension on CapacityProviderField {
-  String toValue() {
-    switch (this) {
-      case CapacityProviderField.tags:
-        return 'TAGS';
-    }
-  }
-}
+  final String value;
 
-extension CapacityProviderFieldFromString on String {
-  CapacityProviderField toCapacityProviderField() {
-    switch (this) {
-      case 'TAGS':
-        return CapacityProviderField.tags;
-    }
-    throw Exception('$this is not known in enum CapacityProviderField');
-  }
+  const CapacityProviderField(this.value);
+
+  static CapacityProviderField fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum CapacityProviderField'));
 }
 
 enum CapacityProviderStatus {
-  active,
-  inactive,
-}
+  active('ACTIVE'),
+  inactive('INACTIVE'),
+  ;
 
-extension CapacityProviderStatusValueExtension on CapacityProviderStatus {
-  String toValue() {
-    switch (this) {
-      case CapacityProviderStatus.active:
-        return 'ACTIVE';
-      case CapacityProviderStatus.inactive:
-        return 'INACTIVE';
-    }
-  }
-}
+  final String value;
 
-extension CapacityProviderStatusFromString on String {
-  CapacityProviderStatus toCapacityProviderStatus() {
-    switch (this) {
-      case 'ACTIVE':
-        return CapacityProviderStatus.active;
-      case 'INACTIVE':
-        return CapacityProviderStatus.inactive;
-    }
-    throw Exception('$this is not known in enum CapacityProviderStatus');
-  }
+  const CapacityProviderStatus(this.value);
+
+  static CapacityProviderStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum CapacityProviderStatus'));
 }
 
 /// The details of a capacity provider strategy. A capacity provider strategy
-/// can be set when using the <a>RunTask</a> or <a>CreateCluster</a> APIs or as
-/// the default capacity provider strategy for a cluster with the
-/// <a>CreateCluster</a> API.
+/// can be set when using the <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_RunTask.html">RunTask</a>or
+/// <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateCluster.html">CreateCluster</a>
+/// APIs or as the default capacity provider strategy for a cluster with the
+/// <code>CreateCluster</code> API.
 ///
 /// Only capacity providers that are already associated with a cluster and have
 /// an <code>ACTIVE</code> or <code>UPDATING</code> status can be used in a
-/// capacity provider strategy. The <a>PutClusterCapacityProviders</a> API is
-/// used to associate a capacity provider with a cluster.
+/// capacity provider strategy. The <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutClusterCapacityProviders.html">PutClusterCapacityProviders</a>
+/// API is used to associate a capacity provider with a cluster.
 ///
 /// If specifying a capacity provider that uses an Auto Scaling group, the
 /// capacity provider must already be created. New Auto Scaling group capacity
-/// providers can be created with the <a>CreateCapacityProvider</a> API
-/// operation.
+/// providers can be created with the <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateClusterCapacityProvider.html">CreateClusterCapacityProvider</a>
+/// API operation.
 ///
 /// To use a Fargate capacity provider, specify either the <code>FARGATE</code>
 /// or <code>FARGATE_SPOT</code> capacity providers. The Fargate capacity
 /// providers are available to all accounts and only need to be associated with
 /// a cluster to be used in a capacity provider strategy.
+///
+/// With <code>FARGATE_SPOT</code>, you can run interruption tolerant tasks at a
+/// rate that's discounted compared to the <code>FARGATE</code> price.
+/// <code>FARGATE_SPOT</code> runs tasks on spare compute capacity. When Amazon
+/// Web Services needs the capacity back, your tasks are interrupted with a
+/// two-minute warning. <code>FARGATE_SPOT</code> only supports Linux tasks with
+/// the X86_64 architecture on platform version 1.3.0 or later.
 ///
 /// A capacity provider strategy may contain a maximum of 6 capacity providers.
 class CapacityProviderStrategyItem {
@@ -6133,52 +6431,22 @@ class CapacityProviderStrategyItem {
 }
 
 enum CapacityProviderUpdateStatus {
-  deleteInProgress,
-  deleteComplete,
-  deleteFailed,
-  updateInProgress,
-  updateComplete,
-  updateFailed,
-}
+  deleteInProgress('DELETE_IN_PROGRESS'),
+  deleteComplete('DELETE_COMPLETE'),
+  deleteFailed('DELETE_FAILED'),
+  updateInProgress('UPDATE_IN_PROGRESS'),
+  updateComplete('UPDATE_COMPLETE'),
+  updateFailed('UPDATE_FAILED'),
+  ;
 
-extension CapacityProviderUpdateStatusValueExtension
-    on CapacityProviderUpdateStatus {
-  String toValue() {
-    switch (this) {
-      case CapacityProviderUpdateStatus.deleteInProgress:
-        return 'DELETE_IN_PROGRESS';
-      case CapacityProviderUpdateStatus.deleteComplete:
-        return 'DELETE_COMPLETE';
-      case CapacityProviderUpdateStatus.deleteFailed:
-        return 'DELETE_FAILED';
-      case CapacityProviderUpdateStatus.updateInProgress:
-        return 'UPDATE_IN_PROGRESS';
-      case CapacityProviderUpdateStatus.updateComplete:
-        return 'UPDATE_COMPLETE';
-      case CapacityProviderUpdateStatus.updateFailed:
-        return 'UPDATE_FAILED';
-    }
-  }
-}
+  final String value;
 
-extension CapacityProviderUpdateStatusFromString on String {
-  CapacityProviderUpdateStatus toCapacityProviderUpdateStatus() {
-    switch (this) {
-      case 'DELETE_IN_PROGRESS':
-        return CapacityProviderUpdateStatus.deleteInProgress;
-      case 'DELETE_COMPLETE':
-        return CapacityProviderUpdateStatus.deleteComplete;
-      case 'DELETE_FAILED':
-        return CapacityProviderUpdateStatus.deleteFailed;
-      case 'UPDATE_IN_PROGRESS':
-        return CapacityProviderUpdateStatus.updateInProgress;
-      case 'UPDATE_COMPLETE':
-        return CapacityProviderUpdateStatus.updateComplete;
-      case 'UPDATE_FAILED':
-        return CapacityProviderUpdateStatus.updateFailed;
-    }
-    throw Exception('$this is not known in enum CapacityProviderUpdateStatus');
-  }
+  const CapacityProviderUpdateStatus(this.value);
+
+  static CapacityProviderUpdateStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum CapacityProviderUpdateStatus'));
 }
 
 /// A regional grouping of one or more container instances where you can run
@@ -6187,8 +6455,8 @@ extension CapacityProviderUpdateStatusFromString on String {
 /// may contain more than one instance type simultaneously.
 class Cluster {
   /// The number of services that are running on the cluster in an
-  /// <code>ACTIVE</code> state. You can view these services with
-  /// <a>ListServices</a>.
+  /// <code>ACTIVE</code> state. You can view these services with <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ListServices.html">PListServices</a>.
   final int? activeServicesCount;
 
   /// The resources attached to a cluster. When using a capacity provider with a
@@ -6378,12 +6646,12 @@ class Cluster {
     return Cluster(
       activeServicesCount: json['activeServicesCount'] as int?,
       attachments: (json['attachments'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attachment.fromJson(e as Map<String, dynamic>))
           .toList(),
       attachmentsStatus: json['attachmentsStatus'] as String?,
       capacityProviders: (json['capacityProviders'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       clusterArn: json['clusterArn'] as String?,
@@ -6394,7 +6662,7 @@ class Cluster {
           : null,
       defaultCapacityProviderStrategy: (json['defaultCapacityProviderStrategy']
               as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               CapacityProviderStrategyItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -6407,29 +6675,33 @@ class Cluster {
               json['serviceConnectDefaults'] as Map<String, dynamic>)
           : null,
       settings: (json['settings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ClusterSetting.fromJson(e as Map<String, dynamic>))
           .toList(),
       statistics: (json['statistics'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => KeyValuePair.fromJson(e as Map<String, dynamic>))
           .toList(),
       status: json['status'] as String?,
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
   }
 }
 
-/// The execute command configuration for the cluster.
+/// The execute command and managed storage configuration for the cluster.
 class ClusterConfiguration {
   /// The details of the execute command configuration.
   final ExecuteCommandConfiguration? executeCommandConfiguration;
 
+  /// The details of the managed storage configuration.
+  final ManagedStorageConfiguration? managedStorageConfiguration;
+
   ClusterConfiguration({
     this.executeCommandConfiguration,
+    this.managedStorageConfiguration,
   });
 
   factory ClusterConfiguration.fromJson(Map<String, dynamic> json) {
@@ -6438,59 +6710,41 @@ class ClusterConfiguration {
           ? ExecuteCommandConfiguration.fromJson(
               json['executeCommandConfiguration'] as Map<String, dynamic>)
           : null,
+      managedStorageConfiguration: json['managedStorageConfiguration'] != null
+          ? ManagedStorageConfiguration.fromJson(
+              json['managedStorageConfiguration'] as Map<String, dynamic>)
+          : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     final executeCommandConfiguration = this.executeCommandConfiguration;
+    final managedStorageConfiguration = this.managedStorageConfiguration;
     return {
       if (executeCommandConfiguration != null)
         'executeCommandConfiguration': executeCommandConfiguration,
+      if (managedStorageConfiguration != null)
+        'managedStorageConfiguration': managedStorageConfiguration,
     };
   }
 }
 
 enum ClusterField {
-  attachments,
-  configurations,
-  settings,
-  statistics,
-  tags,
-}
+  attachments('ATTACHMENTS'),
+  configurations('CONFIGURATIONS'),
+  settings('SETTINGS'),
+  statistics('STATISTICS'),
+  tags('TAGS'),
+  ;
 
-extension ClusterFieldValueExtension on ClusterField {
-  String toValue() {
-    switch (this) {
-      case ClusterField.attachments:
-        return 'ATTACHMENTS';
-      case ClusterField.configurations:
-        return 'CONFIGURATIONS';
-      case ClusterField.settings:
-        return 'SETTINGS';
-      case ClusterField.statistics:
-        return 'STATISTICS';
-      case ClusterField.tags:
-        return 'TAGS';
-    }
-  }
-}
+  final String value;
 
-extension ClusterFieldFromString on String {
-  ClusterField toClusterField() {
-    switch (this) {
-      case 'ATTACHMENTS':
-        return ClusterField.attachments;
-      case 'CONFIGURATIONS':
-        return ClusterField.configurations;
-      case 'SETTINGS':
-        return ClusterField.settings;
-      case 'STATISTICS':
-        return ClusterField.statistics;
-      case 'TAGS':
-        return ClusterField.tags;
-    }
-    throw Exception('$this is not known in enum ClusterField');
-  }
+  const ClusterField(this.value);
+
+  static ClusterField fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ClusterField'));
 }
 
 /// Use this parameter to set a default Service Connect namespace. After you set
@@ -6561,7 +6815,7 @@ class ClusterServiceConnectDefaultsRequest {
   /// in the Command Line Interface. Other types of instance discovery aren't used
   /// by Service Connect.
   ///
-  /// If you update the service with an empty string <code>""</code> for the
+  /// If you update the cluster with an empty string <code>""</code> for the
   /// namespace name, the cluster configuration for Service Connect is removed.
   /// Note that the namespace will remain in Cloud Map and must be deleted
   /// separately.
@@ -6611,7 +6865,7 @@ class ClusterSetting {
 
   factory ClusterSetting.fromJson(Map<String, dynamic> json) {
     return ClusterSetting(
-      name: (json['name'] as String?)?.toClusterSettingName(),
+      name: (json['name'] as String?)?.let(ClusterSettingName.fromString),
       value: json['value'] as String?,
     );
   }
@@ -6620,94 +6874,55 @@ class ClusterSetting {
     final name = this.name;
     final value = this.value;
     return {
-      if (name != null) 'name': name.toValue(),
+      if (name != null) 'name': name.value,
       if (value != null) 'value': value,
     };
   }
 }
 
 enum ClusterSettingName {
-  containerInsights,
-}
+  containerInsights('containerInsights'),
+  ;
 
-extension ClusterSettingNameValueExtension on ClusterSettingName {
-  String toValue() {
-    switch (this) {
-      case ClusterSettingName.containerInsights:
-        return 'containerInsights';
-    }
-  }
-}
+  final String value;
 
-extension ClusterSettingNameFromString on String {
-  ClusterSettingName toClusterSettingName() {
-    switch (this) {
-      case 'containerInsights':
-        return ClusterSettingName.containerInsights;
-    }
-    throw Exception('$this is not known in enum ClusterSettingName');
-  }
+  const ClusterSettingName(this.value);
+
+  static ClusterSettingName fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ClusterSettingName'));
 }
 
 enum Compatibility {
-  ec2,
-  fargate,
-  external,
-}
+  ec2('EC2'),
+  fargate('FARGATE'),
+  external('EXTERNAL'),
+  ;
 
-extension CompatibilityValueExtension on Compatibility {
-  String toValue() {
-    switch (this) {
-      case Compatibility.ec2:
-        return 'EC2';
-      case Compatibility.fargate:
-        return 'FARGATE';
-      case Compatibility.external:
-        return 'EXTERNAL';
-    }
-  }
-}
+  final String value;
 
-extension CompatibilityFromString on String {
-  Compatibility toCompatibility() {
-    switch (this) {
-      case 'EC2':
-        return Compatibility.ec2;
-      case 'FARGATE':
-        return Compatibility.fargate;
-      case 'EXTERNAL':
-        return Compatibility.external;
-    }
-    throw Exception('$this is not known in enum Compatibility');
-  }
+  const Compatibility(this.value);
+
+  static Compatibility fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum Compatibility'));
 }
 
 enum Connectivity {
-  connected,
-  disconnected,
-}
+  connected('CONNECTED'),
+  disconnected('DISCONNECTED'),
+  ;
 
-extension ConnectivityValueExtension on Connectivity {
-  String toValue() {
-    switch (this) {
-      case Connectivity.connected:
-        return 'CONNECTED';
-      case Connectivity.disconnected:
-        return 'DISCONNECTED';
-    }
-  }
-}
+  final String value;
 
-extension ConnectivityFromString on String {
-  Connectivity toConnectivity() {
-    switch (this) {
-      case 'CONNECTED':
-        return Connectivity.connected;
-      case 'DISCONNECTED':
-        return Connectivity.disconnected;
-    }
-    throw Exception('$this is not known in enum Connectivity');
-  }
+  const Connectivity(this.value);
+
+  static Connectivity fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum Connectivity'));
 }
 
 /// A Docker container that's part of a task.
@@ -6793,27 +7008,26 @@ class Container {
       containerArn: json['containerArn'] as String?,
       cpu: json['cpu'] as String?,
       exitCode: json['exitCode'] as int?,
-      gpuIds: (json['gpuIds'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
-      healthStatus: (json['healthStatus'] as String?)?.toHealthStatus(),
+      gpuIds:
+          (json['gpuIds'] as List?)?.nonNulls.map((e) => e as String).toList(),
+      healthStatus:
+          (json['healthStatus'] as String?)?.let(HealthStatus.fromString),
       image: json['image'] as String?,
       imageDigest: json['imageDigest'] as String?,
       lastStatus: json['lastStatus'] as String?,
       managedAgents: (json['managedAgents'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ManagedAgent.fromJson(e as Map<String, dynamic>))
           .toList(),
       memory: json['memory'] as String?,
       memoryReservation: json['memoryReservation'] as String?,
       name: json['name'] as String?,
       networkBindings: (json['networkBindings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => NetworkBinding.fromJson(e as Map<String, dynamic>))
           .toList(),
       networkInterfaces: (json['networkInterfaces'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => NetworkInterface.fromJson(e as Map<String, dynamic>))
           .toList(),
       reason: json['reason'] as String?,
@@ -6824,67 +7038,34 @@ class Container {
 }
 
 enum ContainerCondition {
-  start,
-  complete,
-  success,
-  healthy,
-}
+  start('START'),
+  complete('COMPLETE'),
+  success('SUCCESS'),
+  healthy('HEALTHY'),
+  ;
 
-extension ContainerConditionValueExtension on ContainerCondition {
-  String toValue() {
-    switch (this) {
-      case ContainerCondition.start:
-        return 'START';
-      case ContainerCondition.complete:
-        return 'COMPLETE';
-      case ContainerCondition.success:
-        return 'SUCCESS';
-      case ContainerCondition.healthy:
-        return 'HEALTHY';
-    }
-  }
-}
+  final String value;
 
-extension ContainerConditionFromString on String {
-  ContainerCondition toContainerCondition() {
-    switch (this) {
-      case 'START':
-        return ContainerCondition.start;
-      case 'COMPLETE':
-        return ContainerCondition.complete;
-      case 'SUCCESS':
-        return ContainerCondition.success;
-      case 'HEALTHY':
-        return ContainerCondition.healthy;
-    }
-    throw Exception('$this is not known in enum ContainerCondition');
-  }
+  const ContainerCondition(this.value);
+
+  static ContainerCondition fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ContainerCondition'));
 }
 
 /// Container definitions are used in task definitions to describe the different
 /// containers that are launched as part of a task.
 class ContainerDefinition {
   /// The command that's passed to the container. This parameter maps to
-  /// <code>Cmd</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>COMMAND</code> parameter to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>. For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/builder/#cmd">https://docs.docker.com/engine/reference/builder/#cmd</a>.
-  /// If there are multiple arguments, each argument is a separated string in the
-  /// array.
+  /// <code>Cmd</code> in the docker conainer create command and the
+  /// <code>COMMAND</code> parameter to docker run. If there are multiple
+  /// arguments, each argument is a separated string in the array.
   final List<String>? command;
 
   /// The number of <code>cpu</code> units reserved for the container. This
-  /// parameter maps to <code>CpuShares</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--cpu-shares</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// parameter maps to <code>CpuShares</code> in the docker conainer create
+  /// commandand the <code>--cpu-shares</code> option to docker run.
   ///
   /// This field is optional for tasks using the Fargate launch type, and the only
   /// requirement is that the total amount of CPU reserved for all containers
@@ -6908,13 +7089,12 @@ class ContainerDefinition {
   ///
   /// On Linux container instances, the Docker daemon on the container instance
   /// uses the CPU value to calculate the relative CPU share ratios for running
-  /// containers. For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#cpu-share-constraint">CPU
-  /// share constraint</a> in the Docker documentation. The minimum valid CPU
-  /// share value that the Linux kernel allows is 2. However, the CPU parameter
-  /// isn't required, and you can use CPU values below 2 in your container
-  /// definitions. For CPU values below 2 (including null), the behavior varies
-  /// based on your Amazon ECS container agent version:
+  /// containers. The minimum valid CPU share value that the Linux kernel allows
+  /// is 2, and the maximum valid CPU share value that the Linux kernel allows is
+  /// 262144. However, the CPU parameter isn't required, and you can use CPU
+  /// values below 2 or above 262144 in your container definitions. For CPU values
+  /// below 2 (including null) or above 262144, the behavior varies based on your
+  /// Amazon ECS container agent version:
   ///
   /// <ul>
   /// <li>
@@ -6927,6 +7107,11 @@ class ContainerDefinition {
   /// <b>Agent versions greater than or equal to 1.2.0:</b> Null, zero, and CPU
   /// values of 1 are passed to Docker as 2.
   /// </li>
+  /// <li>
+  /// <b>Agent versions greater than or equal to 1.84.0:</b> CPU values greater
+  /// than 256 vCPU are passed to Docker as 256, which is equivalent to 262144 CPU
+  /// shares.
+  /// </li>
   /// </ul>
   /// On Windows container instances, the CPU limit is enforced as an absolute
   /// limit, or a quota. Windows containers only have access to the specified
@@ -6934,6 +7119,44 @@ class ContainerDefinition {
   /// value is passed to Docker as <code>0</code>, which Windows interprets as 1%
   /// of one CPU.
   final int? cpu;
+
+  /// A list of ARNs in SSM or Amazon S3 to a credential spec
+  /// (<code>CredSpec</code>) file that configures the container for Active
+  /// Directory authentication. We recommend that you use this parameter instead
+  /// of the <code>dockerSecurityOptions</code>. The maximum number of ARNs is 1.
+  ///
+  /// There are two formats for each ARN.
+  /// <dl> <dt>credentialspecdomainless:MyARN</dt> <dd>
+  /// You use <code>credentialspecdomainless:MyARN</code> to provide a
+  /// <code>CredSpec</code> with an additional section for a secret in Secrets
+  /// Manager. You provide the login credentials to the domain in the secret.
+  ///
+  /// Each task that runs on any container instance can join different domains.
+  ///
+  /// You can use this format without joining the container instance to a domain.
+  /// </dd> <dt>credentialspec:MyARN</dt> <dd>
+  /// You use <code>credentialspec:MyARN</code> to provide a <code>CredSpec</code>
+  /// for a single domain.
+  ///
+  /// You must join the container instance to the domain before you start any
+  /// tasks that use this task definition.
+  /// </dd> </dl>
+  /// In both formats, replace <code>MyARN</code> with the ARN in SSM or Amazon
+  /// S3.
+  ///
+  /// If you provide a <code>credentialspecdomainless:MyARN</code>, the
+  /// <code>credspec</code> must provide a ARN in Secrets Manager for a secret
+  /// containing the username, password, and the domain to connect to. For better
+  /// security, the instance isn't joined to the domain for domainless
+  /// authentication. Other applications on the instance can't use the domainless
+  /// credentials. You can use this parameter to run tasks on the same instance,
+  /// even it the tasks need to join different domains. For more information, see
+  /// <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/windows-gmsa.html">Using
+  /// gMSAs for Windows Containers</a> and <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/linux-gmsa.html">Using
+  /// gMSAs for Linux Containers</a>.
+  final List<String>? credentialSpecs;
 
   /// The dependencies defined for container startup and shutdown. A container can
   /// contain multiple dependencies on other containers in a task definition. When
@@ -6971,60 +7194,41 @@ class ContainerDefinition {
   final List<ContainerDependency>? dependsOn;
 
   /// When this parameter is true, networking is off within the container. This
-  /// parameter maps to <code>NetworkDisabled</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a>.
+  /// parameter maps to <code>NetworkDisabled</code> in the docker conainer create
+  /// command.
   /// <note>
   /// This parameter is not supported for Windows containers.
   /// </note>
   final bool? disableNetworking;
 
   /// A list of DNS search domains that are presented to the container. This
-  /// parameter maps to <code>DnsSearch</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--dns-search</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// parameter maps to <code>DnsSearch</code> in the docker conainer create
+  /// command and the <code>--dns-search</code> option to docker run.
   /// <note>
   /// This parameter is not supported for Windows containers.
   /// </note>
   final List<String>? dnsSearchDomains;
 
   /// A list of DNS servers that are presented to the container. This parameter
-  /// maps to <code>Dns</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--dns</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// maps to <code>Dns</code> in the the docker conainer create command and the
+  /// <code>--dns</code> option to docker run.
   /// <note>
   /// This parameter is not supported for Windows containers.
   /// </note>
   final List<String>? dnsServers;
 
   /// A key/value map of labels to add to the container. This parameter maps to
-  /// <code>Labels</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--label</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>. This parameter requires version 1.18 of the Docker Remote API or
-  /// greater on your container instance. To check the Docker Remote API version
-  /// on your container instance, log in to your container instance and run the
-  /// following command: <code>sudo docker version --format
-  /// '{{.Server.APIVersion}}'</code>
+  /// <code>Labels</code> in the docker conainer create command and the
+  /// <code>--label</code> option to docker run. This parameter requires version
+  /// 1.18 of the Docker Remote API or greater on your container instance. To
+  /// check the Docker Remote API version on your container instance, log in to
+  /// your container instance and run the following command: <code>sudo docker
+  /// version --format '{{.Server.APIVersion}}'</code>
   final Map<String, String>? dockerLabels;
 
   /// A list of strings to provide custom configuration for multiple security
-  /// systems. For more information about valid values, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">Docker
-  /// Run Security Configuration</a>. This field isn't valid for containers in
-  /// tasks using the Fargate launch type.
+  /// systems. This field isn't valid for containers in tasks using the Fargate
+  /// launch type.
   ///
   /// For Linux tasks on EC2, this parameter can be used to reference custom
   /// labels for SELinux and AppArmor multi-level security systems.
@@ -7038,13 +7242,8 @@ class ContainerDefinition {
   /// gMSAs for Linux Containers</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
   ///
-  /// This parameter maps to <code>SecurityOpt</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--security-opt</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// This parameter maps to <code>SecurityOpt</code> in the docker conainer
+  /// create command and the <code>--security-opt</code> option to docker run.
   /// <note>
   /// The Amazon ECS container agent running on a container instance must register
   /// with the <code>ECS_SELINUX_CAPABLE=true</code> or
@@ -7055,10 +7254,6 @@ class ContainerDefinition {
   /// ECS Container Agent Configuration</a> in the <i>Amazon Elastic Container
   /// Service Developer Guide</i>.
   /// </note>
-  /// For more information about valid values, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">Docker
-  /// Run Security Configuration</a>.
-  ///
   /// Valid values: "no-new-privileges" | "apparmor:PROFILE" | "label:value" |
   /// "credentialspec:CredentialSpecFilePath"
   final List<String>? dockerSecurityOptions;
@@ -7070,24 +7265,13 @@ class ContainerDefinition {
   /// and arguments as <code>command</code> array items instead.
   /// </important>
   /// The entry point that's passed to the container. This parameter maps to
-  /// <code>Entrypoint</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--entrypoint</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>. For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/builder/#entrypoint">https://docs.docker.com/engine/reference/builder/#entrypoint</a>.
+  /// <code>Entrypoint</code> in tthe docker conainer create command and the
+  /// <code>--entrypoint</code> option to docker run.
   final List<String>? entryPoint;
 
   /// The environment variables to pass to a container. This parameter maps to
-  /// <code>Env</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--env</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>Env</code> in the docker conainer create command and the
+  /// <code>--env</code> option to docker run.
   /// <important>
   /// We don't recommend that you use plaintext environment variables for
   /// sensitive information, such as credential data.
@@ -7095,17 +7279,12 @@ class ContainerDefinition {
   final List<KeyValuePair>? environment;
 
   /// A list of files containing the environment variables to pass to a container.
-  /// This parameter maps to the <code>--env-file</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// This parameter maps to the <code>--env-file</code> option to docker run.
   ///
   /// You can specify up to ten environment files. The file must have a
   /// <code>.env</code> file extension. Each line in an environment file contains
   /// an environment variable in <code>VARIABLE=VALUE</code> format. Lines
-  /// beginning with <code>#</code> are treated as comments and are ignored. For
-  /// more information about the environment variable file syntax, see <a
-  /// href="https://docs.docker.com/compose/env-file/">Declare default environment
-  /// variables in file</a>.
+  /// beginning with <code>#</code> are treated as comments and are ignored.
   ///
   /// If there are environment variables specified using the
   /// <code>environment</code> parameter in a container definition, they take
@@ -7137,13 +7316,8 @@ class ContainerDefinition {
 
   /// A list of hostnames and IP address mappings to append to the
   /// <code>/etc/hosts</code> file on the container. This parameter maps to
-  /// <code>ExtraHosts</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--add-host</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>ExtraHosts</code> in the docker conainer create command and the
+  /// <code>--add-host</code> option to docker run.
   /// <note>
   /// This parameter isn't supported for Windows containers or tasks that use the
   /// <code>awsvpc</code> network mode.
@@ -7158,23 +7332,14 @@ class ContainerDefinition {
   final FirelensConfiguration? firelensConfiguration;
 
   /// The container health check command and associated configuration parameters
-  /// for the container. This parameter maps to <code>HealthCheck</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>HEALTHCHECK</code> parameter of <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// for the container. This parameter maps to <code>HealthCheck</code> in the
+  /// docker conainer create command and the <code>HEALTHCHECK</code> parameter of
+  /// docker run.
   final HealthCheck? healthCheck;
 
   /// The hostname to use for your container. This parameter maps to
-  /// <code>Hostname</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--hostname</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>Hostname</code> in thethe docker conainer create command and the
+  /// <code>--hostname</code> option to docker run.
   /// <note>
   /// The <code>hostname</code> parameter is not supported if you're using the
   /// <code>awsvpc</code> network mode.
@@ -7188,13 +7353,8 @@ class ContainerDefinition {
   /// <i>repository-url</i>/<i>image</i>@<i>digest</i> </code>. Up to 255 letters
   /// (uppercase and lowercase), numbers, hyphens, underscores, colons, periods,
   /// forward slashes, and number signs are allowed. This parameter maps to
-  /// <code>Image</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>IMAGE</code> parameter of <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>Image</code> in the docker conainer create command and the
+  /// <code>IMAGE</code> parameter of docker run.
   ///
   /// <ul>
   /// <li>
@@ -7228,13 +7388,9 @@ class ContainerDefinition {
 
   /// When this parameter is <code>true</code>, you can deploy containerized
   /// applications that require <code>stdin</code> or a <code>tty</code> to be
-  /// allocated. This parameter maps to <code>OpenStdin</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--interactive</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// allocated. This parameter maps to <code>OpenStdin</code> in the docker
+  /// conainer create command and the <code>--interactive</code> option to docker
+  /// run.
   final bool? interactive;
 
   /// The <code>links</code> parameter allows containers to communicate with each
@@ -7242,17 +7398,9 @@ class ContainerDefinition {
   /// if the network mode of a task definition is <code>bridge</code>. The
   /// <code>name:internalName</code> construct is analogous to
   /// <code>name:alias</code> in Docker links. Up to 255 letters (uppercase and
-  /// lowercase), numbers, underscores, and hyphens are allowed. For more
-  /// information about linking Docker containers, go to <a
-  /// href="https://docs.docker.com/network/links/">Legacy container links</a> in
-  /// the Docker documentation. This parameter maps to <code>Links</code> in the
-  /// <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--link</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// lowercase), numbers, underscores, and hyphens are allowed.. This parameter
+  /// maps to <code>Links</code> in the docker conainer create command and the
+  /// <code>--link</code> option to docker run.
   /// <note>
   /// This parameter is not supported for Windows containers.
   /// </note> <important>
@@ -7264,8 +7412,8 @@ class ContainerDefinition {
   final List<String>? links;
 
   /// Linux-specific modifications that are applied to the container, such as
-  /// Linux kernel capabilities. For more information see
-  /// <a>KernelCapabilities</a>.
+  /// Linux kernel capabilities. For more information see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_KernelCapabilities.html">KernelCapabilities</a>.
   /// <note>
   /// This parameter is not supported for Windows containers.
   /// </note>
@@ -7273,26 +7421,20 @@ class ContainerDefinition {
 
   /// The log configuration specification for the container.
   ///
-  /// This parameter maps to <code>LogConfig</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--log-driver</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>. By default, containers use the same logging driver that the Docker
-  /// daemon uses. However the container can use a different logging driver than
-  /// the Docker daemon by specifying a log driver with this parameter in the
-  /// container definition. To use a different logging driver for a container, the
-  /// log system must be configured properly on the container instance (or on a
-  /// different log server for remote logging options). For more information about
-  /// the options for different supported log drivers, see <a
-  /// href="https://docs.docker.com/engine/admin/logging/overview/">Configure
-  /// logging drivers</a> in the Docker documentation.
+  /// This parameter maps to <code>LogConfig</code> in the docker conainer create
+  /// command and the <code>--log-driver</code> option to docker run. By default,
+  /// containers use the same logging driver that the Docker daemon uses. However
+  /// the container can use a different logging driver than the Docker daemon by
+  /// specifying a log driver with this parameter in the container definition. To
+  /// use a different logging driver for a container, the log system must be
+  /// configured properly on the container instance (or on a different log server
+  /// for remote logging options).
   /// <note>
   /// Amazon ECS currently supports a subset of the logging drivers available to
-  /// the Docker daemon (shown in the <a>LogConfiguration</a> data type).
-  /// Additional log drivers may be available in future releases of the Amazon ECS
-  /// container agent.
+  /// the Docker daemon (shown in the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_LogConfiguration.html">LogConfiguration</a>
+  /// data type). Additional log drivers may be available in future releases of
+  /// the Amazon ECS container agent.
   /// </note>
   /// This parameter requires version 1.18 of the Docker Remote API or greater on
   /// your container instance. To check the Docker Remote API version on your
@@ -7314,13 +7456,8 @@ class ContainerDefinition {
   /// attempts to exceed the memory specified here, the container is killed. The
   /// total amount of memory reserved for all containers within a task must be
   /// lower than the task <code>memory</code> value, if one is specified. This
-  /// parameter maps to <code>Memory</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--memory</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// parameter maps to <code>Memory</code> in thethe docker conainer create
+  /// command and the <code>--memory</code> option to docker run.
   ///
   /// If using the Fargate launch type, this parameter is optional.
   ///
@@ -7348,13 +7485,8 @@ class ContainerDefinition {
   /// when it needs to, up to either the hard limit specified with the
   /// <code>memory</code> parameter (if applicable), or all of the available
   /// memory on the container instance, whichever comes first. This parameter maps
-  /// to <code>MemoryReservation</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--memory-reservation</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// to <code>MemoryReservation</code> in the the docker conainer create command
+  /// and the <code>--memory-reservation</code> option to docker run.
   ///
   /// If a task-level memory value is not specified, you must specify a non-zero
   /// integer for one or both of <code>memory</code> or
@@ -7384,13 +7516,8 @@ class ContainerDefinition {
 
   /// The mount points for data volumes in your container.
   ///
-  /// This parameter maps to <code>Volumes</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--volume</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// This parameter maps to <code>Volumes</code> in the the docker conainer
+  /// create command and the <code>--volume</code> option to docker run.
   ///
   /// Windows containers can mount whole directories on the same drive as
   /// <code>$env:ProgramData</code>. Windows containers can't mount directories on
@@ -7401,13 +7528,8 @@ class ContainerDefinition {
   /// task definition, the <code>name</code> of one container can be entered in
   /// the <code>links</code> of another container to connect the containers. Up to
   /// 255 letters (uppercase and lowercase), numbers, underscores, and hyphens are
-  /// allowed. This parameter maps to <code>name</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--name</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// allowed. This parameter maps to <code>name</code> in tthe docker conainer
+  /// create command and the <code>--name</code> option to docker run.
   final String? name;
 
   /// The list of port mappings for the container. Port mappings allow containers
@@ -7421,35 +7543,27 @@ class ContainerDefinition {
   /// than <code>localhost</code>. There's no loopback for port mappings on
   /// Windows, so you can't access a container's mapped port from the host itself.
   ///
-  /// This parameter maps to <code>PortBindings</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--publish</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>. If the network mode of a task definition is set to
-  /// <code>none</code>, then you can't specify port mappings. If the network mode
-  /// of a task definition is set to <code>host</code>, then host ports must
-  /// either be undefined or they must match the container port in the port
-  /// mapping.
+  /// This parameter maps to <code>PortBindings</code> in the the docker conainer
+  /// create command and the <code>--publish</code> option to docker run. If the
+  /// network mode of a task definition is set to <code>none</code>, then you
+  /// can't specify port mappings. If the network mode of a task definition is set
+  /// to <code>host</code>, then host ports must either be undefined or they must
+  /// match the container port in the port mapping.
   /// <note>
   /// After a task reaches the <code>RUNNING</code> status, manual and automatic
   /// host and container port assignments are visible in the <b>Network
   /// Bindings</b> section of a container description for a selected task in the
   /// Amazon ECS console. The assignments are also visible in the
-  /// <code>networkBindings</code> section <a>DescribeTasks</a> responses.
+  /// <code>networkBindings</code> section <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTasks.html">DescribeTasks</a>
+  /// responses.
   /// </note>
   final List<PortMapping>? portMappings;
 
   /// When this parameter is true, the container is given elevated privileges on
   /// the host container instance (similar to the <code>root</code> user). This
-  /// parameter maps to <code>Privileged</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--privileged</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// parameter maps to <code>Privileged</code> in the the docker conainer create
+  /// command and the <code>--privileged</code> option to docker run
   /// <note>
   /// This parameter is not supported for Windows containers or tasks run on
   /// Fargate.
@@ -7457,24 +7571,14 @@ class ContainerDefinition {
   final bool? privileged;
 
   /// When this parameter is <code>true</code>, a TTY is allocated. This parameter
-  /// maps to <code>Tty</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--tty</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// maps to <code>Tty</code> in tthe docker conainer create command and the
+  /// <code>--tty</code> option to docker run.
   final bool? pseudoTerminal;
 
   /// When this parameter is true, the container is given read-only access to its
   /// root file system. This parameter maps to <code>ReadonlyRootfs</code> in the
-  /// <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--read-only</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// docker conainer create command and the <code>--read-only</code> option to
+  /// docker run.
   /// <note>
   /// This parameter is not supported for Windows containers.
   /// </note>
@@ -7486,6 +7590,14 @@ class ContainerDefinition {
   /// The type and amount of a resource to assign to a container. The only
   /// supported resource is a GPU.
   final List<ResourceRequirement>? resourceRequirements;
+
+  /// The restart policy for a container. When you set up a restart policy, Amazon
+  /// ECS can restart the container without needing to replace the task. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-restart-policy.html">Restart
+  /// individual containers in Amazon ECS tasks with container restart
+  /// policies</a> in the <i>Amazon Elastic Container Service Developer Guide</i>.
+  final ContainerRestartPolicy? restartPolicy;
 
   /// The secrets to pass to the container. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/specifying-sensitive-data.html">Specifying
@@ -7533,6 +7645,8 @@ class ContainerDefinition {
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html">Amazon
   /// ECS-optimized Linux AMI</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
+  ///
+  /// The valid values for Fargate are 2-120 seconds.
   final int? startTimeout;
 
   /// Time duration (in seconds) to wait before the container is forcefully killed
@@ -7574,45 +7688,32 @@ class ContainerDefinition {
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-optimized_AMI.html">Amazon
   /// ECS-optimized Linux AMI</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
+  ///
+  /// The valid values are 2-120 seconds.
   final int? stopTimeout;
 
   /// A list of namespaced kernel parameters to set in the container. This
-  /// parameter maps to <code>Sysctls</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--sysctl</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
-  /// <note>
-  /// We don't recommended that you specify network-related
-  /// <code>systemControls</code> parameters for multiple containers in a single
-  /// task that also uses either the <code>awsvpc</code> or <code>host</code>
-  /// network modes. For tasks that use the <code>awsvpc</code> network mode, the
-  /// container that's started last determines which <code>systemControls</code>
-  /// parameters take effect. For tasks that use the <code>host</code> network
-  /// mode, it changes the container instance's namespaced kernel parameters as
-  /// well as the containers.
-  /// </note>
+  /// parameter maps to <code>Sysctls</code> in tthe docker conainer create
+  /// command and the <code>--sysctl</code> option to docker run. For example, you
+  /// can configure <code>net.ipv4.tcp_keepalive_time</code> setting to maintain
+  /// longer lived connections.
   final List<SystemControl>? systemControls;
 
   /// A list of <code>ulimits</code> to set in the container. If a
   /// <code>ulimit</code> value is specified in a task definition, it overrides
   /// the default values set by Docker. This parameter maps to
-  /// <code>Ulimits</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--ulimit</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>. Valid naming values are displayed in the <a>Ulimit</a> data type.
+  /// <code>Ulimits</code> in tthe docker conainer create command and the
+  /// <code>--ulimit</code> option to docker run. Valid naming values are
+  /// displayed in the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_Ulimit.html">Ulimit</a>
+  /// data type.
   ///
   /// Amazon ECS tasks hosted on Fargate use the default resource limit values set
   /// by the operating system with the exception of the <code>nofile</code>
   /// resource limit parameter which Fargate overrides. The <code>nofile</code>
   /// resource limit sets a restriction on the number of open files that a
-  /// container can use. The default <code>nofile</code> soft limit is
-  /// <code>1024</code> and the default hard limit is <code>4096</code>.
+  /// container can use. The default <code>nofile</code> soft limit is <code>
+  /// 65535</code> and the default hard limit is <code>65535</code>.
   ///
   /// This parameter requires version 1.18 of the Docker Remote API or greater on
   /// your container instance. To check the Docker Remote API version on your
@@ -7624,13 +7725,8 @@ class ContainerDefinition {
   final List<Ulimit>? ulimits;
 
   /// The user to use inside the container. This parameter maps to
-  /// <code>User</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--user</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>User</code> in the docker conainer create command and the
+  /// <code>--user</code> option to docker run.
   /// <important>
   /// When running tasks using the <code>host</code> network mode, don't run
   /// containers using the root user (UID 0). We recommend using a non-root user
@@ -7664,28 +7760,19 @@ class ContainerDefinition {
   final String? user;
 
   /// Data volumes to mount from another container. This parameter maps to
-  /// <code>VolumesFrom</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--volumes-from</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>VolumesFrom</code> in tthe docker conainer create command and the
+  /// <code>--volumes-from</code> option to docker run.
   final List<VolumeFrom>? volumesFrom;
 
   /// The working directory to run commands inside the container in. This
-  /// parameter maps to <code>WorkingDir</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--workdir</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// parameter maps to <code>WorkingDir</code> in the docker conainer create
+  /// command and the <code>--workdir</code> option to docker run.
   final String? workingDirectory;
 
   ContainerDefinition({
     this.command,
     this.cpu,
+    this.credentialSpecs,
     this.dependsOn,
     this.disableNetworking,
     this.dnsSearchDomains,
@@ -7715,6 +7802,7 @@ class ContainerDefinition {
     this.readonlyRootFilesystem,
     this.repositoryCredentials,
     this.resourceRequirements,
+    this.restartPolicy,
     this.secrets,
     this.startTimeout,
     this.stopTimeout,
@@ -7727,45 +7815,47 @@ class ContainerDefinition {
 
   factory ContainerDefinition.fromJson(Map<String, dynamic> json) {
     return ContainerDefinition(
-      command: (json['command'] as List?)
-          ?.whereNotNull()
+      command:
+          (json['command'] as List?)?.nonNulls.map((e) => e as String).toList(),
+      cpu: json['cpu'] as int?,
+      credentialSpecs: (json['credentialSpecs'] as List?)
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
-      cpu: json['cpu'] as int?,
       dependsOn: (json['dependsOn'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ContainerDependency.fromJson(e as Map<String, dynamic>))
           .toList(),
       disableNetworking: json['disableNetworking'] as bool?,
       dnsSearchDomains: (json['dnsSearchDomains'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       dnsServers: (json['dnsServers'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       dockerLabels: (json['dockerLabels'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       dockerSecurityOptions: (json['dockerSecurityOptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       entryPoint: (json['entryPoint'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       environment: (json['environment'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => KeyValuePair.fromJson(e as Map<String, dynamic>))
           .toList(),
       environmentFiles: (json['environmentFiles'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => EnvironmentFile.fromJson(e as Map<String, dynamic>))
           .toList(),
       essential: json['essential'] as bool?,
       extraHosts: (json['extraHosts'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => HostEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
       firelensConfiguration: json['firelensConfiguration'] != null
@@ -7778,10 +7868,8 @@ class ContainerDefinition {
       hostname: json['hostname'] as String?,
       image: json['image'] as String?,
       interactive: json['interactive'] as bool?,
-      links: (json['links'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      links:
+          (json['links'] as List?)?.nonNulls.map((e) => e as String).toList(),
       linuxParameters: json['linuxParameters'] != null
           ? LinuxParameters.fromJson(
               json['linuxParameters'] as Map<String, dynamic>)
@@ -7793,12 +7881,12 @@ class ContainerDefinition {
       memory: json['memory'] as int?,
       memoryReservation: json['memoryReservation'] as int?,
       mountPoints: (json['mountPoints'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => MountPoint.fromJson(e as Map<String, dynamic>))
           .toList(),
       name: json['name'] as String?,
       portMappings: (json['portMappings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => PortMapping.fromJson(e as Map<String, dynamic>))
           .toList(),
       privileged: json['privileged'] as bool?,
@@ -7809,26 +7897,30 @@ class ContainerDefinition {
               json['repositoryCredentials'] as Map<String, dynamic>)
           : null,
       resourceRequirements: (json['resourceRequirements'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ResourceRequirement.fromJson(e as Map<String, dynamic>))
           .toList(),
+      restartPolicy: json['restartPolicy'] != null
+          ? ContainerRestartPolicy.fromJson(
+              json['restartPolicy'] as Map<String, dynamic>)
+          : null,
       secrets: (json['secrets'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Secret.fromJson(e as Map<String, dynamic>))
           .toList(),
       startTimeout: json['startTimeout'] as int?,
       stopTimeout: json['stopTimeout'] as int?,
       systemControls: (json['systemControls'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => SystemControl.fromJson(e as Map<String, dynamic>))
           .toList(),
       ulimits: (json['ulimits'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Ulimit.fromJson(e as Map<String, dynamic>))
           .toList(),
       user: json['user'] as String?,
       volumesFrom: (json['volumesFrom'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => VolumeFrom.fromJson(e as Map<String, dynamic>))
           .toList(),
       workingDirectory: json['workingDirectory'] as String?,
@@ -7838,6 +7930,7 @@ class ContainerDefinition {
   Map<String, dynamic> toJson() {
     final command = this.command;
     final cpu = this.cpu;
+    final credentialSpecs = this.credentialSpecs;
     final dependsOn = this.dependsOn;
     final disableNetworking = this.disableNetworking;
     final dnsSearchDomains = this.dnsSearchDomains;
@@ -7867,6 +7960,7 @@ class ContainerDefinition {
     final readonlyRootFilesystem = this.readonlyRootFilesystem;
     final repositoryCredentials = this.repositoryCredentials;
     final resourceRequirements = this.resourceRequirements;
+    final restartPolicy = this.restartPolicy;
     final secrets = this.secrets;
     final startTimeout = this.startTimeout;
     final stopTimeout = this.stopTimeout;
@@ -7878,6 +7972,7 @@ class ContainerDefinition {
     return {
       if (command != null) 'command': command,
       if (cpu != null) 'cpu': cpu,
+      if (credentialSpecs != null) 'credentialSpecs': credentialSpecs,
       if (dependsOn != null) 'dependsOn': dependsOn,
       if (disableNetworking != null) 'disableNetworking': disableNetworking,
       if (dnsSearchDomains != null) 'dnsSearchDomains': dnsSearchDomains,
@@ -7912,6 +8007,7 @@ class ContainerDefinition {
         'repositoryCredentials': repositoryCredentials,
       if (resourceRequirements != null)
         'resourceRequirements': resourceRequirements,
+      if (restartPolicy != null) 'restartPolicy': restartPolicy,
       if (secrets != null) 'secrets': secrets,
       if (startTimeout != null) 'startTimeout': startTimeout,
       if (stopTimeout != null) 'stopTimeout': stopTimeout,
@@ -7955,6 +8051,10 @@ class ContainerDefinition {
 /// Windows platform version <code>1.0.0</code> or later.
 /// </li>
 /// </ul> </note>
+/// For more information about how to create a container dependency, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/example_task_definitions.html#example_task_definition-containerdependency">Container
+/// dependency</a> in the <i>Amazon Elastic Container Service Developer
+/// Guide</i>.
 class ContainerDependency {
   /// The dependency condition of the container. The following are the available
   /// conditions and their behavior:
@@ -7995,7 +8095,7 @@ class ContainerDependency {
 
   factory ContainerDependency.fromJson(Map<String, dynamic> json) {
     return ContainerDependency(
-      condition: (json['condition'] as String).toContainerCondition(),
+      condition: ContainerCondition.fromString((json['condition'] as String)),
       containerName: json['containerName'] as String,
     );
   }
@@ -8004,7 +8104,7 @@ class ContainerDependency {
     final condition = this.condition;
     final containerName = this.containerName;
     return {
-      'condition': condition.toValue(),
+      'condition': condition.value,
       'containerName': containerName,
     };
   }
@@ -8028,8 +8128,9 @@ class ContainerInstance {
   final List<Attachment>? attachments;
 
   /// The attributes set for the container instance, either by the Amazon ECS
-  /// container agent at instance registration or manually with the
-  /// <a>PutAttributes</a> operation.
+  /// container agent at instance registration or manually with the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAttributes.html">PutAttributes</a>
+  /// operation.
   final List<Attribute>? attributes;
 
   /// The capacity provider that's associated with the container instance.
@@ -8074,8 +8175,8 @@ class ContainerInstance {
   /// mode). Any port that's not specified here is available for new tasks.
   final List<Resource>? remainingResources;
 
-  /// The number of tasks on the container instance that are in the
-  /// <code>RUNNING</code> status.
+  /// The number of tasks on the container instance that have a desired status
+  /// (<code>desiredStatus</code>) of <code>RUNNING</code>.
   final int? runningTasksCount;
 
   /// The status of the container instance. The valid values are
@@ -8183,14 +8284,14 @@ class ContainerInstance {
   factory ContainerInstance.fromJson(Map<String, dynamic> json) {
     return ContainerInstance(
       agentConnected: json['agentConnected'] as bool?,
-      agentUpdateStatus:
-          (json['agentUpdateStatus'] as String?)?.toAgentUpdateStatus(),
+      agentUpdateStatus: (json['agentUpdateStatus'] as String?)
+          ?.let(AgentUpdateStatus.fromString),
       attachments: (json['attachments'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attachment.fromJson(e as Map<String, dynamic>))
           .toList(),
       attributes: (json['attributes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attribute.fromJson(e as Map<String, dynamic>))
           .toList(),
       capacityProviderName: json['capacityProviderName'] as String?,
@@ -8203,18 +8304,18 @@ class ContainerInstance {
       pendingTasksCount: json['pendingTasksCount'] as int?,
       registeredAt: timeStampFromJson(json['registeredAt']),
       registeredResources: (json['registeredResources'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Resource.fromJson(e as Map<String, dynamic>))
           .toList(),
       remainingResources: (json['remainingResources'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Resource.fromJson(e as Map<String, dynamic>))
           .toList(),
       runningTasksCount: json['runningTasksCount'] as int?,
       status: json['status'] as String?,
       statusReason: json['statusReason'] as String?,
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       version: json['version'] as int?,
@@ -8226,31 +8327,18 @@ class ContainerInstance {
 }
 
 enum ContainerInstanceField {
-  tags,
-  containerInstanceHealth,
-}
+  tags('TAGS'),
+  containerInstanceHealth('CONTAINER_INSTANCE_HEALTH'),
+  ;
 
-extension ContainerInstanceFieldValueExtension on ContainerInstanceField {
-  String toValue() {
-    switch (this) {
-      case ContainerInstanceField.tags:
-        return 'TAGS';
-      case ContainerInstanceField.containerInstanceHealth:
-        return 'CONTAINER_INSTANCE_HEALTH';
-    }
-  }
-}
+  final String value;
 
-extension ContainerInstanceFieldFromString on String {
-  ContainerInstanceField toContainerInstanceField() {
-    switch (this) {
-      case 'TAGS':
-        return ContainerInstanceField.tags;
-      case 'CONTAINER_INSTANCE_HEALTH':
-        return ContainerInstanceField.containerInstanceHealth;
-    }
-    throw Exception('$this is not known in enum ContainerInstanceField');
-  }
+  const ContainerInstanceField(this.value);
+
+  static ContainerInstanceField fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ContainerInstanceField'));
 }
 
 /// An object representing the health status of the container instance.
@@ -8271,63 +8359,43 @@ class ContainerInstanceHealthStatus {
   factory ContainerInstanceHealthStatus.fromJson(Map<String, dynamic> json) {
     return ContainerInstanceHealthStatus(
       details: (json['details'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               InstanceHealthCheckResult.fromJson(e as Map<String, dynamic>))
           .toList(),
-      overallStatus:
-          (json['overallStatus'] as String?)?.toInstanceHealthCheckState(),
+      overallStatus: (json['overallStatus'] as String?)
+          ?.let(InstanceHealthCheckState.fromString),
     );
   }
 }
 
 enum ContainerInstanceStatus {
-  active,
-  draining,
-  registering,
-  deregistering,
-  registrationFailed,
-}
+  active('ACTIVE'),
+  draining('DRAINING'),
+  registering('REGISTERING'),
+  deregistering('DEREGISTERING'),
+  registrationFailed('REGISTRATION_FAILED'),
+  ;
 
-extension ContainerInstanceStatusValueExtension on ContainerInstanceStatus {
-  String toValue() {
-    switch (this) {
-      case ContainerInstanceStatus.active:
-        return 'ACTIVE';
-      case ContainerInstanceStatus.draining:
-        return 'DRAINING';
-      case ContainerInstanceStatus.registering:
-        return 'REGISTERING';
-      case ContainerInstanceStatus.deregistering:
-        return 'DEREGISTERING';
-      case ContainerInstanceStatus.registrationFailed:
-        return 'REGISTRATION_FAILED';
-    }
-  }
-}
+  final String value;
 
-extension ContainerInstanceStatusFromString on String {
-  ContainerInstanceStatus toContainerInstanceStatus() {
-    switch (this) {
-      case 'ACTIVE':
-        return ContainerInstanceStatus.active;
-      case 'DRAINING':
-        return ContainerInstanceStatus.draining;
-      case 'REGISTERING':
-        return ContainerInstanceStatus.registering;
-      case 'DEREGISTERING':
-        return ContainerInstanceStatus.deregistering;
-      case 'REGISTRATION_FAILED':
-        return ContainerInstanceStatus.registrationFailed;
-    }
-    throw Exception('$this is not known in enum ContainerInstanceStatus');
-  }
+  const ContainerInstanceStatus(this.value);
+
+  static ContainerInstanceStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ContainerInstanceStatus'));
 }
 
 /// The overrides that are sent to a container. An empty container override can
 /// be passed in. An example of an empty container override is
 /// <code>{"containerOverrides": [ ] }</code>. If a non-empty container override
 /// is specified, the <code>name</code> parameter must be included.
+///
+/// You can use Secrets Manager or Amazon Web Services Systems Manager Parameter
+/// Store to store the sensitive data. For more information, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/secrets-envvar.html">Retrieve
+/// secrets through environment variables</a> in the Amazon ECS Developer Guide.
 class ContainerOverride {
   /// The command to send to the container that overrides the default command from
   /// the Docker image or the task definition. You must also specify a container
@@ -8382,24 +8450,22 @@ class ContainerOverride {
 
   factory ContainerOverride.fromJson(Map<String, dynamic> json) {
     return ContainerOverride(
-      command: (json['command'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      command:
+          (json['command'] as List?)?.nonNulls.map((e) => e as String).toList(),
       cpu: json['cpu'] as int?,
       environment: (json['environment'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => KeyValuePair.fromJson(e as Map<String, dynamic>))
           .toList(),
       environmentFiles: (json['environmentFiles'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => EnvironmentFile.fromJson(e as Map<String, dynamic>))
           .toList(),
       memory: json['memory'] as int?,
       memoryReservation: json['memoryReservation'] as int?,
       name: json['name'] as String?,
       resourceRequirements: (json['resourceRequirements'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ResourceRequirement.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -8424,6 +8490,62 @@ class ContainerOverride {
       if (name != null) 'name': name,
       if (resourceRequirements != null)
         'resourceRequirements': resourceRequirements,
+    };
+  }
+}
+
+/// You can enable a restart policy for each container defined in your task
+/// definition, to overcome transient failures faster and maintain task
+/// availability. When you enable a restart policy for a container, Amazon ECS
+/// can restart the container if it exits, without needing to replace the task.
+/// For more information, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/container-restart-policy.html">Restart
+/// individual containers in Amazon ECS tasks with container restart
+/// policies</a> in the <i>Amazon Elastic Container Service Developer Guide</i>.
+class ContainerRestartPolicy {
+  /// Specifies whether a restart policy is enabled for the container.
+  final bool enabled;
+
+  /// A list of exit codes that Amazon ECS will ignore and not attempt a restart
+  /// on. You can specify a maximum of 50 container exit codes. By default, Amazon
+  /// ECS does not ignore any exit codes.
+  final List<int>? ignoredExitCodes;
+
+  /// A period of time (in seconds) that the container must run for before a
+  /// restart can be attempted. A container can be restarted only once every
+  /// <code>restartAttemptPeriod</code> seconds. If a container isn't able to run
+  /// for this time period and exits early, it will not be restarted. You can set
+  /// a minimum <code>restartAttemptPeriod</code> of 60 seconds and a maximum
+  /// <code>restartAttemptPeriod</code> of 1800 seconds. By default, a container
+  /// must run for 300 seconds before it can be restarted.
+  final int? restartAttemptPeriod;
+
+  ContainerRestartPolicy({
+    required this.enabled,
+    this.ignoredExitCodes,
+    this.restartAttemptPeriod,
+  });
+
+  factory ContainerRestartPolicy.fromJson(Map<String, dynamic> json) {
+    return ContainerRestartPolicy(
+      enabled: json['enabled'] as bool,
+      ignoredExitCodes: (json['ignoredExitCodes'] as List?)
+          ?.nonNulls
+          .map((e) => e as int)
+          .toList(),
+      restartAttemptPeriod: json['restartAttemptPeriod'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final enabled = this.enabled;
+    final ignoredExitCodes = this.ignoredExitCodes;
+    final restartAttemptPeriod = this.restartAttemptPeriod;
+    return {
+      'enabled': enabled,
+      if (ignoredExitCodes != null) 'ignoredExitCodes': ignoredExitCodes,
+      if (restartAttemptPeriod != null)
+        'restartAttemptPeriod': restartAttemptPeriod,
     };
   }
 }
@@ -8596,7 +8718,7 @@ class DeleteAttributesResponse {
   factory DeleteAttributesResponse.fromJson(Map<String, dynamic> json) {
     return DeleteAttributesResponse(
       attributes: (json['attributes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attribute.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -8670,11 +8792,11 @@ class DeleteTaskDefinitionsResponse {
   factory DeleteTaskDefinitionsResponse.fromJson(Map<String, dynamic> json) {
     return DeleteTaskDefinitionsResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       taskDefinitions: (json['taskDefinitions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => TaskDefinition.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -8720,6 +8842,9 @@ class Deployment {
   /// failed task count resets to zero and stops being evaluated.
   /// </note>
   final int? failedTasks;
+
+  /// The Fargate ephemeral storage settings for the deployment.
+  final DeploymentEphemeralStorage? fargateEphemeralStorage;
 
   /// The ID of the deployment.
   final String? id;
@@ -8769,7 +8894,8 @@ class Deployment {
   /// If the service fails to reach a steady state and circuit breaker is turned
   /// on, the deployment transitions to a <code>FAILED</code> state. A deployment
   /// in <code>FAILED</code> state doesn't launch any new tasks. For more
-  /// information, see <a>DeploymentCircuitBreaker</a>.
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentCircuitBreaker.html">DeploymentCircuitBreaker</a>.
   final DeploymentRolloutState? rolloutState;
 
   /// A description of the rollout state of a deployment.
@@ -8820,11 +8946,20 @@ class Deployment {
   /// updated.
   final DateTime? updatedAt;
 
+  /// The details of the volume that was <code>configuredAtLaunch</code>. You can
+  /// configure different settings like the size, throughput, volumeType, and
+  /// ecryption in <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ServiceManagedEBSVolumeConfiguration.html">ServiceManagedEBSVolumeConfiguration</a>.
+  /// The <code>name</code> of the volume must match the <code>name</code> from
+  /// the task definition.
+  final List<ServiceVolumeConfiguration>? volumeConfigurations;
+
   Deployment({
     this.capacityProviderStrategy,
     this.createdAt,
     this.desiredCount,
     this.failedTasks,
+    this.fargateEphemeralStorage,
     this.id,
     this.launchType,
     this.networkConfiguration,
@@ -8839,20 +8974,25 @@ class Deployment {
     this.status,
     this.taskDefinition,
     this.updatedAt,
+    this.volumeConfigurations,
   });
 
   factory Deployment.fromJson(Map<String, dynamic> json) {
     return Deployment(
       capacityProviderStrategy: (json['capacityProviderStrategy'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               CapacityProviderStrategyItem.fromJson(e as Map<String, dynamic>))
           .toList(),
       createdAt: timeStampFromJson(json['createdAt']),
       desiredCount: json['desiredCount'] as int?,
       failedTasks: json['failedTasks'] as int?,
+      fargateEphemeralStorage: json['fargateEphemeralStorage'] != null
+          ? DeploymentEphemeralStorage.fromJson(
+              json['fargateEphemeralStorage'] as Map<String, dynamic>)
+          : null,
       id: json['id'] as String?,
-      launchType: (json['launchType'] as String?)?.toLaunchType(),
+      launchType: (json['launchType'] as String?)?.let(LaunchType.fromString),
       networkConfiguration: json['networkConfiguration'] != null
           ? NetworkConfiguration.fromJson(
               json['networkConfiguration'] as Map<String, dynamic>)
@@ -8860,8 +9000,8 @@ class Deployment {
       pendingCount: json['pendingCount'] as int?,
       platformFamily: json['platformFamily'] as String?,
       platformVersion: json['platformVersion'] as String?,
-      rolloutState:
-          (json['rolloutState'] as String?)?.toDeploymentRolloutState(),
+      rolloutState: (json['rolloutState'] as String?)
+          ?.let(DeploymentRolloutState.fromString),
       rolloutStateReason: json['rolloutStateReason'] as String?,
       runningCount: json['runningCount'] as int?,
       serviceConnectConfiguration: json['serviceConnectConfiguration'] != null
@@ -8869,13 +9009,18 @@ class Deployment {
               json['serviceConnectConfiguration'] as Map<String, dynamic>)
           : null,
       serviceConnectResources: (json['serviceConnectResources'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               ServiceConnectServiceResource.fromJson(e as Map<String, dynamic>))
           .toList(),
       status: json['status'] as String?,
       taskDefinition: json['taskDefinition'] as String?,
       updatedAt: timeStampFromJson(json['updatedAt']),
+      volumeConfigurations: (json['volumeConfigurations'] as List?)
+          ?.nonNulls
+          .map((e) =>
+              ServiceVolumeConfiguration.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
@@ -8919,7 +9064,7 @@ class DeploymentAlarms {
   factory DeploymentAlarms.fromJson(Map<String, dynamic> json) {
     return DeploymentAlarms(
       alarmNames: (json['alarmNames'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as String)
           .toList(),
       enable: json['enable'] as bool,
@@ -8951,6 +9096,11 @@ class DeploymentAlarms {
 /// information, see <a
 /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/deployment-type-ecs.html">Rolling
 /// update</a> in the <i>Amazon Elastic Container Service Developer Guide</i>.
+///
+/// For more information about API failure reasons, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/api_failures_messages.html">API
+/// failure reasons</a> in the <i>Amazon Elastic Container Service Developer
+/// Guide</i>.
 class DeploymentCircuitBreaker {
   /// Determines whether to use the deployment circuit breaker logic for the
   /// service.
@@ -9061,7 +9211,7 @@ class DeploymentConfiguration {
   /// is determined by the container health check settings.
   /// </li>
   /// </ul>
-  /// For services are that <i>do</i> use a load balancer, the following should be
+  /// For services that <i>do</i> use a load balancer, the following should be
   /// noted:
   ///
   /// <ul>
@@ -9078,6 +9228,18 @@ class DeploymentConfiguration {
   /// before counting the task towards the minimum healthy percent total.
   /// </li>
   /// </ul>
+  /// The default value for a replica service for
+  /// <code>minimumHealthyPercent</code> is 100%. The default
+  /// <code>minimumHealthyPercent</code> value for a service using the
+  /// <code>DAEMON</code> service schedule is 0% for the CLI, the Amazon Web
+  /// Services SDKs, and the APIs and 50% for the Amazon Web Services Management
+  /// Console.
+  ///
+  /// The minimum number of healthy tasks during a deployment is the
+  /// <code>desiredCount</code> multiplied by the
+  /// <code>minimumHealthyPercent</code>/100, rounded up to the nearest integer
+  /// value.
+  ///
   /// If a service is using either the blue/green (<code>CODE_DEPLOY</code>) or
   /// <code>EXTERNAL</code> deployment types and is running tasks that use the EC2
   /// launch type, the <b>minimum healthy percent</b> value is set to the default
@@ -9141,8 +9303,8 @@ class DeploymentController {
   /// current running version of the container with the latest version. The number
   /// of containers Amazon ECS adds or removes from the service during a rolling
   /// update is controlled by adjusting the minimum and maximum number of healthy
-  /// tasks allowed during a service deployment, as specified in the
-  /// <a>DeploymentConfiguration</a>.
+  /// tasks allowed during a service deployment, as specified in the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DeploymentConfiguration.html">DeploymentConfiguration</a>.
   /// </dd> <dt>CODE_DEPLOY</dt> <dd>
   /// The blue/green (<code>CODE_DEPLOY</code>) deployment type uses the
   /// blue/green deployment model powered by CodeDeploy, which allows you to
@@ -9161,82 +9323,65 @@ class DeploymentController {
 
   factory DeploymentController.fromJson(Map<String, dynamic> json) {
     return DeploymentController(
-      type: (json['type'] as String).toDeploymentControllerType(),
+      type: DeploymentControllerType.fromString((json['type'] as String)),
     );
   }
 
   Map<String, dynamic> toJson() {
     final type = this.type;
     return {
-      'type': type.toValue(),
+      'type': type.value,
     };
   }
 }
 
 enum DeploymentControllerType {
-  ecs,
-  codeDeploy,
-  external,
+  ecs('ECS'),
+  codeDeploy('CODE_DEPLOY'),
+  external('EXTERNAL'),
+  ;
+
+  final String value;
+
+  const DeploymentControllerType(this.value);
+
+  static DeploymentControllerType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DeploymentControllerType'));
 }
 
-extension DeploymentControllerTypeValueExtension on DeploymentControllerType {
-  String toValue() {
-    switch (this) {
-      case DeploymentControllerType.ecs:
-        return 'ECS';
-      case DeploymentControllerType.codeDeploy:
-        return 'CODE_DEPLOY';
-      case DeploymentControllerType.external:
-        return 'EXTERNAL';
-    }
-  }
-}
+/// The amount of ephemeral storage to allocate for the deployment.
+class DeploymentEphemeralStorage {
+  /// Specify an Key Management Service key ID to encrypt the ephemeral storage
+  /// for deployment.
+  final String? kmsKeyId;
 
-extension DeploymentControllerTypeFromString on String {
-  DeploymentControllerType toDeploymentControllerType() {
-    switch (this) {
-      case 'ECS':
-        return DeploymentControllerType.ecs;
-      case 'CODE_DEPLOY':
-        return DeploymentControllerType.codeDeploy;
-      case 'EXTERNAL':
-        return DeploymentControllerType.external;
-    }
-    throw Exception('$this is not known in enum DeploymentControllerType');
+  DeploymentEphemeralStorage({
+    this.kmsKeyId,
+  });
+
+  factory DeploymentEphemeralStorage.fromJson(Map<String, dynamic> json) {
+    return DeploymentEphemeralStorage(
+      kmsKeyId: json['kmsKeyId'] as String?,
+    );
   }
 }
 
 enum DeploymentRolloutState {
-  completed,
-  failed,
-  inProgress,
-}
+  completed('COMPLETED'),
+  failed('FAILED'),
+  inProgress('IN_PROGRESS'),
+  ;
 
-extension DeploymentRolloutStateValueExtension on DeploymentRolloutState {
-  String toValue() {
-    switch (this) {
-      case DeploymentRolloutState.completed:
-        return 'COMPLETED';
-      case DeploymentRolloutState.failed:
-        return 'FAILED';
-      case DeploymentRolloutState.inProgress:
-        return 'IN_PROGRESS';
-    }
-  }
-}
+  final String value;
 
-extension DeploymentRolloutStateFromString on String {
-  DeploymentRolloutState toDeploymentRolloutState() {
-    switch (this) {
-      case 'COMPLETED':
-        return DeploymentRolloutState.completed;
-      case 'FAILED':
-        return DeploymentRolloutState.failed;
-      case 'IN_PROGRESS':
-        return DeploymentRolloutState.inProgress;
-    }
-    throw Exception('$this is not known in enum DeploymentRolloutState');
-  }
+  const DeploymentRolloutState(this.value);
+
+  static DeploymentRolloutState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DeploymentRolloutState'));
 }
 
 class DeregisterContainerInstanceResponse {
@@ -9301,11 +9446,11 @@ class DescribeCapacityProvidersResponse {
       Map<String, dynamic> json) {
     return DescribeCapacityProvidersResponse(
       capacityProviders: (json['capacityProviders'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => CapacityProvider.fromJson(e as Map<String, dynamic>))
           .toList(),
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -9328,11 +9473,11 @@ class DescribeClustersResponse {
   factory DescribeClustersResponse.fromJson(Map<String, dynamic> json) {
     return DescribeClustersResponse(
       clusters: (json['clusters'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Cluster.fromJson(e as Map<String, dynamic>))
           .toList(),
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -9355,11 +9500,11 @@ class DescribeContainerInstancesResponse {
       Map<String, dynamic> json) {
     return DescribeContainerInstancesResponse(
       containerInstances: (json['containerInstances'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ContainerInstance.fromJson(e as Map<String, dynamic>))
           .toList(),
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -9381,11 +9526,11 @@ class DescribeServicesResponse {
   factory DescribeServicesResponse.fromJson(Map<String, dynamic> json) {
     return DescribeServicesResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       services: (json['services'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Service.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -9443,7 +9588,7 @@ class DescribeTaskDefinitionResponse {
   factory DescribeTaskDefinitionResponse.fromJson(Map<String, dynamic> json) {
     return DescribeTaskDefinitionResponse(
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       taskDefinition: json['taskDefinition'] != null
@@ -9469,11 +9614,11 @@ class DescribeTaskSetsResponse {
   factory DescribeTaskSetsResponse.fromJson(Map<String, dynamic> json) {
     return DescribeTaskSetsResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       taskSets: (json['taskSets'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => TaskSet.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -9495,11 +9640,11 @@ class DescribeTasksResponse {
   factory DescribeTasksResponse.fromJson(Map<String, dynamic> json) {
     return DescribeTasksResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       tasks: (json['tasks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Task.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -9507,36 +9652,19 @@ class DescribeTasksResponse {
 }
 
 enum DesiredStatus {
-  running,
-  pending,
-  stopped,
-}
+  running('RUNNING'),
+  pending('PENDING'),
+  stopped('STOPPED'),
+  ;
 
-extension DesiredStatusValueExtension on DesiredStatus {
-  String toValue() {
-    switch (this) {
-      case DesiredStatus.running:
-        return 'RUNNING';
-      case DesiredStatus.pending:
-        return 'PENDING';
-      case DesiredStatus.stopped:
-        return 'STOPPED';
-    }
-  }
-}
+  final String value;
 
-extension DesiredStatusFromString on String {
-  DesiredStatus toDesiredStatus() {
-    switch (this) {
-      case 'RUNNING':
-        return DesiredStatus.running;
-      case 'PENDING':
-        return DesiredStatus.pending;
-      case 'STOPPED':
-        return DesiredStatus.stopped;
-    }
-    throw Exception('$this is not known in enum DesiredStatus');
-  }
+  const DesiredStatus(this.value);
+
+  static DesiredStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum DesiredStatus'));
 }
 
 /// An object representing a container instance host device.
@@ -9563,8 +9691,8 @@ class Device {
       hostPath: json['hostPath'] as String,
       containerPath: json['containerPath'] as String?,
       permissions: (json['permissions'] as List?)
-          ?.whereNotNull()
-          .map((e) => (e as String).toDeviceCgroupPermission())
+          ?.nonNulls
+          .map((e) => DeviceCgroupPermission.fromString((e as String)))
           .toList(),
     );
   }
@@ -9577,42 +9705,25 @@ class Device {
       'hostPath': hostPath,
       if (containerPath != null) 'containerPath': containerPath,
       if (permissions != null)
-        'permissions': permissions.map((e) => e.toValue()).toList(),
+        'permissions': permissions.map((e) => e.value).toList(),
     };
   }
 }
 
 enum DeviceCgroupPermission {
-  read,
-  write,
-  mknod,
-}
+  read('read'),
+  write('write'),
+  mknod('mknod'),
+  ;
 
-extension DeviceCgroupPermissionValueExtension on DeviceCgroupPermission {
-  String toValue() {
-    switch (this) {
-      case DeviceCgroupPermission.read:
-        return 'read';
-      case DeviceCgroupPermission.write:
-        return 'write';
-      case DeviceCgroupPermission.mknod:
-        return 'mknod';
-    }
-  }
-}
+  final String value;
 
-extension DeviceCgroupPermissionFromString on String {
-  DeviceCgroupPermission toDeviceCgroupPermission() {
-    switch (this) {
-      case 'read':
-        return DeviceCgroupPermission.read;
-      case 'write':
-        return DeviceCgroupPermission.write;
-      case 'mknod':
-        return DeviceCgroupPermission.mknod;
-    }
-    throw Exception('$this is not known in enum DeviceCgroupPermission');
-  }
+  const DeviceCgroupPermission(this.value);
+
+  static DeviceCgroupPermission fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum DeviceCgroupPermission'));
 }
 
 class DiscoverPollEndpointResponse {
@@ -9660,35 +9771,19 @@ class DockerVolumeConfiguration {
   /// installed using the Docker plugin CLI, use <code>docker plugin ls</code> to
   /// retrieve the driver name from your container instance. If the driver was
   /// installed using another method, use Docker plugin discovery to retrieve the
-  /// driver name. For more information, see <a
-  /// href="https://docs.docker.com/engine/extend/plugin_api/#plugin-discovery">Docker
-  /// plugin discovery</a>. This parameter maps to <code>Driver</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/VolumeCreate">Create
-  /// a volume</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>xxdriver</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/commandline/volume_create/">docker
-  /// volume create</a>.
+  /// driver name. This parameter maps to <code>Driver</code> in the docker
+  /// conainer create command and the <code>xxdriver</code> option to docker
+  /// volume create.
   final String? driver;
 
   /// A map of Docker driver-specific options passed through. This parameter maps
-  /// to <code>DriverOpts</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/VolumeCreate">Create
-  /// a volume</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>xxopt</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/commandline/volume_create/">docker
-  /// volume create</a>.
+  /// to <code>DriverOpts</code> in the docker create-volume command and the
+  /// <code>xxopt</code> option to docker volume create.
   final Map<String, String>? driverOpts;
 
   /// Custom metadata to add to your Docker volume. This parameter maps to
-  /// <code>Labels</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/VolumeCreate">Create
-  /// a volume</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>xxlabel</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/commandline/volume_create/">docker
-  /// volume create</a>.
+  /// <code>Labels</code> in the docker conainer create command and the
+  /// <code>xxlabel</code> option to docker volume create.
   final Map<String, String>? labels;
 
   /// The scope for the Docker volume that determines its lifecycle. Docker
@@ -9713,7 +9808,7 @@ class DockerVolumeConfiguration {
           ?.map((k, e) => MapEntry(k, e as String)),
       labels: (json['labels'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
-      scope: (json['scope'] as String?)?.toScope(),
+      scope: (json['scope'] as String?)?.let(Scope.fromString),
     );
   }
 
@@ -9728,7 +9823,68 @@ class DockerVolumeConfiguration {
       if (driver != null) 'driver': driver,
       if (driverOpts != null) 'driverOpts': driverOpts,
       if (labels != null) 'labels': labels,
-      if (scope != null) 'scope': scope.toValue(),
+      if (scope != null) 'scope': scope.value,
+    };
+  }
+}
+
+enum EBSResourceType {
+  volume('volume'),
+  ;
+
+  final String value;
+
+  const EBSResourceType(this.value);
+
+  static EBSResourceType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum EBSResourceType'));
+}
+
+/// The tag specifications of an Amazon EBS volume.
+class EBSTagSpecification {
+  /// The type of volume resource.
+  final EBSResourceType resourceType;
+
+  /// Determines whether to propagate the tags from the task definition to
+  /// &#x2028;the Amazon EBS volume. Tags can only propagate to a
+  /// <code>SERVICE</code> specified in
+  /// &#x2028;<code>ServiceVolumeConfiguration</code>. If no value is specified,
+  /// the tags aren't &#x2028;propagated.
+  final PropagateTags? propagateTags;
+
+  /// The tags applied to this Amazon EBS volume. <code>AmazonECSCreated</code>
+  /// and <code>AmazonECSManaged</code> are reserved tags that can't be used.
+  final List<Tag>? tags;
+
+  EBSTagSpecification({
+    required this.resourceType,
+    this.propagateTags,
+    this.tags,
+  });
+
+  factory EBSTagSpecification.fromJson(Map<String, dynamic> json) {
+    return EBSTagSpecification(
+      resourceType:
+          EBSResourceType.fromString((json['resourceType'] as String)),
+      propagateTags:
+          (json['propagateTags'] as String?)?.let(PropagateTags.fromString),
+      tags: (json['tags'] as List?)
+          ?.nonNulls
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final resourceType = this.resourceType;
+    final propagateTags = this.propagateTags;
+    final tags = this.tags;
+    return {
+      'resourceType': resourceType.value,
+      if (propagateTags != null) 'propagateTags': propagateTags.value,
+      if (tags != null) 'tags': tags,
     };
   }
 }
@@ -9764,7 +9920,7 @@ class EFSAuthorizationConfig {
   factory EFSAuthorizationConfig.fromJson(Map<String, dynamic> json) {
     return EFSAuthorizationConfig(
       accessPointId: json['accessPointId'] as String?,
-      iam: (json['iam'] as String?)?.toEFSAuthorizationConfigIAM(),
+      iam: (json['iam'] as String?)?.let(EFSAuthorizationConfigIAM.fromString),
     );
   }
 
@@ -9773,65 +9929,39 @@ class EFSAuthorizationConfig {
     final iam = this.iam;
     return {
       if (accessPointId != null) 'accessPointId': accessPointId,
-      if (iam != null) 'iam': iam.toValue(),
+      if (iam != null) 'iam': iam.value,
     };
   }
 }
 
 enum EFSAuthorizationConfigIAM {
-  enabled,
-  disabled,
-}
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
 
-extension EFSAuthorizationConfigIAMValueExtension on EFSAuthorizationConfigIAM {
-  String toValue() {
-    switch (this) {
-      case EFSAuthorizationConfigIAM.enabled:
-        return 'ENABLED';
-      case EFSAuthorizationConfigIAM.disabled:
-        return 'DISABLED';
-    }
-  }
-}
+  final String value;
 
-extension EFSAuthorizationConfigIAMFromString on String {
-  EFSAuthorizationConfigIAM toEFSAuthorizationConfigIAM() {
-    switch (this) {
-      case 'ENABLED':
-        return EFSAuthorizationConfigIAM.enabled;
-      case 'DISABLED':
-        return EFSAuthorizationConfigIAM.disabled;
-    }
-    throw Exception('$this is not known in enum EFSAuthorizationConfigIAM');
-  }
+  const EFSAuthorizationConfigIAM(this.value);
+
+  static EFSAuthorizationConfigIAM fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum EFSAuthorizationConfigIAM'));
 }
 
 enum EFSTransitEncryption {
-  enabled,
-  disabled,
-}
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
 
-extension EFSTransitEncryptionValueExtension on EFSTransitEncryption {
-  String toValue() {
-    switch (this) {
-      case EFSTransitEncryption.enabled:
-        return 'ENABLED';
-      case EFSTransitEncryption.disabled:
-        return 'DISABLED';
-    }
-  }
-}
+  final String value;
 
-extension EFSTransitEncryptionFromString on String {
-  EFSTransitEncryption toEFSTransitEncryption() {
-    switch (this) {
-      case 'ENABLED':
-        return EFSTransitEncryption.enabled;
-      case 'DISABLED':
-        return EFSTransitEncryption.disabled;
-    }
-    throw Exception('$this is not known in enum EFSTransitEncryption');
-  }
+  const EFSTransitEncryption(this.value);
+
+  static EFSTransitEncryption fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum EFSTransitEncryption'));
 }
 
 /// This parameter is specified when you're using an Amazon Elastic File System
@@ -9890,8 +10020,8 @@ class EFSVolumeConfiguration {
               json['authorizationConfig'] as Map<String, dynamic>)
           : null,
       rootDirectory: json['rootDirectory'] as String?,
-      transitEncryption:
-          (json['transitEncryption'] as String?)?.toEFSTransitEncryption(),
+      transitEncryption: (json['transitEncryption'] as String?)
+          ?.let(EFSTransitEncryption.fromString),
       transitEncryptionPort: json['transitEncryptionPort'] as int?,
     );
   }
@@ -9908,7 +10038,7 @@ class EFSVolumeConfiguration {
         'authorizationConfig': authorizationConfig,
       if (rootDirectory != null) 'rootDirectory': rootDirectory,
       if (transitEncryption != null)
-        'transitEncryption': transitEncryption.toValue(),
+        'transitEncryption': transitEncryption.value,
       if (transitEncryptionPort != null)
         'transitEncryptionPort': transitEncryptionPort,
     };
@@ -9919,10 +10049,7 @@ class EFSVolumeConfiguration {
 /// You can specify up to ten environment files. The file must have a
 /// <code>.env</code> file extension. Each line in an environment file should
 /// contain an environment variable in <code>VARIABLE=VALUE</code> format. Lines
-/// beginning with <code>#</code> are treated as comments and are ignored. For
-/// more information about the environment variable file syntax, see <a
-/// href="https://docs.docker.com/compose/env-file/">Declare default environment
-/// variables in file</a>.
+/// beginning with <code>#</code> are treated as comments and are ignored.
 ///
 /// If there are environment variables specified using the
 /// <code>environment</code> parameter in a container definition, they take
@@ -9930,12 +10057,14 @@ class EFSVolumeConfiguration {
 /// multiple environment files are specified that contain the same variable,
 /// they're processed from the top down. We recommend that you use unique
 /// variable names. For more information, see <a
-/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/taskdef-envfiles.html">Specifying
-/// environment variables</a> in the <i>Amazon Elastic Container Service
-/// Developer Guide</i>.
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/use-environment-file.html">Use
+/// a file to pass environment variables to a container</a> in the <i>Amazon
+/// Elastic Container Service Developer Guide</i>.
 ///
-/// This parameter is only supported for tasks hosted on Fargate using the
-/// following platform versions:
+/// Environment variable files are objects in Amazon S3 and all Amazon S3
+/// security considerations apply.
+///
+/// You must use the following platforms for the Fargate launch type:
 ///
 /// <ul>
 /// <li>
@@ -9945,8 +10074,22 @@ class EFSVolumeConfiguration {
 /// Windows platform version <code>1.0.0</code> or later.
 /// </li>
 /// </ul>
+/// Consider the following when using the Fargate launch type:
+///
+/// <ul>
+/// <li>
+/// The file is handled like a native Docker env-file.
+/// </li>
+/// <li>
+/// There is no support for shell escape handling.
+/// </li>
+/// <li>
+/// The container entry point interperts the <code>VARIABLE</code> values.
+/// </li>
+/// </ul>
 class EnvironmentFile {
-  /// The file type to use. The only supported value is <code>s3</code>.
+  /// The file type to use. Environment files are objects in Amazon S3. The only
+  /// supported value is <code>s3</code>.
   final EnvironmentFileType type;
 
   /// The Amazon Resource Name (ARN) of the Amazon S3 object containing the
@@ -9960,7 +10103,7 @@ class EnvironmentFile {
 
   factory EnvironmentFile.fromJson(Map<String, dynamic> json) {
     return EnvironmentFile(
-      type: (json['type'] as String).toEnvironmentFileType(),
+      type: EnvironmentFileType.fromString((json['type'] as String)),
       value: json['value'] as String,
     );
   }
@@ -9969,40 +10112,31 @@ class EnvironmentFile {
     final type = this.type;
     final value = this.value;
     return {
-      'type': type.toValue(),
+      'type': type.value,
       'value': value,
     };
   }
 }
 
 enum EnvironmentFileType {
-  s3,
-}
+  s3('s3'),
+  ;
 
-extension EnvironmentFileTypeValueExtension on EnvironmentFileType {
-  String toValue() {
-    switch (this) {
-      case EnvironmentFileType.s3:
-        return 's3';
-    }
-  }
-}
+  final String value;
 
-extension EnvironmentFileTypeFromString on String {
-  EnvironmentFileType toEnvironmentFileType() {
-    switch (this) {
-      case 's3':
-        return EnvironmentFileType.s3;
-    }
-    throw Exception('$this is not known in enum EnvironmentFileType');
-  }
+  const EnvironmentFileType(this.value);
+
+  static EnvironmentFileType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum EnvironmentFileType'));
 }
 
 /// The amount of ephemeral storage to allocate for the task. This parameter is
 /// used to expand the total amount of ephemeral storage available, beyond the
 /// default amount, for tasks hosted on Fargate. For more information, see <a
-/// href="https://docs.aws.amazon.com/AmazonECS/latest/userguide/using_data_volumes.html">Fargate
-/// task storage</a> in the <i>Amazon ECS User Guide for Fargate</i>.
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_data_volumes.html">Using
+/// data volumes in tasks</a> in the <i>Amazon ECS Developer Guide;</i>.
 /// <note>
 /// For tasks using the Fargate launch type, the task requires the following
 /// platforms:
@@ -10017,7 +10151,7 @@ extension EnvironmentFileTypeFromString on String {
 /// </ul> </note>
 class EphemeralStorage {
   /// The total amount, in GiB, of ephemeral storage to set for the task. The
-  /// minimum supported value is <code>21</code> GiB and the maximum supported
+  /// minimum supported value is <code>20</code> GiB and the maximum supported
   /// value is <code>200</code> GiB.
   final int sizeInGiB;
 
@@ -10085,7 +10219,8 @@ class ExecuteCommandConfiguration {
           ? ExecuteCommandLogConfiguration.fromJson(
               json['logConfiguration'] as Map<String, dynamic>)
           : null,
-      logging: (json['logging'] as String?)?.toExecuteCommandLogging(),
+      logging:
+          (json['logging'] as String?)?.let(ExecuteCommandLogging.fromString),
     );
   }
 
@@ -10096,7 +10231,7 @@ class ExecuteCommandConfiguration {
     return {
       if (kmsKeyId != null) 'kmsKeyId': kmsKeyId,
       if (logConfiguration != null) 'logConfiguration': logConfiguration,
-      if (logging != null) 'logging': logging.toValue(),
+      if (logging != null) 'logging': logging.value,
     };
   }
 }
@@ -10165,36 +10300,19 @@ class ExecuteCommandLogConfiguration {
 }
 
 enum ExecuteCommandLogging {
-  none,
-  $default,
-  override,
-}
+  none('NONE'),
+  $default('DEFAULT'),
+  override('OVERRIDE'),
+  ;
 
-extension ExecuteCommandLoggingValueExtension on ExecuteCommandLogging {
-  String toValue() {
-    switch (this) {
-      case ExecuteCommandLogging.none:
-        return 'NONE';
-      case ExecuteCommandLogging.$default:
-        return 'DEFAULT';
-      case ExecuteCommandLogging.override:
-        return 'OVERRIDE';
-    }
-  }
-}
+  final String value;
 
-extension ExecuteCommandLoggingFromString on String {
-  ExecuteCommandLogging toExecuteCommandLogging() {
-    switch (this) {
-      case 'NONE':
-        return ExecuteCommandLogging.none;
-      case 'DEFAULT':
-        return ExecuteCommandLogging.$default;
-      case 'OVERRIDE':
-        return ExecuteCommandLogging.override;
-    }
-    throw Exception('$this is not known in enum ExecuteCommandLogging');
-  }
+  const ExecuteCommandLogging(this.value);
+
+  static ExecuteCommandLogging fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ExecuteCommandLogging'));
 }
 
 class ExecuteCommandResponse {
@@ -10396,7 +10514,7 @@ class FirelensConfiguration {
 
   factory FirelensConfiguration.fromJson(Map<String, dynamic> json) {
     return FirelensConfiguration(
-      type: (json['type'] as String).toFirelensConfigurationType(),
+      type: FirelensConfigurationType.fromString((json['type'] as String)),
       options: (json['options'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -10406,38 +10524,25 @@ class FirelensConfiguration {
     final type = this.type;
     final options = this.options;
     return {
-      'type': type.toValue(),
+      'type': type.value,
       if (options != null) 'options': options,
     };
   }
 }
 
 enum FirelensConfigurationType {
-  fluentd,
-  fluentbit,
-}
+  fluentd('fluentd'),
+  fluentbit('fluentbit'),
+  ;
 
-extension FirelensConfigurationTypeValueExtension on FirelensConfigurationType {
-  String toValue() {
-    switch (this) {
-      case FirelensConfigurationType.fluentd:
-        return 'fluentd';
-      case FirelensConfigurationType.fluentbit:
-        return 'fluentbit';
-    }
-  }
-}
+  final String value;
 
-extension FirelensConfigurationTypeFromString on String {
-  FirelensConfigurationType toFirelensConfigurationType() {
-    switch (this) {
-      case 'fluentd':
-        return FirelensConfigurationType.fluentd;
-      case 'fluentbit':
-        return FirelensConfigurationType.fluentbit;
-    }
-    throw Exception('$this is not known in enum FirelensConfigurationType');
-  }
+  const FirelensConfigurationType(this.value);
+
+  static FirelensConfigurationType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum FirelensConfigurationType'));
 }
 
 class GetTaskProtectionResponse {
@@ -10470,11 +10575,11 @@ class GetTaskProtectionResponse {
   factory GetTaskProtectionResponse.fromJson(Map<String, dynamic> json) {
     return GetTaskProtectionResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       protectedTasks: (json['protectedTasks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ProtectedTask.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -10485,8 +10590,7 @@ class GetTaskProtectionResponse {
 /// that are specified in a container definition override any Docker health
 /// checks that exist in the container image (such as those specified in a
 /// parent image or from the image's Dockerfile). This configuration maps to the
-/// <code>HEALTHCHECK</code> parameter of <a
-/// href="https://docs.docker.com/engine/reference/run/">docker run</a>.
+/// <code>HEALTHCHECK</code> parameter of docker run.
 /// <note>
 /// The Amazon ECS container agent only monitors and reports on the health
 /// checks specified in the task definition. Amazon ECS does not monitor Docker
@@ -10499,6 +10603,12 @@ class GetTaskProtectionResponse {
 /// the DescribeTasks API operation or when viewing the task details in the
 /// console.
 ///
+/// The health check is designed to make sure that your containers survive agent
+/// restarts, upgrades, or temporary unavailability.
+///
+/// Amazon ECS performs health checks on containers with the default that
+/// launched the container instance or the task.
+///
 /// The following describes the possible <code>healthStatus</code> values for a
 /// container:
 ///
@@ -10510,27 +10620,82 @@ class GetTaskProtectionResponse {
 /// <code>UNHEALTHY</code>-The container health check has failed.
 /// </li>
 /// <li>
-/// <code>UNKNOWN</code>-The container health check is being evaluated or
-/// there's no container health check defined.
+/// <code>UNKNOWN</code>-The container health check is being evaluated, there's
+/// no container health check defined, or Amazon ECS doesn't have the health
+/// status of the container.
 /// </li>
 /// </ul>
-/// The following describes the possible <code>healthStatus</code> values for a
-/// task. The container health check status of non-essential containers don't
-/// have an effect on the health status of a task.
+/// The following describes the possible <code>healthStatus</code> values based
+/// on the container health checker status of essential containers in the task
+/// with the following priority order (high to low):
 ///
 /// <ul>
-/// <li>
-/// <code>HEALTHY</code>-All essential containers within the task have passed
-/// their health checks.
-/// </li>
 /// <li>
 /// <code>UNHEALTHY</code>-One or more essential containers have failed their
 /// health check.
 /// </li>
 /// <li>
-/// <code>UNKNOWN</code>-The essential containers within the task are still
-/// having their health checks evaluated, there are only nonessential containers
-/// with health checks defined, or there are no container health checks defined.
+/// <code>UNKNOWN</code>-Any essential container running within the task is in
+/// an <code>UNKNOWN</code> state and no other essential containers have an
+/// <code>UNHEALTHY</code> state.
+/// </li>
+/// <li>
+/// <code>HEALTHY</code>-All essential containers within the task have passed
+/// their health checks.
+/// </li>
+/// </ul>
+/// Consider the following task health example with 2 containers.
+///
+/// <ul>
+/// <li>
+/// If Container1 is <code>UNHEALTHY</code> and Container2 is
+/// <code>UNKNOWN</code>, the task health is <code>UNHEALTHY</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>UNHEALTHY</code> and Container2 is
+/// <code>HEALTHY</code>, the task health is <code>UNHEALTHY</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>HEALTHY</code> and Container2 is
+/// <code>UNKNOWN</code>, the task health is <code>UNKNOWN</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>HEALTHY</code> and Container2 is
+/// <code>HEALTHY</code>, the task health is <code>HEALTHY</code>.
+/// </li>
+/// </ul>
+/// Consider the following task health example with 3 containers.
+///
+/// <ul>
+/// <li>
+/// If Container1 is <code>UNHEALTHY</code> and Container2 is
+/// <code>UNKNOWN</code>, and Container3 is <code>UNKNOWN</code>, the task
+/// health is <code>UNHEALTHY</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>UNHEALTHY</code> and Container2 is
+/// <code>UNKNOWN</code>, and Container3 is <code>HEALTHY</code>, the task
+/// health is <code>UNHEALTHY</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>UNHEALTHY</code> and Container2 is
+/// <code>HEALTHY</code>, and Container3 is <code>HEALTHY</code>, the task
+/// health is <code>UNHEALTHY</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>HEALTHY</code> and Container2 is
+/// <code>UNKNOWN</code>, and Container3 is <code>HEALTHY</code>, the task
+/// health is <code>UNKNOWN</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>HEALTHY</code> and Container2 is
+/// <code>UNKNOWN</code>, and Container3 is <code>UNKNOWN</code>, the task
+/// health is <code>UNKNOWN</code>.
+/// </li>
+/// <li>
+/// If Container1 is <code>HEALTHY</code> and Container2 is
+/// <code>HEALTHY</code>, and Container3 is <code>HEALTHY</code>, the task
+/// health is <code>HEALTHY</code>.
 /// </li>
 /// </ul>
 /// If a task is run manually, and not as part of a service, the task will
@@ -10542,8 +10707,19 @@ class GetTaskProtectionResponse {
 ///
 /// <ul>
 /// <li>
-/// Container health checks require version 1.17.0 or greater of the Amazon ECS
-/// container agent. For more information, see <a
+/// If the Amazon ECS container agent becomes disconnected from the Amazon ECS
+/// service, this won't cause a container to transition to an
+/// <code>UNHEALTHY</code> status. This is by design, to ensure that containers
+/// remain running during agent restarts or temporary unavailability. The health
+/// check status is the "last heard from" response from the Amazon ECS agent, so
+/// if the container was considered <code>HEALTHY</code> prior to the
+/// disconnect, that status will remain until the agent reconnects and another
+/// health check occurs. There are no assumptions made about the status of the
+/// container health checks.
+/// </li>
+/// <li>
+/// Container health checks require version <code>1.17.0</code> or greater of
+/// the Amazon ECS container agent. For more information, see <a
 /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ecs-agent-update.html">Updating
 /// the Amazon ECS container agent</a>.
 /// </li>
@@ -10576,10 +10752,8 @@ class HealthCheck {
   /// <code> CMD-SHELL, curl -f http://localhost/ || exit 1</code>
   ///
   /// An exit code of 0 indicates success, and non-zero exit code indicates
-  /// failure. For more information, see <code>HealthCheck</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a>.
+  /// failure. For more information, see <code>HealthCheck</code> in tthe docker
+  /// conainer create command
   final List<String> command;
 
   /// The time period in seconds between each health check execution. You may
@@ -10617,10 +10791,8 @@ class HealthCheck {
 
   factory HealthCheck.fromJson(Map<String, dynamic> json) {
     return HealthCheck(
-      command: (json['command'] as List)
-          .whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      command:
+          (json['command'] as List).nonNulls.map((e) => e as String).toList(),
       interval: json['interval'] as int?,
       retries: json['retries'] as int?,
       startPeriod: json['startPeriod'] as int?,
@@ -10645,41 +10817,25 @@ class HealthCheck {
 }
 
 enum HealthStatus {
-  healthy,
-  unhealthy,
-  unknown,
-}
+  healthy('HEALTHY'),
+  unhealthy('UNHEALTHY'),
+  unknown('UNKNOWN'),
+  ;
 
-extension HealthStatusValueExtension on HealthStatus {
-  String toValue() {
-    switch (this) {
-      case HealthStatus.healthy:
-        return 'HEALTHY';
-      case HealthStatus.unhealthy:
-        return 'UNHEALTHY';
-      case HealthStatus.unknown:
-        return 'UNKNOWN';
-    }
-  }
-}
+  final String value;
 
-extension HealthStatusFromString on String {
-  HealthStatus toHealthStatus() {
-    switch (this) {
-      case 'HEALTHY':
-        return HealthStatus.healthy;
-      case 'UNHEALTHY':
-        return HealthStatus.unhealthy;
-      case 'UNKNOWN':
-        return HealthStatus.unknown;
-    }
-    throw Exception('$this is not known in enum HealthStatus');
-  }
+  const HealthStatus(this.value);
+
+  static HealthStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum HealthStatus'));
 }
 
 /// Hostnames and IP address entries that are added to the
 /// <code>/etc/hosts</code> file of a container via the <code>extraHosts</code>
-/// parameter of its <a>ContainerDefinition</a>.
+/// parameter of its <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_ContainerDefinition.html">ContainerDefinition</a>.
 class HostEntry {
   /// The hostname to use in the <code>/etc/hosts</code> entry.
   final String hostname;
@@ -10843,124 +10999,69 @@ class InstanceHealthCheckResult {
     return InstanceHealthCheckResult(
       lastStatusChange: timeStampFromJson(json['lastStatusChange']),
       lastUpdated: timeStampFromJson(json['lastUpdated']),
-      status: (json['status'] as String?)?.toInstanceHealthCheckState(),
-      type: (json['type'] as String?)?.toInstanceHealthCheckType(),
+      status:
+          (json['status'] as String?)?.let(InstanceHealthCheckState.fromString),
+      type: (json['type'] as String?)?.let(InstanceHealthCheckType.fromString),
     );
   }
 }
 
 enum InstanceHealthCheckState {
-  ok,
-  impaired,
-  insufficientData,
-  initializing,
-}
+  ok('OK'),
+  impaired('IMPAIRED'),
+  insufficientData('INSUFFICIENT_DATA'),
+  initializing('INITIALIZING'),
+  ;
 
-extension InstanceHealthCheckStateValueExtension on InstanceHealthCheckState {
-  String toValue() {
-    switch (this) {
-      case InstanceHealthCheckState.ok:
-        return 'OK';
-      case InstanceHealthCheckState.impaired:
-        return 'IMPAIRED';
-      case InstanceHealthCheckState.insufficientData:
-        return 'INSUFFICIENT_DATA';
-      case InstanceHealthCheckState.initializing:
-        return 'INITIALIZING';
-    }
-  }
-}
+  final String value;
 
-extension InstanceHealthCheckStateFromString on String {
-  InstanceHealthCheckState toInstanceHealthCheckState() {
-    switch (this) {
-      case 'OK':
-        return InstanceHealthCheckState.ok;
-      case 'IMPAIRED':
-        return InstanceHealthCheckState.impaired;
-      case 'INSUFFICIENT_DATA':
-        return InstanceHealthCheckState.insufficientData;
-      case 'INITIALIZING':
-        return InstanceHealthCheckState.initializing;
-    }
-    throw Exception('$this is not known in enum InstanceHealthCheckState');
-  }
+  const InstanceHealthCheckState(this.value);
+
+  static InstanceHealthCheckState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum InstanceHealthCheckState'));
 }
 
 enum InstanceHealthCheckType {
-  containerRuntime,
-}
+  containerRuntime('CONTAINER_RUNTIME'),
+  ;
 
-extension InstanceHealthCheckTypeValueExtension on InstanceHealthCheckType {
-  String toValue() {
-    switch (this) {
-      case InstanceHealthCheckType.containerRuntime:
-        return 'CONTAINER_RUNTIME';
-    }
-  }
-}
+  final String value;
 
-extension InstanceHealthCheckTypeFromString on String {
-  InstanceHealthCheckType toInstanceHealthCheckType() {
-    switch (this) {
-      case 'CONTAINER_RUNTIME':
-        return InstanceHealthCheckType.containerRuntime;
-    }
-    throw Exception('$this is not known in enum InstanceHealthCheckType');
-  }
+  const InstanceHealthCheckType(this.value);
+
+  static InstanceHealthCheckType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum InstanceHealthCheckType'));
 }
 
 enum IpcMode {
-  host,
-  task,
-  none,
+  host('host'),
+  task('task'),
+  none('none'),
+  ;
+
+  final String value;
+
+  const IpcMode(this.value);
+
+  static IpcMode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum IpcMode'));
 }
 
-extension IpcModeValueExtension on IpcMode {
-  String toValue() {
-    switch (this) {
-      case IpcMode.host:
-        return 'host';
-      case IpcMode.task:
-        return 'task';
-      case IpcMode.none:
-        return 'none';
-    }
-  }
-}
-
-extension IpcModeFromString on String {
-  IpcMode toIpcMode() {
-    switch (this) {
-      case 'host':
-        return IpcMode.host;
-      case 'task':
-        return IpcMode.task;
-      case 'none':
-        return IpcMode.none;
-    }
-    throw Exception('$this is not known in enum IpcMode');
-  }
-}
-
-/// The Linux capabilities for the container that are added to or dropped from
-/// the default configuration provided by Docker. For more information about the
-/// default capabilities and the non-default available capabilities, see <a
-/// href="https://docs.docker.com/engine/reference/run/#runtime-privilege-and-linux-capabilities">Runtime
-/// privilege and Linux capabilities</a> in the <i>Docker run reference</i>. For
-/// more detailed information about these Linux capabilities, see the <a
+/// The Linux capabilities to add or remove from the default Docker
+/// configuration for a container defined in the task definition. For more
+/// detailed information about these Linux capabilities, see the <a
 /// href="http://man7.org/linux/man-pages/man7/capabilities.7.html">capabilities(7)</a>
 /// Linux manual page.
 class KernelCapabilities {
   /// The Linux capabilities for the container that have been added to the default
   /// configuration provided by Docker. This parameter maps to <code>CapAdd</code>
-  /// in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--cap-add</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// in the docker conainer create command and the <code>--cap-add</code> option
+  /// to docker run.
   /// <note>
   /// Tasks launched on Fargate only support adding the <code>SYS_PTRACE</code>
   /// kernel capability.
@@ -10977,13 +11078,8 @@ class KernelCapabilities {
 
   /// The Linux capabilities for the container that have been removed from the
   /// default configuration provided by Docker. This parameter maps to
-  /// <code>CapDrop</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--cap-drop</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>CapDrop</code> in the docker conainer create command and the
+  /// <code>--cap-drop</code> option to docker run.
   ///
   /// Valid values: <code>"ALL" | "AUDIT_CONTROL" | "AUDIT_WRITE" |
   /// "BLOCK_SUSPEND" | "CHOWN" | "DAC_OVERRIDE" | "DAC_READ_SEARCH" | "FOWNER" |
@@ -11002,14 +11098,8 @@ class KernelCapabilities {
 
   factory KernelCapabilities.fromJson(Map<String, dynamic> json) {
     return KernelCapabilities(
-      add: (json['add'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
-      drop: (json['drop'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      add: (json['add'] as List?)?.nonNulls.map((e) => e as String).toList(),
+      drop: (json['drop'] as List?)?.nonNulls.map((e) => e as String).toList(),
     );
   }
 
@@ -11056,36 +11146,18 @@ class KeyValuePair {
 }
 
 enum LaunchType {
-  ec2,
-  fargate,
-  external,
-}
+  ec2('EC2'),
+  fargate('FARGATE'),
+  external('EXTERNAL'),
+  ;
 
-extension LaunchTypeValueExtension on LaunchType {
-  String toValue() {
-    switch (this) {
-      case LaunchType.ec2:
-        return 'EC2';
-      case LaunchType.fargate:
-        return 'FARGATE';
-      case LaunchType.external:
-        return 'EXTERNAL';
-    }
-  }
-}
+  final String value;
 
-extension LaunchTypeFromString on String {
-  LaunchType toLaunchType() {
-    switch (this) {
-      case 'EC2':
-        return LaunchType.ec2;
-      case 'FARGATE':
-        return LaunchType.fargate;
-      case 'EXTERNAL':
-        return LaunchType.external;
-    }
-    throw Exception('$this is not known in enum LaunchType');
-  }
+  const LaunchType(this.value);
+
+  static LaunchType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum LaunchType'));
 }
 
 /// The Linux-specific options that are applied to the container, such as Linux
@@ -11102,13 +11174,8 @@ class LinuxParameters {
   final KernelCapabilities? capabilities;
 
   /// Any host devices to expose to the container. This parameter maps to
-  /// <code>Devices</code> in the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-  /// a container</a> section of the <a
-  /// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-  /// the <code>--device</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// <code>Devices</code> in tthe docker conainer create command and the
+  /// <code>--device</code> option to docker run.
   /// <note>
   /// If you're using tasks that use the Fargate launch type, the
   /// <code>devices</code> parameter isn't supported.
@@ -11117,19 +11184,16 @@ class LinuxParameters {
 
   /// Run an <code>init</code> process inside the container that forwards signals
   /// and reaps processes. This parameter maps to the <code>--init</code> option
-  /// to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>. This parameter requires version 1.25 of the Docker Remote API or
-  /// greater on your container instance. To check the Docker Remote API version
-  /// on your container instance, log in to your container instance and run the
-  /// following command: <code>sudo docker version --format
+  /// to docker run. This parameter requires version 1.25 of the Docker Remote API
+  /// or greater on your container instance. To check the Docker Remote API
+  /// version on your container instance, log in to your container instance and
+  /// run the following command: <code>sudo docker version --format
   /// '{{.Server.APIVersion}}'</code>
   final bool? initProcessEnabled;
 
   /// The total amount of swap memory (in MiB) a container can use. This parameter
-  /// will be translated to the <code>--memory-swap</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a> where the value would be the sum of the container memory plus the
+  /// will be translated to the <code>--memory-swap</code> option to docker run
+  /// where the value would be the sum of the container memory plus the
   /// <code>maxSwap</code> value.
   ///
   /// If a <code>maxSwap</code> value of <code>0</code> is specified, the
@@ -11148,9 +11212,7 @@ class LinuxParameters {
   final int? maxSwap;
 
   /// The value for the size (in MiB) of the <code>/dev/shm</code> volume. This
-  /// parameter maps to the <code>--shm-size</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// parameter maps to the <code>--shm-size</code> option to docker run.
   /// <note>
   /// If you are using tasks that use the Fargate launch type, the
   /// <code>sharedMemorySize</code> parameter is not supported.
@@ -11165,9 +11227,7 @@ class LinuxParameters {
   /// <code>swappiness</code> parameter is not specified, a default value of
   /// <code>60</code> is used. If a value is not specified for
   /// <code>maxSwap</code> then this parameter is ignored. This parameter maps to
-  /// the <code>--memory-swappiness</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// the <code>--memory-swappiness</code> option to docker run.
   /// <note>
   /// If you're using tasks that use the Fargate launch type, the
   /// <code>swappiness</code> parameter isn't supported.
@@ -11178,9 +11238,7 @@ class LinuxParameters {
   final int? swappiness;
 
   /// The container path, mount options, and size (in MiB) of the tmpfs mount.
-  /// This parameter maps to the <code>--tmpfs</code> option to <a
-  /// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-  /// run</a>.
+  /// This parameter maps to the <code>--tmpfs</code> option to docker run.
   /// <note>
   /// If you're using tasks that use the Fargate launch type, the
   /// <code>tmpfs</code> parameter isn't supported.
@@ -11204,7 +11262,7 @@ class LinuxParameters {
               json['capabilities'] as Map<String, dynamic>)
           : null,
       devices: (json['devices'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Device.fromJson(e as Map<String, dynamic>))
           .toList(),
       initProcessEnabled: json['initProcessEnabled'] as bool?,
@@ -11212,7 +11270,7 @@ class LinuxParameters {
       sharedMemorySize: json['sharedMemorySize'] as int?,
       swappiness: json['swappiness'] as int?,
       tmpfs: (json['tmpfs'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tmpfs.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -11258,7 +11316,7 @@ class ListAccountSettingsResponse {
     return ListAccountSettingsResponse(
       nextToken: json['nextToken'] as String?,
       settings: (json['settings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Setting.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -11284,7 +11342,7 @@ class ListAttributesResponse {
   factory ListAttributesResponse.fromJson(Map<String, dynamic> json) {
     return ListAttributesResponse(
       attributes: (json['attributes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attribute.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -11312,7 +11370,7 @@ class ListClustersResponse {
   factory ListClustersResponse.fromJson(Map<String, dynamic> json) {
     return ListClustersResponse(
       clusterArns: (json['clusterArns'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -11340,7 +11398,7 @@ class ListContainerInstancesResponse {
   factory ListContainerInstancesResponse.fromJson(Map<String, dynamic> json) {
     return ListContainerInstancesResponse(
       containerInstanceArns: (json['containerInstanceArns'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -11369,7 +11427,7 @@ class ListServicesByNamespaceResponse {
     return ListServicesByNamespaceResponse(
       nextToken: json['nextToken'] as String?,
       serviceArns: (json['serviceArns'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -11397,7 +11455,7 @@ class ListServicesResponse {
     return ListServicesResponse(
       nextToken: json['nextToken'] as String?,
       serviceArns: (json['serviceArns'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -11415,7 +11473,7 @@ class ListTagsForResourceResponse {
   factory ListTagsForResourceResponse.fromJson(Map<String, dynamic> json) {
     return ListTagsForResourceResponse(
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -11444,7 +11502,7 @@ class ListTaskDefinitionFamiliesResponse {
       Map<String, dynamic> json) {
     return ListTaskDefinitionFamiliesResponse(
       families: (json['families'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -11473,7 +11531,7 @@ class ListTaskDefinitionsResponse {
     return ListTaskDefinitionsResponse(
       nextToken: json['nextToken'] as String?,
       taskDefinitionArns: (json['taskDefinitionArns'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -11500,7 +11558,7 @@ class ListTasksResponse {
     return ListTasksResponse(
       nextToken: json['nextToken'] as String?,
       taskArns: (json['taskArns'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -11525,6 +11583,9 @@ class ListTasksResponse {
 class LoadBalancer {
   /// The name of the container (as it appears in a container definition) to
   /// associate with the load balancer.
+  ///
+  /// You need to specify the container name when configuring the target group for
+  /// an Amazon ECS load balancer.
   final String? containerName;
 
   /// The port on the container to associate with the load balancer. This port
@@ -11537,7 +11598,6 @@ class LoadBalancer {
   /// The name of the load balancer to associate with the Amazon ECS service or
   /// task set.
   ///
-  /// A load balancer name is only specified when using a Classic Load Balancer.
   /// If you are using an Application Load Balancer or a Network Load Balancer the
   /// load balancer name parameter should be omitted.
   final String? loadBalancerName;
@@ -11546,8 +11606,7 @@ class LoadBalancer {
   /// group or groups associated with a service or task set.
   ///
   /// A target group ARN is only specified when using an Application Load Balancer
-  /// or Network Load Balancer. If you're using a Classic Load Balancer, omit the
-  /// target group ARN.
+  /// or Network Load Balancer.
   ///
   /// For services using the <code>ECS</code> deployment controller, you can
   /// specify one or multiple target groups. For more information, see <a
@@ -11602,21 +11661,13 @@ class LoadBalancer {
 }
 
 /// The log configuration for the container. This parameter maps to
-/// <code>LogConfig</code> in the <a
-/// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-/// a container</a> section of the <a
-/// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-/// the <code>--log-driver</code> option to <a
-/// href="https://docs.docker.com/engine/reference/commandline/run/">
-/// <code>docker run</code> </a>.
+/// <code>LogConfig</code> in the docker conainer create command and the
+/// <code>--log-driver</code> option to docker run.
 ///
 /// By default, containers use the same logging driver that the Docker daemon
 /// uses. However, the container might use a different logging driver than the
 /// Docker daemon by specifying a log driver configuration in the container
-/// definition. For more information about the options for different supported
-/// log drivers, see <a
-/// href="https://docs.docker.com/engine/admin/logging/overview/">Configure
-/// logging drivers</a> in the Docker documentation.
+/// definition.
 ///
 /// Understand the following when specifying a log configuration for your
 /// containers.
@@ -11624,8 +11675,16 @@ class LoadBalancer {
 /// <ul>
 /// <li>
 /// Amazon ECS currently supports a subset of the logging drivers available to
-/// the Docker daemon (shown in the valid values below). Additional log drivers
-/// may be available in future releases of the Amazon ECS container agent.
+/// the Docker daemon. Additional log drivers may be available in future
+/// releases of the Amazon ECS container agent.
+///
+/// For tasks on Fargate, the supported log drivers are <code>awslogs</code>,
+/// <code>splunk</code>, and <code>awsfirelens</code>.
+///
+/// For tasks hosted on Amazon EC2 instances, the supported log drivers are
+/// <code>awslogs</code>, <code>fluentd</code>, <code>gelf</code>,
+/// <code>json-file</code>, <code>journald</code>,<code>syslog</code>,
+/// <code>splunk</code>, and <code>awsfirelens</code>.
 /// </li>
 /// <li>
 /// This parameter requires version 1.18 of the Docker Remote API or greater on
@@ -11656,20 +11715,19 @@ class LogConfiguration {
   ///
   /// For tasks hosted on Amazon EC2 instances, the supported log drivers are
   /// <code>awslogs</code>, <code>fluentd</code>, <code>gelf</code>,
-  /// <code>json-file</code>, <code>journald</code>,
-  /// <code>logentries</code>,<code>syslog</code>, <code>splunk</code>, and
-  /// <code>awsfirelens</code>.
+  /// <code>json-file</code>, <code>journald</code>, <code>syslog</code>,
+  /// <code>splunk</code>, and <code>awsfirelens</code>.
   ///
   /// For more information about using the <code>awslogs</code> log driver, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html">Using
-  /// the awslogs log driver</a> in the <i>Amazon Elastic Container Service
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_awslogs.html">Send
+  /// Amazon ECS logs to CloudWatch</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
   ///
   /// For more information about using the <code>awsfirelens</code> log driver,
   /// see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html">Custom
-  /// log routing</a> in the <i>Amazon Elastic Container Service Developer
-  /// Guide</i>.
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_firelens.html">Send
+  /// Amazon ECS logs to an Amazon Web Services service or Amazon Web Services
+  /// Partner</a>.
   /// <note>
   /// If you have a custom driver that isn't listed, you can fork the Amazon ECS
   /// container agent project that's <a
@@ -11701,11 +11759,11 @@ class LogConfiguration {
 
   factory LogConfiguration.fromJson(Map<String, dynamic> json) {
     return LogConfiguration(
-      logDriver: (json['logDriver'] as String).toLogDriver(),
+      logDriver: LogDriver.fromString((json['logDriver'] as String)),
       options: (json['options'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       secretOptions: (json['secretOptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Secret.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -11716,7 +11774,7 @@ class LogConfiguration {
     final options = this.options;
     final secretOptions = this.secretOptions;
     return {
-      'logDriver': logDriver.toValue(),
+      'logDriver': logDriver.value,
       if (options != null) 'options': options,
       if (secretOptions != null) 'secretOptions': secretOptions,
     };
@@ -11724,61 +11782,23 @@ class LogConfiguration {
 }
 
 enum LogDriver {
-  jsonFile,
-  syslog,
-  journald,
-  gelf,
-  fluentd,
-  awslogs,
-  splunk,
-  awsfirelens,
-}
+  jsonFile('json-file'),
+  syslog('syslog'),
+  journald('journald'),
+  gelf('gelf'),
+  fluentd('fluentd'),
+  awslogs('awslogs'),
+  splunk('splunk'),
+  awsfirelens('awsfirelens'),
+  ;
 
-extension LogDriverValueExtension on LogDriver {
-  String toValue() {
-    switch (this) {
-      case LogDriver.jsonFile:
-        return 'json-file';
-      case LogDriver.syslog:
-        return 'syslog';
-      case LogDriver.journald:
-        return 'journald';
-      case LogDriver.gelf:
-        return 'gelf';
-      case LogDriver.fluentd:
-        return 'fluentd';
-      case LogDriver.awslogs:
-        return 'awslogs';
-      case LogDriver.splunk:
-        return 'splunk';
-      case LogDriver.awsfirelens:
-        return 'awsfirelens';
-    }
-  }
-}
+  final String value;
 
-extension LogDriverFromString on String {
-  LogDriver toLogDriver() {
-    switch (this) {
-      case 'json-file':
-        return LogDriver.jsonFile;
-      case 'syslog':
-        return LogDriver.syslog;
-      case 'journald':
-        return LogDriver.journald;
-      case 'gelf':
-        return LogDriver.gelf;
-      case 'fluentd':
-        return LogDriver.fluentd;
-      case 'awslogs':
-        return LogDriver.awslogs;
-      case 'splunk':
-        return LogDriver.splunk;
-      case 'awsfirelens':
-        return LogDriver.awsfirelens;
-    }
-    throw Exception('$this is not known in enum LogDriver');
-  }
+  const LogDriver(this.value);
+
+  static LogDriver fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum LogDriver'));
 }
 
 /// Details about the managed agent status for the container.
@@ -11807,33 +11827,24 @@ class ManagedAgent {
     return ManagedAgent(
       lastStartedAt: timeStampFromJson(json['lastStartedAt']),
       lastStatus: json['lastStatus'] as String?,
-      name: (json['name'] as String?)?.toManagedAgentName(),
+      name: (json['name'] as String?)?.let(ManagedAgentName.fromString),
       reason: json['reason'] as String?,
     );
   }
 }
 
 enum ManagedAgentName {
-  executeCommandAgent,
-}
+  executeCommandAgent('ExecuteCommandAgent'),
+  ;
 
-extension ManagedAgentNameValueExtension on ManagedAgentName {
-  String toValue() {
-    switch (this) {
-      case ManagedAgentName.executeCommandAgent:
-        return 'ExecuteCommandAgent';
-    }
-  }
-}
+  final String value;
 
-extension ManagedAgentNameFromString on String {
-  ManagedAgentName toManagedAgentName() {
-    switch (this) {
-      case 'ExecuteCommandAgent':
-        return ManagedAgentName.executeCommandAgent;
-    }
-    throw Exception('$this is not known in enum ManagedAgentName');
-  }
+  const ManagedAgentName(this.value);
+
+  static ManagedAgentName fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ManagedAgentName'));
 }
 
 /// An object representing a change in state for a managed agent.
@@ -11864,11 +11875,26 @@ class ManagedAgentStateChange {
     final reason = this.reason;
     return {
       'containerName': containerName,
-      'managedAgentName': managedAgentName.toValue(),
+      'managedAgentName': managedAgentName.value,
       'status': status,
       if (reason != null) 'reason': reason,
     };
   }
+}
+
+enum ManagedDraining {
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
+
+  final String value;
+
+  const ManagedDraining(this.value);
+
+  static ManagedDraining fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ManagedDraining'));
 }
 
 /// The managed scaling settings for the Auto Scaling group capacity provider.
@@ -11891,8 +11917,8 @@ class ManagedScaling {
   final int? instanceWarmupPeriod;
 
   /// The maximum number of Amazon EC2 instances that Amazon ECS will scale out at
-  /// one time. The scale in process is not affected by this parameter. If this
-  /// parameter is omitted, the default value of <code>1</code> is used.
+  /// one time. If this parameter is omitted, the default value of
+  /// <code>10000</code> is used.
   final int? maximumScalingStepSize;
 
   /// The minimum number of Amazon EC2 instances that Amazon ECS will scale out at
@@ -11934,7 +11960,7 @@ class ManagedScaling {
       instanceWarmupPeriod: json['instanceWarmupPeriod'] as int?,
       maximumScalingStepSize: json['maximumScalingStepSize'] as int?,
       minimumScalingStepSize: json['minimumScalingStepSize'] as int?,
-      status: (json['status'] as String?)?.toManagedScalingStatus(),
+      status: (json['status'] as String?)?.let(ManagedScalingStatus.fromString),
       targetCapacity: json['targetCapacity'] as int?,
     );
   }
@@ -11952,67 +11978,73 @@ class ManagedScaling {
         'maximumScalingStepSize': maximumScalingStepSize,
       if (minimumScalingStepSize != null)
         'minimumScalingStepSize': minimumScalingStepSize,
-      if (status != null) 'status': status.toValue(),
+      if (status != null) 'status': status.value,
       if (targetCapacity != null) 'targetCapacity': targetCapacity,
     };
   }
 }
 
 enum ManagedScalingStatus {
-  enabled,
-  disabled,
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
+
+  final String value;
+
+  const ManagedScalingStatus(this.value);
+
+  static ManagedScalingStatus fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ManagedScalingStatus'));
 }
 
-extension ManagedScalingStatusValueExtension on ManagedScalingStatus {
-  String toValue() {
-    switch (this) {
-      case ManagedScalingStatus.enabled:
-        return 'ENABLED';
-      case ManagedScalingStatus.disabled:
-        return 'DISABLED';
-    }
+/// The managed storage configuration for the cluster.
+class ManagedStorageConfiguration {
+  /// Specify the Key Management Service key ID for the Fargate ephemeral storage.
+  final String? fargateEphemeralStorageKmsKeyId;
+
+  /// Specify a Key Management Service key ID to encrypt the managed storage.
+  final String? kmsKeyId;
+
+  ManagedStorageConfiguration({
+    this.fargateEphemeralStorageKmsKeyId,
+    this.kmsKeyId,
+  });
+
+  factory ManagedStorageConfiguration.fromJson(Map<String, dynamic> json) {
+    return ManagedStorageConfiguration(
+      fargateEphemeralStorageKmsKeyId:
+          json['fargateEphemeralStorageKmsKeyId'] as String?,
+      kmsKeyId: json['kmsKeyId'] as String?,
+    );
   }
-}
 
-extension ManagedScalingStatusFromString on String {
-  ManagedScalingStatus toManagedScalingStatus() {
-    switch (this) {
-      case 'ENABLED':
-        return ManagedScalingStatus.enabled;
-      case 'DISABLED':
-        return ManagedScalingStatus.disabled;
-    }
-    throw Exception('$this is not known in enum ManagedScalingStatus');
+  Map<String, dynamic> toJson() {
+    final fargateEphemeralStorageKmsKeyId =
+        this.fargateEphemeralStorageKmsKeyId;
+    final kmsKeyId = this.kmsKeyId;
+    return {
+      if (fargateEphemeralStorageKmsKeyId != null)
+        'fargateEphemeralStorageKmsKeyId': fargateEphemeralStorageKmsKeyId,
+      if (kmsKeyId != null) 'kmsKeyId': kmsKeyId,
+    };
   }
 }
 
 enum ManagedTerminationProtection {
-  enabled,
-  disabled,
-}
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
 
-extension ManagedTerminationProtectionValueExtension
-    on ManagedTerminationProtection {
-  String toValue() {
-    switch (this) {
-      case ManagedTerminationProtection.enabled:
-        return 'ENABLED';
-      case ManagedTerminationProtection.disabled:
-        return 'DISABLED';
-    }
-  }
-}
+  final String value;
 
-extension ManagedTerminationProtectionFromString on String {
-  ManagedTerminationProtection toManagedTerminationProtection() {
-    switch (this) {
-      case 'ENABLED':
-        return ManagedTerminationProtection.enabled;
-      case 'DISABLED':
-        return ManagedTerminationProtection.disabled;
-    }
-    throw Exception('$this is not known in enum ManagedTerminationProtection');
-  }
+  const ManagedTerminationProtection(this.value);
+
+  static ManagedTerminationProtection fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ManagedTerminationProtection'));
 }
 
 /// The details for a volume mount point that's used in a container definition.
@@ -12058,7 +12090,9 @@ class MountPoint {
 /// Details on the network bindings between a container and its host container
 /// instance. After a task reaches the <code>RUNNING</code> status, manual and
 /// automatic host and container port assignments are visible in the
-/// <code>networkBindings</code> section of <a>DescribeTasks</a> API responses.
+/// <code>networkBindings</code> section of <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTasks.html">DescribeTasks</a>
+/// API responses.
 class NetworkBinding {
   /// The IP address that the container is bound to on the container instance.
   final String? bindIP;
@@ -12098,8 +12132,8 @@ class NetworkBinding {
   /// <ul>
   /// <li>
   /// For containers in a task with the <code>awsvpc</code> network mode, the
-  /// <code>hostPort</code> is set to the same value as the
-  /// <code>containerPort</code>. This is a static mapping strategy.
+  /// <code>hostPortRange</code> is set to the same value as the
+  /// <code>containerPortRange</code>. This is a static mapping strategy.
   /// </li>
   /// <li>
   /// For containers in a task with the <code>bridge</code> network mode, the
@@ -12165,7 +12199,8 @@ class NetworkBinding {
       containerPortRange: json['containerPortRange'] as String?,
       hostPort: json['hostPort'] as int?,
       hostPortRange: json['hostPortRange'] as String?,
-      protocol: (json['protocol'] as String?)?.toTransportProtocol(),
+      protocol:
+          (json['protocol'] as String?)?.let(TransportProtocol.fromString),
     );
   }
 
@@ -12182,7 +12217,7 @@ class NetworkBinding {
       if (containerPortRange != null) 'containerPortRange': containerPortRange,
       if (hostPort != null) 'hostPort': hostPort,
       if (hostPortRange != null) 'hostPortRange': hostPortRange,
-      if (protocol != null) 'protocol': protocol.toValue(),
+      if (protocol != null) 'protocol': protocol.value,
     };
   }
 }
@@ -12245,127 +12280,53 @@ class NetworkInterface {
 }
 
 enum NetworkMode {
-  bridge,
-  host,
-  awsvpc,
-  none,
-}
+  bridge('bridge'),
+  host('host'),
+  awsvpc('awsvpc'),
+  none('none'),
+  ;
 
-extension NetworkModeValueExtension on NetworkMode {
-  String toValue() {
-    switch (this) {
-      case NetworkMode.bridge:
-        return 'bridge';
-      case NetworkMode.host:
-        return 'host';
-      case NetworkMode.awsvpc:
-        return 'awsvpc';
-      case NetworkMode.none:
-        return 'none';
-    }
-  }
-}
+  final String value;
 
-extension NetworkModeFromString on String {
-  NetworkMode toNetworkMode() {
-    switch (this) {
-      case 'bridge':
-        return NetworkMode.bridge;
-      case 'host':
-        return NetworkMode.host;
-      case 'awsvpc':
-        return NetworkMode.awsvpc;
-      case 'none':
-        return NetworkMode.none;
-    }
-    throw Exception('$this is not known in enum NetworkMode');
-  }
+  const NetworkMode(this.value);
+
+  static NetworkMode fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum NetworkMode'));
 }
 
 enum OSFamily {
-  windowsServer_2019Full,
-  windowsServer_2019Core,
-  windowsServer_2016Full,
-  windowsServer_2004Core,
-  windowsServer_2022Core,
-  windowsServer_2022Full,
-  windowsServer_20h2Core,
-  linux,
-}
+  windowsServer_2019Full('WINDOWS_SERVER_2019_FULL'),
+  windowsServer_2019Core('WINDOWS_SERVER_2019_CORE'),
+  windowsServer_2016Full('WINDOWS_SERVER_2016_FULL'),
+  windowsServer_2004Core('WINDOWS_SERVER_2004_CORE'),
+  windowsServer_2022Core('WINDOWS_SERVER_2022_CORE'),
+  windowsServer_2022Full('WINDOWS_SERVER_2022_FULL'),
+  windowsServer_20h2Core('WINDOWS_SERVER_20H2_CORE'),
+  linux('LINUX'),
+  ;
 
-extension OSFamilyValueExtension on OSFamily {
-  String toValue() {
-    switch (this) {
-      case OSFamily.windowsServer_2019Full:
-        return 'WINDOWS_SERVER_2019_FULL';
-      case OSFamily.windowsServer_2019Core:
-        return 'WINDOWS_SERVER_2019_CORE';
-      case OSFamily.windowsServer_2016Full:
-        return 'WINDOWS_SERVER_2016_FULL';
-      case OSFamily.windowsServer_2004Core:
-        return 'WINDOWS_SERVER_2004_CORE';
-      case OSFamily.windowsServer_2022Core:
-        return 'WINDOWS_SERVER_2022_CORE';
-      case OSFamily.windowsServer_2022Full:
-        return 'WINDOWS_SERVER_2022_FULL';
-      case OSFamily.windowsServer_20h2Core:
-        return 'WINDOWS_SERVER_20H2_CORE';
-      case OSFamily.linux:
-        return 'LINUX';
-    }
-  }
-}
+  final String value;
 
-extension OSFamilyFromString on String {
-  OSFamily toOSFamily() {
-    switch (this) {
-      case 'WINDOWS_SERVER_2019_FULL':
-        return OSFamily.windowsServer_2019Full;
-      case 'WINDOWS_SERVER_2019_CORE':
-        return OSFamily.windowsServer_2019Core;
-      case 'WINDOWS_SERVER_2016_FULL':
-        return OSFamily.windowsServer_2016Full;
-      case 'WINDOWS_SERVER_2004_CORE':
-        return OSFamily.windowsServer_2004Core;
-      case 'WINDOWS_SERVER_2022_CORE':
-        return OSFamily.windowsServer_2022Core;
-      case 'WINDOWS_SERVER_2022_FULL':
-        return OSFamily.windowsServer_2022Full;
-      case 'WINDOWS_SERVER_20H2_CORE':
-        return OSFamily.windowsServer_20h2Core;
-      case 'LINUX':
-        return OSFamily.linux;
-    }
-    throw Exception('$this is not known in enum OSFamily');
-  }
+  const OSFamily(this.value);
+
+  static OSFamily fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum OSFamily'));
 }
 
 enum PidMode {
-  host,
-  task,
-}
+  host('host'),
+  task('task'),
+  ;
 
-extension PidModeValueExtension on PidMode {
-  String toValue() {
-    switch (this) {
-      case PidMode.host:
-        return 'host';
-      case PidMode.task:
-        return 'task';
-    }
-  }
-}
+  final String value;
 
-extension PidModeFromString on String {
-  PidMode toPidMode() {
-    switch (this) {
-      case 'host':
-        return PidMode.host;
-      case 'task':
-        return PidMode.task;
-    }
-    throw Exception('$this is not known in enum PidMode');
-  }
+  const PidMode(this.value);
+
+  static PidMode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum PidMode'));
 }
 
 /// An object representing a constraint on task placement. For more information,
@@ -12401,7 +12362,7 @@ class PlacementConstraint {
   factory PlacementConstraint.fromJson(Map<String, dynamic> json) {
     return PlacementConstraint(
       expression: json['expression'] as String?,
-      type: (json['type'] as String?)?.toPlacementConstraintType(),
+      type: (json['type'] as String?)?.let(PlacementConstraintType.fromString),
     );
   }
 
@@ -12410,37 +12371,24 @@ class PlacementConstraint {
     final type = this.type;
     return {
       if (expression != null) 'expression': expression,
-      if (type != null) 'type': type.toValue(),
+      if (type != null) 'type': type.value,
     };
   }
 }
 
 enum PlacementConstraintType {
-  distinctInstance,
-  memberOf,
-}
+  distinctInstance('distinctInstance'),
+  memberOf('memberOf'),
+  ;
 
-extension PlacementConstraintTypeValueExtension on PlacementConstraintType {
-  String toValue() {
-    switch (this) {
-      case PlacementConstraintType.distinctInstance:
-        return 'distinctInstance';
-      case PlacementConstraintType.memberOf:
-        return 'memberOf';
-    }
-  }
-}
+  final String value;
 
-extension PlacementConstraintTypeFromString on String {
-  PlacementConstraintType toPlacementConstraintType() {
-    switch (this) {
-      case 'distinctInstance':
-        return PlacementConstraintType.distinctInstance;
-      case 'memberOf':
-        return PlacementConstraintType.memberOf;
-    }
-    throw Exception('$this is not known in enum PlacementConstraintType');
-  }
+  const PlacementConstraintType(this.value);
+
+  static PlacementConstraintType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum PlacementConstraintType'));
 }
 
 /// The task placement strategy for a task or service. For more information, see
@@ -12477,7 +12425,7 @@ class PlacementStrategy {
   factory PlacementStrategy.fromJson(Map<String, dynamic> json) {
     return PlacementStrategy(
       field: json['field'] as String?,
-      type: (json['type'] as String?)?.toPlacementStrategyType(),
+      type: (json['type'] as String?)?.let(PlacementStrategyType.fromString),
     );
   }
 
@@ -12486,42 +12434,25 @@ class PlacementStrategy {
     final type = this.type;
     return {
       if (field != null) 'field': field,
-      if (type != null) 'type': type.toValue(),
+      if (type != null) 'type': type.value,
     };
   }
 }
 
 enum PlacementStrategyType {
-  random,
-  spread,
-  binpack,
-}
+  random('random'),
+  spread('spread'),
+  binpack('binpack'),
+  ;
 
-extension PlacementStrategyTypeValueExtension on PlacementStrategyType {
-  String toValue() {
-    switch (this) {
-      case PlacementStrategyType.random:
-        return 'random';
-      case PlacementStrategyType.spread:
-        return 'spread';
-      case PlacementStrategyType.binpack:
-        return 'binpack';
-    }
-  }
-}
+  final String value;
 
-extension PlacementStrategyTypeFromString on String {
-  PlacementStrategyType toPlacementStrategyType() {
-    switch (this) {
-      case 'random':
-        return PlacementStrategyType.random;
-      case 'spread':
-        return PlacementStrategyType.spread;
-      case 'binpack':
-        return PlacementStrategyType.binpack;
-    }
-    throw Exception('$this is not known in enum PlacementStrategyType');
-  }
+  const PlacementStrategyType(this.value);
+
+  static PlacementStrategyType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum PlacementStrategyType'));
 }
 
 /// The devices that are available on the container instance. The only supported
@@ -12546,32 +12477,23 @@ class PlatformDevice {
     final type = this.type;
     return {
       'id': id,
-      'type': type.toValue(),
+      'type': type.value,
     };
   }
 }
 
 enum PlatformDeviceType {
-  gpu,
-}
+  gpu('GPU'),
+  ;
 
-extension PlatformDeviceTypeValueExtension on PlatformDeviceType {
-  String toValue() {
-    switch (this) {
-      case PlatformDeviceType.gpu:
-        return 'GPU';
-    }
-  }
-}
+  final String value;
 
-extension PlatformDeviceTypeFromString on String {
-  PlatformDeviceType toPlatformDeviceType() {
-    switch (this) {
-      case 'GPU':
-        return PlatformDeviceType.gpu;
-    }
-    throw Exception('$this is not known in enum PlatformDeviceType');
-  }
+  const PlatformDeviceType(this.value);
+
+  static PlatformDeviceType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum PlatformDeviceType'));
 }
 
 /// Port mappings allow containers to access ports on the host container
@@ -12585,22 +12507,19 @@ extension PlatformDeviceTypeFromString on String {
 ///
 /// Most fields of this parameter (<code>containerPort</code>,
 /// <code>hostPort</code>, <code>protocol</code>) maps to
-/// <code>PortBindings</code> in the <a
-/// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-/// a container</a> section of the <a
-/// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-/// the <code>--publish</code> option to <a
-/// href="https://docs.docker.com/engine/reference/commandline/run/">
-/// <code>docker run</code> </a>. If the network mode of a task definition is
-/// set to <code>host</code>, host ports must either be undefined or match the
-/// container port in the port mapping.
+/// <code>PortBindings</code> in the docker conainer create command and the
+/// <code>--publish</code> option to <code>docker run</code>. If the network
+/// mode of a task definition is set to <code>host</code>, host ports must
+/// either be undefined or match the container port in the port mapping.
 /// <note>
 /// You can't expose the same container port for multiple protocols. If you
 /// attempt this, an error is returned.
 /// </note>
 /// After a task reaches the <code>RUNNING</code> status, manual and automatic
 /// host and container port assignments are visible in the
-/// <code>networkBindings</code> section of <a>DescribeTasks</a> API responses.
+/// <code>networkBindings</code> section of <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_DescribeTasks.html">DescribeTasks</a>
+/// API responses.
 class PortMapping {
   /// The application protocol that's used for the port mapping. This parameter
   /// only applies to Service Connect. We recommend that you set this parameter to
@@ -12611,6 +12530,9 @@ class PortMapping {
   ///
   /// If you don't set a value for this parameter, then TCP is used. However,
   /// Amazon ECS doesn't add protocol-specific telemetry for TCP.
+  ///
+  /// <code>appProtocol</code> is immutable in a Service Connect service. Updating
+  /// this field requires a service deletion and redeployment.
   ///
   /// Tasks that run in a namespace can use short names to connect to services in
   /// the namespace. Tasks can connect to services across all of the clusters in
@@ -12669,8 +12591,8 @@ class PortMapping {
   /// <ul>
   /// <li>
   /// For containers in a task with the <code>awsvpc</code> network mode, the
-  /// <code>hostPort</code> is set to the same value as the
-  /// <code>containerPort</code>. This is a static mapping strategy.
+  /// <code>hostPortRange</code> is set to the same value as the
+  /// <code>containerPortRange</code>. This is a static mapping strategy.
   /// </li>
   /// <li>
   /// For containers in a task with the <code>bridge</code> network mode, the
@@ -12742,9 +12664,10 @@ class PortMapping {
   /// listed on the instance under
   /// <code>/proc/sys/net/ipv4/ip_local_port_range</code>. If this kernel
   /// parameter is unavailable, the default ephemeral port range from 49153
-  /// through 65535 is used. Do not attempt to specify a host port in the
-  /// ephemeral port range as these are reserved for automatic assignment. In
-  /// general, ports below 32768 are outside of the ephemeral port range.
+  /// through 65535 (Linux) or 49152 through 65535 (Windows) is used. Do not
+  /// attempt to specify a host port in the ephemeral port range as these are
+  /// reserved for automatic assignment. In general, ports below 32768 are outside
+  /// of the ephemeral port range.
   ///
   /// The default reserved ports are 22 for SSH, the Docker ports 2375 and 2376,
   /// and the Amazon ECS container agent ports 51678-51680. Any host port that was
@@ -12769,7 +12692,9 @@ class PortMapping {
   final String? name;
 
   /// The protocol used for the port mapping. Valid values are <code>tcp</code>
-  /// and <code>udp</code>. The default is <code>tcp</code>.
+  /// and <code>udp</code>. The default is <code>tcp</code>. <code>protocol</code>
+  /// is immutable in a Service Connect service. Updating this field requires a
+  /// service deletion and redeployment.
   final TransportProtocol? protocol;
 
   PortMapping({
@@ -12783,12 +12708,14 @@ class PortMapping {
 
   factory PortMapping.fromJson(Map<String, dynamic> json) {
     return PortMapping(
-      appProtocol: (json['appProtocol'] as String?)?.toApplicationProtocol(),
+      appProtocol:
+          (json['appProtocol'] as String?)?.let(ApplicationProtocol.fromString),
       containerPort: json['containerPort'] as int?,
       containerPortRange: json['containerPortRange'] as String?,
       hostPort: json['hostPort'] as int?,
       name: json['name'] as String?,
-      protocol: (json['protocol'] as String?)?.toTransportProtocol(),
+      protocol:
+          (json['protocol'] as String?)?.let(TransportProtocol.fromString),
     );
   }
 
@@ -12800,52 +12727,38 @@ class PortMapping {
     final name = this.name;
     final protocol = this.protocol;
     return {
-      if (appProtocol != null) 'appProtocol': appProtocol.toValue(),
+      if (appProtocol != null) 'appProtocol': appProtocol.value,
       if (containerPort != null) 'containerPort': containerPort,
       if (containerPortRange != null) 'containerPortRange': containerPortRange,
       if (hostPort != null) 'hostPort': hostPort,
       if (name != null) 'name': name,
-      if (protocol != null) 'protocol': protocol.toValue(),
+      if (protocol != null) 'protocol': protocol.value,
     };
   }
 }
 
 enum PropagateTags {
-  taskDefinition,
-  service,
-  none,
-}
+  taskDefinition('TASK_DEFINITION'),
+  service('SERVICE'),
+  none('NONE'),
+  ;
 
-extension PropagateTagsValueExtension on PropagateTags {
-  String toValue() {
-    switch (this) {
-      case PropagateTags.taskDefinition:
-        return 'TASK_DEFINITION';
-      case PropagateTags.service:
-        return 'SERVICE';
-      case PropagateTags.none:
-        return 'NONE';
-    }
-  }
-}
+  final String value;
 
-extension PropagateTagsFromString on String {
-  PropagateTags toPropagateTags() {
-    switch (this) {
-      case 'TASK_DEFINITION':
-        return PropagateTags.taskDefinition;
-      case 'SERVICE':
-        return PropagateTags.service;
-      case 'NONE':
-        return PropagateTags.none;
-    }
-    throw Exception('$this is not known in enum PropagateTags');
-  }
+  const PropagateTags(this.value);
+
+  static PropagateTags fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum PropagateTags'));
 }
 
 /// An object representing the protection status details for a task. You can set
-/// the protection status with the <a>UpdateTaskProtection</a> API and get the
-/// status of tasks with the <a>GetTaskProtection</a> API.
+/// the protection status with the <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateTaskProtection.html">UpdateTaskProtection</a>
+/// API and get the status of tasks with the <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_GetTaskProtection.html">GetTaskProtection</a>
+/// API.
 class ProtectedTask {
   /// The epoch time when protection for the task will expire.
   final DateTime? expirationDate;
@@ -12941,10 +12854,10 @@ class ProxyConfiguration {
     return ProxyConfiguration(
       containerName: json['containerName'] as String,
       properties: (json['properties'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => KeyValuePair.fromJson(e as Map<String, dynamic>))
           .toList(),
-      type: (json['type'] as String?)?.toProxyConfigurationType(),
+      type: (json['type'] as String?)?.let(ProxyConfigurationType.fromString),
     );
   }
 
@@ -12955,32 +12868,23 @@ class ProxyConfiguration {
     return {
       'containerName': containerName,
       if (properties != null) 'properties': properties,
-      if (type != null) 'type': type.toValue(),
+      if (type != null) 'type': type.value,
     };
   }
 }
 
 enum ProxyConfigurationType {
-  appmesh,
-}
+  appmesh('APPMESH'),
+  ;
 
-extension ProxyConfigurationTypeValueExtension on ProxyConfigurationType {
-  String toValue() {
-    switch (this) {
-      case ProxyConfigurationType.appmesh:
-        return 'APPMESH';
-    }
-  }
-}
+  final String value;
 
-extension ProxyConfigurationTypeFromString on String {
-  ProxyConfigurationType toProxyConfigurationType() {
-    switch (this) {
-      case 'APPMESH':
-        return ProxyConfigurationType.appmesh;
-    }
-    throw Exception('$this is not known in enum ProxyConfigurationType');
-  }
+  const ProxyConfigurationType(this.value);
+
+  static ProxyConfigurationType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ProxyConfigurationType'));
 }
 
 class PutAccountSettingDefaultResponse {
@@ -13028,7 +12932,7 @@ class PutAttributesResponse {
   factory PutAttributesResponse.fromJson(Map<String, dynamic> json) {
     return PutAttributesResponse(
       attributes: (json['attributes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attribute.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -13087,7 +12991,7 @@ class RegisterTaskDefinitionResponse {
   factory RegisterTaskDefinitionResponse.fromJson(Map<String, dynamic> json) {
     return RegisterTaskDefinitionResponse(
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       taskDefinition: json['taskDefinition'] != null
@@ -13171,7 +13075,7 @@ class Resource {
       longValue: json['longValue'] as int?,
       name: json['name'] as String?,
       stringSetValue: (json['stringSetValue'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       type: json['type'] as String?,
@@ -13205,20 +13109,19 @@ class Resource {
 /// with Amazon Elastic Inference on Amazon ECS</a> in the <i>Amazon Elastic
 /// Container Service Developer Guide</i>
 class ResourceRequirement {
-  /// The type of resource to assign to a container. The supported values are
-  /// <code>GPU</code> or <code>InferenceAccelerator</code>.
+  /// The type of resource to assign to a container.
   final ResourceType type;
 
   /// The value for the specified resource type.
   ///
-  /// If the <code>GPU</code> type is used, the value is the number of physical
+  /// When the type is <code>GPU</code>, the value is the number of physical
   /// <code>GPUs</code> the Amazon ECS container agent reserves for the container.
   /// The number of GPUs that's reserved for all containers in a task can't exceed
   /// the number of available GPUs on the container instance that the task is
   /// launched on.
   ///
-  /// If the <code>InferenceAccelerator</code> type is used, the
-  /// <code>value</code> matches the <code>deviceName</code> for an <a
+  /// When the type is <code>InferenceAccelerator</code>, the <code>value</code>
+  /// matches the <code>deviceName</code> for an <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_InferenceAccelerator.html">InferenceAccelerator</a>
   /// specified in a task definition.
   final String value;
@@ -13230,7 +13133,7 @@ class ResourceRequirement {
 
   factory ResourceRequirement.fromJson(Map<String, dynamic> json) {
     return ResourceRequirement(
-      type: (json['type'] as String).toResourceType(),
+      type: ResourceType.fromString((json['type'] as String)),
       value: json['value'] as String,
     );
   }
@@ -13239,42 +13142,36 @@ class ResourceRequirement {
     final type = this.type;
     final value = this.value;
     return {
-      'type': type.toValue(),
+      'type': type.value,
       'value': value,
     };
   }
 }
 
 enum ResourceType {
-  gpu,
-  inferenceAccelerator,
-}
+  gpu('GPU'),
+  inferenceAccelerator('InferenceAccelerator'),
+  ;
 
-extension ResourceTypeValueExtension on ResourceType {
-  String toValue() {
-    switch (this) {
-      case ResourceType.gpu:
-        return 'GPU';
-      case ResourceType.inferenceAccelerator:
-        return 'InferenceAccelerator';
-    }
-  }
-}
+  final String value;
 
-extension ResourceTypeFromString on String {
-  ResourceType toResourceType() {
-    switch (this) {
-      case 'GPU':
-        return ResourceType.gpu;
-      case 'InferenceAccelerator':
-        return ResourceType.inferenceAccelerator;
-    }
-    throw Exception('$this is not known in enum ResourceType');
-  }
+  const ResourceType(this.value);
+
+  static ResourceType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ResourceType'));
 }
 
 class RunTaskResponse {
   /// Any failures associated with the call.
+  ///
+  /// For information about how to address failures, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/service-event-messages.html#service-event-messages-list">Service
+  /// event messages</a> and <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/api_failures_messages.html">API
+  /// failure reasons</a> in the <i>Amazon Elastic Container Service Developer
+  /// Guide</i>.
   final List<Failure>? failures;
 
   /// A full description of the tasks that were run. The tasks that were
@@ -13289,11 +13186,11 @@ class RunTaskResponse {
   factory RunTaskResponse.fromJson(Map<String, dynamic> json) {
     return RunTaskResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       tasks: (json['tasks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Task.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -13324,9 +13221,9 @@ class RuntimePlatform {
   factory RuntimePlatform.fromJson(Map<String, dynamic> json) {
     return RuntimePlatform(
       cpuArchitecture:
-          (json['cpuArchitecture'] as String?)?.toCPUArchitecture(),
+          (json['cpuArchitecture'] as String?)?.let(CPUArchitecture.fromString),
       operatingSystemFamily:
-          (json['operatingSystemFamily'] as String?)?.toOSFamily(),
+          (json['operatingSystemFamily'] as String?)?.let(OSFamily.fromString),
     );
   }
 
@@ -13334,9 +13231,9 @@ class RuntimePlatform {
     final cpuArchitecture = this.cpuArchitecture;
     final operatingSystemFamily = this.operatingSystemFamily;
     return {
-      if (cpuArchitecture != null) 'cpuArchitecture': cpuArchitecture.toValue(),
+      if (cpuArchitecture != null) 'cpuArchitecture': cpuArchitecture.value,
       if (operatingSystemFamily != null)
-        'operatingSystemFamily': operatingSystemFamily.toValue(),
+        'operatingSystemFamily': operatingSystemFamily.value,
     };
   }
 }
@@ -13359,7 +13256,7 @@ class Scale {
 
   factory Scale.fromJson(Map<String, dynamic> json) {
     return Scale(
-      unit: (json['unit'] as String?)?.toScaleUnit(),
+      unit: (json['unit'] as String?)?.let(ScaleUnit.fromString),
       value: json['value'] as double?,
     );
   }
@@ -13368,89 +13265,52 @@ class Scale {
     final unit = this.unit;
     final value = this.value;
     return {
-      if (unit != null) 'unit': unit.toValue(),
+      if (unit != null) 'unit': unit.value,
       if (value != null) 'value': value,
     };
   }
 }
 
 enum ScaleUnit {
-  percent,
-}
+  percent('PERCENT'),
+  ;
 
-extension ScaleUnitValueExtension on ScaleUnit {
-  String toValue() {
-    switch (this) {
-      case ScaleUnit.percent:
-        return 'PERCENT';
-    }
-  }
-}
+  final String value;
 
-extension ScaleUnitFromString on String {
-  ScaleUnit toScaleUnit() {
-    switch (this) {
-      case 'PERCENT':
-        return ScaleUnit.percent;
-    }
-    throw Exception('$this is not known in enum ScaleUnit');
-  }
+  const ScaleUnit(this.value);
+
+  static ScaleUnit fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum ScaleUnit'));
 }
 
 enum SchedulingStrategy {
-  replica,
-  daemon,
-}
+  replica('REPLICA'),
+  daemon('DAEMON'),
+  ;
 
-extension SchedulingStrategyValueExtension on SchedulingStrategy {
-  String toValue() {
-    switch (this) {
-      case SchedulingStrategy.replica:
-        return 'REPLICA';
-      case SchedulingStrategy.daemon:
-        return 'DAEMON';
-    }
-  }
-}
+  final String value;
 
-extension SchedulingStrategyFromString on String {
-  SchedulingStrategy toSchedulingStrategy() {
-    switch (this) {
-      case 'REPLICA':
-        return SchedulingStrategy.replica;
-      case 'DAEMON':
-        return SchedulingStrategy.daemon;
-    }
-    throw Exception('$this is not known in enum SchedulingStrategy');
-  }
+  const SchedulingStrategy(this.value);
+
+  static SchedulingStrategy fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum SchedulingStrategy'));
 }
 
 enum Scope {
-  task,
-  shared,
-}
+  task('task'),
+  shared('shared'),
+  ;
 
-extension ScopeValueExtension on Scope {
-  String toValue() {
-    switch (this) {
-      case Scope.task:
-        return 'task';
-      case Scope.shared:
-        return 'shared';
-    }
-  }
-}
+  final String value;
 
-extension ScopeFromString on String {
-  Scope toScope() {
-    switch (this) {
-      case 'task':
-        return Scope.task;
-      case 'shared':
-        return Scope.shared;
-    }
-    throw Exception('$this is not known in enum Scope');
-  }
+  const Scope(this.value);
+
+  static Scope fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum Scope'));
 }
 
 /// An object representing the secret to expose to your container. Secrets can
@@ -13542,8 +13402,10 @@ class Service {
   final List<Deployment>? deployments;
 
   /// The desired number of instantiations of the task definition to keep running
-  /// on the service. This value is specified when the service is created with
-  /// <a>CreateService</a>, and it can be modified with <a>UpdateService</a>.
+  /// on the service. This value is specified when the service is created with <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateService.html">CreateService</a>
+  /// , and it can be modified with <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>.
   final int? desiredCount;
 
   /// Determines whether to use Amazon ECS managed tags for the tasks in the
@@ -13708,8 +13570,10 @@ class Service {
   final List<Tag>? tags;
 
   /// The task definition to use for tasks in the service. This value is specified
-  /// when the service is created with <a>CreateService</a>, and it can be
-  /// modified with <a>UpdateService</a>.
+  /// when the service is created with <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_CreateService.html">CreateService</a>,
+  /// and it can be modified with <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html">UpdateService</a>.
   final String? taskDefinition;
 
   /// Information about a set of Amazon ECS tasks in either an CodeDeploy or an
@@ -13755,7 +13619,7 @@ class Service {
   factory Service.fromJson(Map<String, dynamic> json) {
     return Service(
       capacityProviderStrategy: (json['capacityProviderStrategy'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               CapacityProviderStrategyItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -13771,21 +13635,21 @@ class Service {
               json['deploymentController'] as Map<String, dynamic>)
           : null,
       deployments: (json['deployments'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Deployment.fromJson(e as Map<String, dynamic>))
           .toList(),
       desiredCount: json['desiredCount'] as int?,
       enableECSManagedTags: json['enableECSManagedTags'] as bool?,
       enableExecuteCommand: json['enableExecuteCommand'] as bool?,
       events: (json['events'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ServiceEvent.fromJson(e as Map<String, dynamic>))
           .toList(),
       healthCheckGracePeriodSeconds:
           json['healthCheckGracePeriodSeconds'] as int?,
-      launchType: (json['launchType'] as String?)?.toLaunchType(),
+      launchType: (json['launchType'] as String?)?.let(LaunchType.fromString),
       loadBalancers: (json['loadBalancers'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => LoadBalancer.fromJson(e as Map<String, dynamic>))
           .toList(),
       networkConfiguration: json['networkConfiguration'] != null
@@ -13794,34 +13658,35 @@ class Service {
           : null,
       pendingCount: json['pendingCount'] as int?,
       placementConstraints: (json['placementConstraints'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => PlacementConstraint.fromJson(e as Map<String, dynamic>))
           .toList(),
       placementStrategy: (json['placementStrategy'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => PlacementStrategy.fromJson(e as Map<String, dynamic>))
           .toList(),
       platformFamily: json['platformFamily'] as String?,
       platformVersion: json['platformVersion'] as String?,
-      propagateTags: (json['propagateTags'] as String?)?.toPropagateTags(),
+      propagateTags:
+          (json['propagateTags'] as String?)?.let(PropagateTags.fromString),
       roleArn: json['roleArn'] as String?,
       runningCount: json['runningCount'] as int?,
-      schedulingStrategy:
-          (json['schedulingStrategy'] as String?)?.toSchedulingStrategy(),
+      schedulingStrategy: (json['schedulingStrategy'] as String?)
+          ?.let(SchedulingStrategy.fromString),
       serviceArn: json['serviceArn'] as String?,
       serviceName: json['serviceName'] as String?,
       serviceRegistries: (json['serviceRegistries'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ServiceRegistry.fromJson(e as Map<String, dynamic>))
           .toList(),
       status: json['status'] as String?,
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       taskDefinition: json['taskDefinition'] as String?,
       taskSets: (json['taskSets'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => TaskSet.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -13951,7 +13816,7 @@ class ServiceConnectConfiguration {
           : null,
       namespace: json['namespace'] as String?,
       services: (json['services'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ServiceConnectService.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -14017,23 +13882,41 @@ class ServiceConnectService {
   /// of the Service Connect proxy.
   final int? ingressPortOverride;
 
+  /// A reference to an object that represents the configured timeouts for Service
+  /// Connect.
+  final TimeoutConfiguration? timeout;
+
+  /// A reference to an object that represents a Transport Layer Security (TLS)
+  /// configuration.
+  final ServiceConnectTlsConfiguration? tls;
+
   ServiceConnectService({
     required this.portName,
     this.clientAliases,
     this.discoveryName,
     this.ingressPortOverride,
+    this.timeout,
+    this.tls,
   });
 
   factory ServiceConnectService.fromJson(Map<String, dynamic> json) {
     return ServiceConnectService(
       portName: json['portName'] as String,
       clientAliases: (json['clientAliases'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               ServiceConnectClientAlias.fromJson(e as Map<String, dynamic>))
           .toList(),
       discoveryName: json['discoveryName'] as String?,
       ingressPortOverride: json['ingressPortOverride'] as int?,
+      timeout: json['timeout'] != null
+          ? TimeoutConfiguration.fromJson(
+              json['timeout'] as Map<String, dynamic>)
+          : null,
+      tls: json['tls'] != null
+          ? ServiceConnectTlsConfiguration.fromJson(
+              json['tls'] as Map<String, dynamic>)
+          : null,
     );
   }
 
@@ -14042,12 +13925,16 @@ class ServiceConnectService {
     final clientAliases = this.clientAliases;
     final discoveryName = this.discoveryName;
     final ingressPortOverride = this.ingressPortOverride;
+    final timeout = this.timeout;
+    final tls = this.tls;
     return {
       'portName': portName,
       if (clientAliases != null) 'clientAliases': clientAliases,
       if (discoveryName != null) 'discoveryName': discoveryName,
       if (ingressPortOverride != null)
         'ingressPortOverride': ingressPortOverride,
+      if (timeout != null) 'timeout': timeout,
+      if (tls != null) 'tls': tls,
     };
   }
 }
@@ -14094,6 +13981,71 @@ class ServiceConnectServiceResource {
   }
 }
 
+/// The certificate root authority that secures your service.
+class ServiceConnectTlsCertificateAuthority {
+  /// The ARN of the Amazon Web Services Private Certificate Authority
+  /// certificate.
+  final String? awsPcaAuthorityArn;
+
+  ServiceConnectTlsCertificateAuthority({
+    this.awsPcaAuthorityArn,
+  });
+
+  factory ServiceConnectTlsCertificateAuthority.fromJson(
+      Map<String, dynamic> json) {
+    return ServiceConnectTlsCertificateAuthority(
+      awsPcaAuthorityArn: json['awsPcaAuthorityArn'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final awsPcaAuthorityArn = this.awsPcaAuthorityArn;
+    return {
+      if (awsPcaAuthorityArn != null) 'awsPcaAuthorityArn': awsPcaAuthorityArn,
+    };
+  }
+}
+
+/// The key that encrypts and decrypts your resources for Service Connect TLS.
+class ServiceConnectTlsConfiguration {
+  /// The signer certificate authority.
+  final ServiceConnectTlsCertificateAuthority issuerCertificateAuthority;
+
+  /// The Amazon Web Services Key Management Service key.
+  final String? kmsKey;
+
+  /// The Amazon Resource Name (ARN) of the IAM role that's associated with the
+  /// Service Connect TLS.
+  final String? roleArn;
+
+  ServiceConnectTlsConfiguration({
+    required this.issuerCertificateAuthority,
+    this.kmsKey,
+    this.roleArn,
+  });
+
+  factory ServiceConnectTlsConfiguration.fromJson(Map<String, dynamic> json) {
+    return ServiceConnectTlsConfiguration(
+      issuerCertificateAuthority:
+          ServiceConnectTlsCertificateAuthority.fromJson(
+              json['issuerCertificateAuthority'] as Map<String, dynamic>),
+      kmsKey: json['kmsKey'] as String?,
+      roleArn: json['roleArn'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final issuerCertificateAuthority = this.issuerCertificateAuthority;
+    final kmsKey = this.kmsKey;
+    final roleArn = this.roleArn;
+    return {
+      'issuerCertificateAuthority': issuerCertificateAuthority,
+      if (kmsKey != null) 'kmsKey': kmsKey,
+      if (roleArn != null) 'roleArn': roleArn,
+    };
+  }
+}
+
 /// The details for an event that's associated with a service.
 class ServiceEvent {
   /// The Unix timestamp for the time when the event was triggered.
@@ -14121,25 +14073,232 @@ class ServiceEvent {
 }
 
 enum ServiceField {
-  tags,
+  tags('TAGS'),
+  ;
+
+  final String value;
+
+  const ServiceField(this.value);
+
+  static ServiceField fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ServiceField'));
 }
 
-extension ServiceFieldValueExtension on ServiceField {
-  String toValue() {
-    switch (this) {
-      case ServiceField.tags:
-        return 'TAGS';
-    }
+/// The configuration for the Amazon EBS volume that Amazon ECS creates and
+/// manages on your behalf. These settings are used to create each Amazon EBS
+/// volume, with one volume created for each task in the service.
+///
+/// Many of these parameters map 1:1 with the Amazon EBS
+/// <code>CreateVolume</code> API request parameters.
+class ServiceManagedEBSVolumeConfiguration {
+  /// The ARN of the IAM role to associate with this volume. This is the Amazon
+  /// ECS infrastructure IAM role that is used to manage your Amazon Web Services
+  /// infrastructure. We recommend using the Amazon ECS-managed
+  /// <code>AmazonECSInfrastructureRolePolicyForVolumes</code> IAM policy with
+  /// this role. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/infrastructure_IAM_role.html">Amazon
+  /// ECS infrastructure IAM role</a> in the <i>Amazon ECS Developer Guide</i>.
+  final String roleArn;
+
+  /// Indicates whether the volume should be encrypted. If no value is specified,
+  /// encryption is turned on by default. This parameter maps 1:1 with the
+  /// <code>Encrypted</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final bool? encrypted;
+
+  /// The Linux filesystem type for the volume. For volumes created from a
+  /// snapshot, you must specify the same filesystem type that the volume was
+  /// using when the snapshot was created. If there is a filesystem type mismatch,
+  /// the task will fail to start.
+  ///
+  /// The available filesystem types are&#x2028; <code>ext3</code>,
+  /// <code>ext4</code>, and <code>xfs</code>. If no value is specified, the
+  /// <code>xfs</code> filesystem type is used by default.
+  final TaskFilesystemType? filesystemType;
+
+  /// The number of I/O operations per second (IOPS). For <code>gp3</code>,
+  /// <code>io1</code>, and <code>io2</code> volumes, this represents the number
+  /// of IOPS that are provisioned for the volume. For <code>gp2</code> volumes,
+  /// this represents the baseline performance of the volume and the rate at which
+  /// the volume accumulates I/O credits for bursting.
+  ///
+  /// The following are the supported values for each volume type.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>gp3</code>: 3,000 - 16,000 IOPS
+  /// </li>
+  /// <li>
+  /// <code>io1</code>: 100 - 64,000 IOPS
+  /// </li>
+  /// <li>
+  /// <code>io2</code>: 100 - 256,000 IOPS
+  /// </li>
+  /// </ul>
+  /// This parameter is required for <code>io1</code> and <code>io2</code> volume
+  /// types. The default for <code>gp3</code> volumes is <code>3,000 IOPS</code>.
+  /// This parameter is not supported for <code>st1</code>, <code>sc1</code>, or
+  /// <code>standard</code> volume types.
+  ///
+  /// This parameter maps 1:1 with the <code>Iops</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final int? iops;
+
+  /// The Amazon Resource Name (ARN) identifier of the Amazon Web Services Key
+  /// Management Service key to use for Amazon EBS encryption. When encryption is
+  /// turned on and no Amazon Web Services Key Management Service key is
+  /// specified, the default Amazon Web Services managed key for Amazon EBS
+  /// volumes is used. This parameter maps 1:1 with the <code>KmsKeyId</code>
+  /// parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  /// <important>
+  /// Amazon Web Services authenticates the Amazon Web Services Key Management
+  /// Service key asynchronously. Therefore, if you specify an ID, alias, or ARN
+  /// that is invalid, the action can appear to complete, but eventually fails.
+  /// </important>
+  final String? kmsKeyId;
+
+  /// The size of the volume in GiB. You must specify either a volume size or a
+  /// snapshot ID. If you specify a snapshot ID, the snapshot size is used for the
+  /// volume size by default. You can optionally specify a volume size greater
+  /// than or equal to the snapshot size. This parameter maps 1:1 with the
+  /// <code>Size</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  ///
+  /// The following are the supported volume size values for each volume type.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>gp2</code> and <code>gp3</code>: 1-16,384
+  /// </li>
+  /// <li>
+  /// <code>io1</code> and <code>io2</code>: 4-16,384
+  /// </li>
+  /// <li>
+  /// <code>st1</code> and <code>sc1</code>: 125-16,384
+  /// </li>
+  /// <li>
+  /// <code>standard</code>: 1-1,024
+  /// </li>
+  /// </ul>
+  final int? sizeInGiB;
+
+  /// The snapshot that Amazon ECS uses to create the volume. You must specify
+  /// either a snapshot ID or a volume size. This parameter maps 1:1 with the
+  /// <code>SnapshotId</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final String? snapshotId;
+
+  /// The tags to apply to the volume. Amazon ECS applies service-managed tags by
+  /// default. This parameter maps 1:1 with the <code>TagSpecifications.N</code>
+  /// parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final List<EBSTagSpecification>? tagSpecifications;
+
+  /// The throughput to provision for a volume, in MiB/s, with a maximum of 1,000
+  /// MiB/s. This parameter maps 1:1 with the <code>Throughput</code> parameter of
+  /// the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  /// <important>
+  /// This parameter is only supported for the <code>gp3</code> volume type.
+  /// </important>
+  final int? throughput;
+
+  /// The volume type. This parameter maps 1:1 with the <code>VolumeType</code>
+  /// parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html">Amazon
+  /// EBS volume types</a> in the <i>Amazon EC2 User Guide</i>.
+  ///
+  /// The following are the supported volume types.
+  ///
+  /// <ul>
+  /// <li>
+  /// General Purpose SSD: <code>gp2</code>|<code>gp3</code>
+  /// </li>
+  /// <li>
+  /// Provisioned IOPS SSD: <code>io1</code>|<code>io2</code>
+  /// </li>
+  /// <li>
+  /// Throughput Optimized HDD: <code>st1</code>
+  /// </li>
+  /// <li>
+  /// Cold HDD: <code>sc1</code>
+  /// </li>
+  /// <li>
+  /// Magnetic: <code>standard</code>
+  /// <note>
+  /// The magnetic volume type is not supported on Fargate.
+  /// </note> </li>
+  /// </ul>
+  final String? volumeType;
+
+  ServiceManagedEBSVolumeConfiguration({
+    required this.roleArn,
+    this.encrypted,
+    this.filesystemType,
+    this.iops,
+    this.kmsKeyId,
+    this.sizeInGiB,
+    this.snapshotId,
+    this.tagSpecifications,
+    this.throughput,
+    this.volumeType,
+  });
+
+  factory ServiceManagedEBSVolumeConfiguration.fromJson(
+      Map<String, dynamic> json) {
+    return ServiceManagedEBSVolumeConfiguration(
+      roleArn: json['roleArn'] as String,
+      encrypted: json['encrypted'] as bool?,
+      filesystemType: (json['filesystemType'] as String?)
+          ?.let(TaskFilesystemType.fromString),
+      iops: json['iops'] as int?,
+      kmsKeyId: json['kmsKeyId'] as String?,
+      sizeInGiB: json['sizeInGiB'] as int?,
+      snapshotId: json['snapshotId'] as String?,
+      tagSpecifications: (json['tagSpecifications'] as List?)
+          ?.nonNulls
+          .map((e) => EBSTagSpecification.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      throughput: json['throughput'] as int?,
+      volumeType: json['volumeType'] as String?,
+    );
   }
-}
 
-extension ServiceFieldFromString on String {
-  ServiceField toServiceField() {
-    switch (this) {
-      case 'TAGS':
-        return ServiceField.tags;
-    }
-    throw Exception('$this is not known in enum ServiceField');
+  Map<String, dynamic> toJson() {
+    final roleArn = this.roleArn;
+    final encrypted = this.encrypted;
+    final filesystemType = this.filesystemType;
+    final iops = this.iops;
+    final kmsKeyId = this.kmsKeyId;
+    final sizeInGiB = this.sizeInGiB;
+    final snapshotId = this.snapshotId;
+    final tagSpecifications = this.tagSpecifications;
+    final throughput = this.throughput;
+    final volumeType = this.volumeType;
+    return {
+      'roleArn': roleArn,
+      if (encrypted != null) 'encrypted': encrypted,
+      if (filesystemType != null) 'filesystemType': filesystemType.value,
+      if (iops != null) 'iops': iops,
+      if (kmsKeyId != null) 'kmsKeyId': kmsKeyId,
+      if (sizeInGiB != null) 'sizeInGiB': sizeInGiB,
+      if (snapshotId != null) 'snapshotId': snapshotId,
+      if (tagSpecifications != null) 'tagSpecifications': tagSpecifications,
+      if (throughput != null) 'throughput': throughput,
+      if (volumeType != null) 'volumeType': volumeType,
+    };
   }
 }
 
@@ -14214,6 +14373,46 @@ class ServiceRegistry {
   }
 }
 
+/// The configuration for a volume specified in the task definition as a volume
+/// that is configured at launch time. Currently, the only supported volume type
+/// is an Amazon EBS volume.
+class ServiceVolumeConfiguration {
+  /// The name of the volume. This value must match the volume name from the
+  /// <code>Volume</code> object in the task definition.
+  final String name;
+
+  /// The configuration for the Amazon EBS volume that Amazon ECS creates and
+  /// manages on your behalf. These settings are used to create each Amazon EBS
+  /// volume, with one volume created for each task in the service. The Amazon EBS
+  /// volumes are visible in your account in the Amazon EC2 console once they are
+  /// created.
+  final ServiceManagedEBSVolumeConfiguration? managedEBSVolume;
+
+  ServiceVolumeConfiguration({
+    required this.name,
+    this.managedEBSVolume,
+  });
+
+  factory ServiceVolumeConfiguration.fromJson(Map<String, dynamic> json) {
+    return ServiceVolumeConfiguration(
+      name: json['name'] as String,
+      managedEBSVolume: json['managedEBSVolume'] != null
+          ? ServiceManagedEBSVolumeConfiguration.fromJson(
+              json['managedEBSVolume'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final managedEBSVolume = this.managedEBSVolume;
+    return {
+      'name': name,
+      if (managedEBSVolume != null) 'managedEBSVolume': managedEBSVolume,
+    };
+  }
+}
+
 /// The details for the execute command session.
 class Session {
   /// The ID of the execute command session.
@@ -14251,6 +14450,15 @@ class Setting {
   /// field is omitted, the authenticated user is assumed.
   final String? principalArn;
 
+  /// Indicates whether Amazon Web Services manages the account setting, or if the
+  /// user manages it.
+  ///
+  /// <code>aws_managed</code> account settings are read-only, as Amazon Web
+  /// Services manages such on the customer's behalf. Currently, the
+  /// <code>guardDutyActivate</code> account setting is the only one Amazon Web
+  /// Services manages.
+  final SettingType? type;
+
   /// Determines whether the account setting is on or off for the specified
   /// resource.
   final String? value;
@@ -14258,125 +14466,82 @@ class Setting {
   Setting({
     this.name,
     this.principalArn,
+    this.type,
     this.value,
   });
 
   factory Setting.fromJson(Map<String, dynamic> json) {
     return Setting(
-      name: (json['name'] as String?)?.toSettingName(),
+      name: (json['name'] as String?)?.let(SettingName.fromString),
       principalArn: json['principalArn'] as String?,
+      type: (json['type'] as String?)?.let(SettingType.fromString),
       value: json['value'] as String?,
     );
   }
 }
 
 enum SettingName {
-  serviceLongArnFormat,
-  taskLongArnFormat,
-  containerInstanceLongArnFormat,
-  awsvpcTrunking,
-  containerInsights,
-  fargateFIPSMode,
-  tagResourceAuthorization,
+  serviceLongArnFormat('serviceLongArnFormat'),
+  taskLongArnFormat('taskLongArnFormat'),
+  containerInstanceLongArnFormat('containerInstanceLongArnFormat'),
+  awsvpcTrunking('awsvpcTrunking'),
+  containerInsights('containerInsights'),
+  fargateFIPSMode('fargateFIPSMode'),
+  tagResourceAuthorization('tagResourceAuthorization'),
+  fargateTaskRetirementWaitPeriod('fargateTaskRetirementWaitPeriod'),
+  guardDutyActivate('guardDutyActivate'),
+  ;
+
+  final String value;
+
+  const SettingName(this.value);
+
+  static SettingName fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum SettingName'));
 }
 
-extension SettingNameValueExtension on SettingName {
-  String toValue() {
-    switch (this) {
-      case SettingName.serviceLongArnFormat:
-        return 'serviceLongArnFormat';
-      case SettingName.taskLongArnFormat:
-        return 'taskLongArnFormat';
-      case SettingName.containerInstanceLongArnFormat:
-        return 'containerInstanceLongArnFormat';
-      case SettingName.awsvpcTrunking:
-        return 'awsvpcTrunking';
-      case SettingName.containerInsights:
-        return 'containerInsights';
-      case SettingName.fargateFIPSMode:
-        return 'fargateFIPSMode';
-      case SettingName.tagResourceAuthorization:
-        return 'tagResourceAuthorization';
-    }
-  }
-}
+enum SettingType {
+  user('user'),
+  awsManaged('aws_managed'),
+  ;
 
-extension SettingNameFromString on String {
-  SettingName toSettingName() {
-    switch (this) {
-      case 'serviceLongArnFormat':
-        return SettingName.serviceLongArnFormat;
-      case 'taskLongArnFormat':
-        return SettingName.taskLongArnFormat;
-      case 'containerInstanceLongArnFormat':
-        return SettingName.containerInstanceLongArnFormat;
-      case 'awsvpcTrunking':
-        return SettingName.awsvpcTrunking;
-      case 'containerInsights':
-        return SettingName.containerInsights;
-      case 'fargateFIPSMode':
-        return SettingName.fargateFIPSMode;
-      case 'tagResourceAuthorization':
-        return SettingName.tagResourceAuthorization;
-    }
-    throw Exception('$this is not known in enum SettingName');
-  }
+  final String value;
+
+  const SettingType(this.value);
+
+  static SettingType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum SettingType'));
 }
 
 enum SortOrder {
-  asc,
-  desc,
-}
+  asc('ASC'),
+  desc('DESC'),
+  ;
 
-extension SortOrderValueExtension on SortOrder {
-  String toValue() {
-    switch (this) {
-      case SortOrder.asc:
-        return 'ASC';
-      case SortOrder.desc:
-        return 'DESC';
-    }
-  }
-}
+  final String value;
 
-extension SortOrderFromString on String {
-  SortOrder toSortOrder() {
-    switch (this) {
-      case 'ASC':
-        return SortOrder.asc;
-      case 'DESC':
-        return SortOrder.desc;
-    }
-    throw Exception('$this is not known in enum SortOrder');
-  }
+  const SortOrder(this.value);
+
+  static SortOrder fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum SortOrder'));
 }
 
 enum StabilityStatus {
-  steadyState,
-  stabilizing,
-}
+  steadyState('STEADY_STATE'),
+  stabilizing('STABILIZING'),
+  ;
 
-extension StabilityStatusValueExtension on StabilityStatus {
-  String toValue() {
-    switch (this) {
-      case StabilityStatus.steadyState:
-        return 'STEADY_STATE';
-      case StabilityStatus.stabilizing:
-        return 'STABILIZING';
-    }
-  }
-}
+  final String value;
 
-extension StabilityStatusFromString on String {
-  StabilityStatus toStabilityStatus() {
-    switch (this) {
-      case 'STEADY_STATE':
-        return StabilityStatus.steadyState;
-      case 'STABILIZING':
-        return StabilityStatus.stabilizing;
-    }
-    throw Exception('$this is not known in enum StabilityStatus');
-  }
+  const StabilityStatus(this.value);
+
+  static StabilityStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum StabilityStatus'));
 }
 
 class StartTaskResponse {
@@ -14395,11 +14560,11 @@ class StartTaskResponse {
   factory StartTaskResponse.fromJson(Map<String, dynamic> json) {
     return StartTaskResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       tasks: (json['tasks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Task.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -14471,40 +14636,66 @@ class SubmitTaskStateChangeResponse {
 }
 
 /// A list of namespaced kernel parameters to set in the container. This
-/// parameter maps to <code>Sysctls</code> in the <a
-/// href="https://docs.docker.com/engine/api/v1.35/#operation/ContainerCreate">Create
-/// a container</a> section of the <a
-/// href="https://docs.docker.com/engine/api/v1.35/">Docker Remote API</a> and
-/// the <code>--sysctl</code> option to <a
-/// href="https://docs.docker.com/engine/reference/run/#security-configuration">docker
-/// run</a>.
+/// parameter maps to <code>Sysctls</code> in tthe docker conainer create
+/// command and the <code>--sysctl</code> option to docker run. For example, you
+/// can configure <code>net.ipv4.tcp_keepalive_time</code> setting to maintain
+/// longer lived connections.
 ///
 /// We don't recommend that you specify network-related
 /// <code>systemControls</code> parameters for multiple containers in a single
-/// task. This task also uses either the <code>awsvpc</code> or
-/// <code>host</code> network mode. It does it for the following reasons.
+/// task that also uses either the <code>awsvpc</code> or <code>host</code>
+/// network mode. Doing this has the following disadvantages:
 ///
 /// <ul>
 /// <li>
-/// For tasks that use the <code>awsvpc</code> network mode, if you set
-/// <code>systemControls</code> for any container, it applies to all containers
-/// in the task. If you set different <code>systemControls</code> for multiple
-/// containers in a single task, the container that's started last determines
-/// which <code>systemControls</code> take effect.
+/// For tasks that use the <code>awsvpc</code> network mode including Fargate,
+/// if you set <code>systemControls</code> for any container, it applies to all
+/// containers in the task. If you set different <code>systemControls</code> for
+/// multiple containers in a single task, the container that's started last
+/// determines which <code>systemControls</code> take effect.
 /// </li>
 /// <li>
-/// For tasks that use the <code>host</code> network mode, the
-/// <code>systemControls</code> parameter applies to the container instance's
-/// kernel parameter and that of all containers of any tasks running on that
-/// container instance.
+/// For tasks that use the <code>host</code> network mode, the network namespace
+/// <code>systemControls</code> aren't supported.
 /// </li>
 /// </ul>
+/// If you're setting an IPC resource namespace to use for the containers in the
+/// task, the following conditions apply to your system controls. For more
+/// information, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_definition_parameters.html#task_definition_ipcmode">IPC
+/// mode</a>.
+///
+/// <ul>
+/// <li>
+/// For tasks that use the <code>host</code> IPC mode, IPC namespace
+/// <code>systemControls</code> aren't supported.
+/// </li>
+/// <li>
+/// For tasks that use the <code>task</code> IPC mode, IPC namespace
+/// <code>systemControls</code> values apply to all containers within a task.
+/// </li>
+/// </ul> <note>
+/// This parameter is not supported for Windows containers.
+/// </note> <note>
+/// This parameter is only supported for tasks that are hosted on Fargate if the
+/// tasks are using platform version <code>1.4.0</code> or later (Linux). This
+/// isn't supported for Windows containers on Fargate.
+/// </note>
 class SystemControl {
   /// The namespaced kernel parameter to set a <code>value</code> for.
   final String? namespace;
 
-  /// The value for the namespaced kernel parameter that's specified in
-  /// <code>namespace</code>.
+  /// The namespaced kernel parameter to set a <code>value</code> for.
+  ///
+  /// Valid IPC namespace values: <code>"kernel.msgmax" | "kernel.msgmnb" |
+  /// "kernel.msgmni" | "kernel.sem" | "kernel.shmall" | "kernel.shmmax" |
+  /// "kernel.shmmni" | "kernel.shm_rmid_forced"</code>, and <code>Sysctls</code>
+  /// that start with <code>"fs.mqueue.*"</code>
+  ///
+  /// Valid network namespace values: <code>Sysctls</code> that start with
+  /// <code>"net.*"</code>
+  ///
+  /// All of these values are supported by Fargate.
   final String? value;
 
   SystemControl({
@@ -14606,26 +14797,16 @@ class TagResourceResponse {
 }
 
 enum TargetType {
-  containerInstance,
-}
+  containerInstance('container-instance'),
+  ;
 
-extension TargetTypeValueExtension on TargetType {
-  String toValue() {
-    switch (this) {
-      case TargetType.containerInstance:
-        return 'container-instance';
-    }
-  }
-}
+  final String value;
 
-extension TargetTypeFromString on String {
-  TargetType toTargetType() {
-    switch (this) {
-      case 'container-instance':
-        return TargetType.containerInstance;
-    }
-    throw Exception('$this is not known in enum TargetType');
-  }
+  const TargetType(this.value);
+
+  static TargetType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum TargetType'));
 }
 
 /// Details on a task in a cluster.
@@ -14733,6 +14914,9 @@ class Task {
 
   /// The Unix timestamp for the time when the task execution stopped.
   final DateTime? executionStoppedAt;
+
+  /// The Fargate ephemeral storage settings for the task.
+  final TaskEphemeralStorage? fargateEphemeralStorage;
 
   /// The name of the task group that's associated with the task.
   final String? group;
@@ -14854,28 +15038,9 @@ class Task {
   /// The stop code indicating why a task was stopped. The
   /// <code>stoppedReason</code> might contain additional details.
   ///
-  /// The following are valid values:
-  ///
-  /// <ul>
-  /// <li>
-  /// <code>TaskFailedToStart</code>
-  /// </li>
-  /// <li>
-  /// <code>EssentialContainerExited</code>
-  /// </li>
-  /// <li>
-  /// <code>UserInitiated</code>
-  /// </li>
-  /// <li>
-  /// <code>TerminationNotice</code>
-  /// </li>
-  /// <li>
-  /// <code>ServiceSchedulerInitiated</code>
-  /// </li>
-  /// <li>
-  /// <code>SpotInterruption</code>
-  /// </li>
-  /// </ul>
+  /// For more information about stop code, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/stopped-task-error-codes.html">Stopped
+  /// tasks error codes</a> in the <i>Amazon ECS Developer Guide</i>.
   final TaskStopCode? stopCode;
 
   /// The Unix timestamp for the time when the task was stopped. More
@@ -14888,7 +15053,7 @@ class Task {
 
   /// The Unix timestamp for the time when the task stops. More specifically, it's
   /// for the time when the task transitions from the <code>RUNNING</code> state
-  /// to <code>STOPPED</code>.
+  /// to <code>STOPPING</code>.
   final DateTime? stoppingAt;
 
   /// The metadata that you apply to the task to help you categorize and organize
@@ -14961,6 +15126,7 @@ class Task {
     this.enableExecuteCommand,
     this.ephemeralStorage,
     this.executionStoppedAt,
+    this.fargateEphemeralStorage,
     this.group,
     this.healthStatus,
     this.inferenceAccelerators,
@@ -14987,21 +15153,22 @@ class Task {
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       attachments: (json['attachments'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attachment.fromJson(e as Map<String, dynamic>))
           .toList(),
       attributes: (json['attributes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attribute.fromJson(e as Map<String, dynamic>))
           .toList(),
       availabilityZone: json['availabilityZone'] as String?,
       capacityProviderName: json['capacityProviderName'] as String?,
       clusterArn: json['clusterArn'] as String?,
-      connectivity: (json['connectivity'] as String?)?.toConnectivity(),
+      connectivity:
+          (json['connectivity'] as String?)?.let(Connectivity.fromString),
       connectivityAt: timeStampFromJson(json['connectivityAt']),
       containerInstanceArn: json['containerInstanceArn'] as String?,
       containers: (json['containers'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Container.fromJson(e as Map<String, dynamic>))
           .toList(),
       cpu: json['cpu'] as String?,
@@ -15013,14 +15180,19 @@ class Task {
               json['ephemeralStorage'] as Map<String, dynamic>)
           : null,
       executionStoppedAt: timeStampFromJson(json['executionStoppedAt']),
+      fargateEphemeralStorage: json['fargateEphemeralStorage'] != null
+          ? TaskEphemeralStorage.fromJson(
+              json['fargateEphemeralStorage'] as Map<String, dynamic>)
+          : null,
       group: json['group'] as String?,
-      healthStatus: (json['healthStatus'] as String?)?.toHealthStatus(),
+      healthStatus:
+          (json['healthStatus'] as String?)?.let(HealthStatus.fromString),
       inferenceAccelerators: (json['inferenceAccelerators'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => InferenceAccelerator.fromJson(e as Map<String, dynamic>))
           .toList(),
       lastStatus: json['lastStatus'] as String?,
-      launchType: (json['launchType'] as String?)?.toLaunchType(),
+      launchType: (json['launchType'] as String?)?.let(LaunchType.fromString),
       memory: json['memory'] as String?,
       overrides: json['overrides'] != null
           ? TaskOverride.fromJson(json['overrides'] as Map<String, dynamic>)
@@ -15031,12 +15203,12 @@ class Task {
       pullStoppedAt: timeStampFromJson(json['pullStoppedAt']),
       startedAt: timeStampFromJson(json['startedAt']),
       startedBy: json['startedBy'] as String?,
-      stopCode: (json['stopCode'] as String?)?.toTaskStopCode(),
+      stopCode: (json['stopCode'] as String?)?.let(TaskStopCode.fromString),
       stoppedAt: timeStampFromJson(json['stoppedAt']),
       stoppedReason: json['stoppedReason'] as String?,
       stoppingAt: timeStampFromJson(json['stoppingAt']),
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       taskArn: json['taskArn'] as String?,
@@ -15072,6 +15244,10 @@ class TaskDefinition {
   /// Fargate launch type, this field is required. You must use one of the
   /// following values. The value that you choose determines your range of valid
   /// values for the <code>memory</code> parameter.
+  ///
+  /// If you use the EC2 launch type, this field is optional. Supported values are
+  /// between <code>128</code> CPU units (<code>0.125</code> vCPUs) and
+  /// <code>10240</code> CPU units (<code>10</code> vCPUs).
   ///
   /// The CPU units cannot be less than 1 vCPU when you use Windows containers on
   /// Fargate.
@@ -15121,10 +15297,10 @@ class TaskDefinition {
 
   /// The Amazon Resource Name (ARN) of the task execution role that grants the
   /// Amazon ECS container agent permission to make Amazon Web Services API calls
-  /// on your behalf. The task execution IAM role is required depending on the
-  /// requirements of your task. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task_execution_IAM_role.html">Amazon
-  /// ECS task execution IAM role</a> in the <i>Amazon Elastic Container Service
+  /// on your behalf. For informationabout the required IAM roles for Amazon ECS,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-ecs-iam-role-overview.html">IAM
+  /// roles for Amazon ECS</a> in the <i>Amazon Elastic Container Service
   /// Developer Guide</i>.
   final String? executionRoleArn;
 
@@ -15151,14 +15327,10 @@ class TaskDefinition {
   /// resources within the containers of a task are private and not shared with
   /// other containers in a task or on the container instance. If no value is
   /// specified, then the IPC resource namespace sharing depends on the Docker
-  /// daemon setting on the container instance. For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#ipc-settings---ipc">IPC
-  /// settings</a> in the <i>Docker run reference</i>.
+  /// daemon setting on the container instance.
   ///
   /// If the <code>host</code> IPC mode is used, be aware that there is a
-  /// heightened risk of undesired IPC namespace expose. For more information, see
-  /// <a href="https://docs.docker.com/engine/security/security/">Docker
-  /// security</a>.
+  /// heightened risk of undesired IPC namespace expose.
   ///
   /// If you are setting namespaced kernel parameters using
   /// <code>systemControls</code> for the containers in the task, the following
@@ -15257,9 +15429,10 @@ class TaskDefinition {
   /// non-root user.
   /// </important>
   /// If the network mode is <code>awsvpc</code>, the task is allocated an elastic
-  /// network interface, and you must specify a <a>NetworkConfiguration</a> value
-  /// when you create a service or run a task with the task definition. For more
-  /// information, see <a
+  /// network interface, and you must specify a <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_NetworkConfiguration.html">NetworkConfiguration</a>
+  /// value when you create a service or run a task with the task definition. For
+  /// more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html">Task
   /// Networking</a> in the <i>Amazon Elastic Container Service Developer
   /// Guide</i>.
@@ -15267,30 +15440,32 @@ class TaskDefinition {
   /// If the network mode is <code>host</code>, you cannot run multiple
   /// instantiations of the same task on a single container instance when port
   /// mappings are used.
-  ///
-  /// For more information, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#network-settings">Network
-  /// settings</a> in the <i>Docker run reference</i>.
   final NetworkMode? networkMode;
 
   /// The process namespace to use for the containers in the task. The valid
-  /// values are <code>host</code> or <code>task</code>. If <code>host</code> is
-  /// specified, then all containers within the tasks that specified the
-  /// <code>host</code> PID mode on the same container instance share the same
-  /// process namespace with the host Amazon EC2 instance. If <code>task</code> is
-  /// specified, all containers within the specified task share the same process
-  /// namespace. If no value is specified, the default is a private namespace. For
-  /// more information, see <a
-  /// href="https://docs.docker.com/engine/reference/run/#pid-settings---pid">PID
-  /// settings</a> in the <i>Docker run reference</i>.
+  /// values are <code>host</code> or <code>task</code>. On Fargate for Linux
+  /// containers, the only valid value is <code>task</code>. For example,
+  /// monitoring sidecars might need <code>pidMode</code> to access information
+  /// about other containers running in the same task.
   ///
-  /// If the <code>host</code> PID mode is used, be aware that there is a
-  /// heightened risk of undesired process namespace expose. For more information,
-  /// see <a href="https://docs.docker.com/engine/security/security/">Docker
-  /// security</a>.
+  /// If <code>host</code> is specified, all containers within the tasks that
+  /// specified the <code>host</code> PID mode on the same container instance
+  /// share the same process namespace with the host Amazon EC2 instance.
+  ///
+  /// If <code>task</code> is specified, all containers within the specified task
+  /// share the same process namespace.
+  ///
+  /// If no value is specified, the default is a private namespace for each
+  /// container.
+  ///
+  /// If the <code>host</code> PID mode is used, there's a heightened risk of
+  /// undesired process namespace exposure.
   /// <note>
-  /// This parameter is not supported for Windows containers or tasks run on
-  /// Fargate.
+  /// This parameter is not supported for Windows containers.
+  /// </note> <note>
+  /// This parameter is only supported for tasks that are hosted on Fargate if the
+  /// tasks are using platform version <code>1.4.0</code> or later (Linux). This
+  /// isn't supported for Windows containers on Fargate.
   /// </note>
   final PidMode? pidMode;
 
@@ -15323,9 +15498,10 @@ class TaskDefinition {
   /// instance is registered to your cluster, the Amazon ECS container agent
   /// assigns some standard attributes to the instance. You can apply custom
   /// attributes. These are specified as key-value pairs using the Amazon ECS
-  /// console or the <a>PutAttributes</a> API. These attributes are used when
-  /// determining task placement for tasks hosted on Amazon EC2 instances. For
-  /// more information, see <a
+  /// console or the <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_PutAttributes.html">PutAttributes</a>
+  /// API. These attributes are used when determining task placement for tasks
+  /// hosted on Amazon EC2 instances. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-placement-constraints.html#attributes">Attributes</a>
   /// in the <i>Amazon Elastic Container Service Developer Guide</i>.
   /// <note>
@@ -15333,8 +15509,9 @@ class TaskDefinition {
   /// </note>
   final List<Attribute>? requiresAttributes;
 
-  /// The task launch types the task definition was validated against. For more
-  /// information, see <a
+  /// The task launch types the task definition was validated against. The valid
+  /// values are <code>EC2</code>, <code>FARGATE</code>, and
+  /// <code>EXTERNAL</code>. For more information, see <a
   /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/launch_types.html">Amazon
   /// ECS launch types</a> in the <i>Amazon Elastic Container Service Developer
   /// Guide</i>.
@@ -15363,18 +15540,11 @@ class TaskDefinition {
 
   /// The short name or full Amazon Resource Name (ARN) of the Identity and Access
   /// Management role that grants containers in the task permission to call Amazon
-  /// Web Services APIs on your behalf. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html">Amazon
-  /// ECS Task Role</a> in the <i>Amazon Elastic Container Service Developer
-  /// Guide</i>.
-  ///
-  /// IAM roles for tasks on Windows require that the
-  /// <code>-EnableTaskIAMRole</code> option is set when you launch the Amazon
-  /// ECS-optimized Windows AMI. Your containers must also run some configuration
-  /// code to use the feature. For more information, see <a
-  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/windows_task_IAM_roles.html">Windows
-  /// IAM roles for tasks</a> in the <i>Amazon Elastic Container Service Developer
-  /// Guide</i>.
+  /// Web Services APIs on your behalf. For informationabout the required IAM
+  /// roles for Amazon ECS, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/security-ecs-iam-role-overview.html">IAM
+  /// roles for Amazon ECS</a> in the <i>Amazon Elastic Container Service
+  /// Developer Guide</i>.
   final String? taskRoleArn;
 
   /// The list of data volume definitions for the task. For more information, see
@@ -15418,11 +15588,11 @@ class TaskDefinition {
   factory TaskDefinition.fromJson(Map<String, dynamic> json) {
     return TaskDefinition(
       compatibilities: (json['compatibilities'] as List?)
-          ?.whereNotNull()
-          .map((e) => (e as String).toCompatibility())
+          ?.nonNulls
+          .map((e) => Compatibility.fromString((e as String)))
           .toList(),
       containerDefinitions: (json['containerDefinitions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ContainerDefinition.fromJson(e as Map<String, dynamic>))
           .toList(),
       cpu: json['cpu'] as String?,
@@ -15434,15 +15604,16 @@ class TaskDefinition {
       executionRoleArn: json['executionRoleArn'] as String?,
       family: json['family'] as String?,
       inferenceAccelerators: (json['inferenceAccelerators'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => InferenceAccelerator.fromJson(e as Map<String, dynamic>))
           .toList(),
-      ipcMode: (json['ipcMode'] as String?)?.toIpcMode(),
+      ipcMode: (json['ipcMode'] as String?)?.let(IpcMode.fromString),
       memory: json['memory'] as String?,
-      networkMode: (json['networkMode'] as String?)?.toNetworkMode(),
-      pidMode: (json['pidMode'] as String?)?.toPidMode(),
+      networkMode:
+          (json['networkMode'] as String?)?.let(NetworkMode.fromString),
+      pidMode: (json['pidMode'] as String?)?.let(PidMode.fromString),
       placementConstraints: (json['placementConstraints'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => TaskDefinitionPlacementConstraint.fromJson(
               e as Map<String, dynamic>))
           .toList(),
@@ -15453,23 +15624,23 @@ class TaskDefinition {
       registeredAt: timeStampFromJson(json['registeredAt']),
       registeredBy: json['registeredBy'] as String?,
       requiresAttributes: (json['requiresAttributes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attribute.fromJson(e as Map<String, dynamic>))
           .toList(),
       requiresCompatibilities: (json['requiresCompatibilities'] as List?)
-          ?.whereNotNull()
-          .map((e) => (e as String).toCompatibility())
+          ?.nonNulls
+          .map((e) => Compatibility.fromString((e as String)))
           .toList(),
       revision: json['revision'] as int?,
       runtimePlatform: json['runtimePlatform'] != null
           ? RuntimePlatform.fromJson(
               json['runtimePlatform'] as Map<String, dynamic>)
           : null,
-      status: (json['status'] as String?)?.toTaskDefinitionStatus(),
+      status: (json['status'] as String?)?.let(TaskDefinitionStatus.fromString),
       taskDefinitionArn: json['taskDefinitionArn'] as String?,
       taskRoleArn: json['taskRoleArn'] as String?,
       volumes: (json['volumes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Volume.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -15477,60 +15648,33 @@ class TaskDefinition {
 }
 
 enum TaskDefinitionFamilyStatus {
-  active,
-  inactive,
-  all,
-}
+  active('ACTIVE'),
+  inactive('INACTIVE'),
+  all('ALL'),
+  ;
 
-extension TaskDefinitionFamilyStatusValueExtension
-    on TaskDefinitionFamilyStatus {
-  String toValue() {
-    switch (this) {
-      case TaskDefinitionFamilyStatus.active:
-        return 'ACTIVE';
-      case TaskDefinitionFamilyStatus.inactive:
-        return 'INACTIVE';
-      case TaskDefinitionFamilyStatus.all:
-        return 'ALL';
-    }
-  }
-}
+  final String value;
 
-extension TaskDefinitionFamilyStatusFromString on String {
-  TaskDefinitionFamilyStatus toTaskDefinitionFamilyStatus() {
-    switch (this) {
-      case 'ACTIVE':
-        return TaskDefinitionFamilyStatus.active;
-      case 'INACTIVE':
-        return TaskDefinitionFamilyStatus.inactive;
-      case 'ALL':
-        return TaskDefinitionFamilyStatus.all;
-    }
-    throw Exception('$this is not known in enum TaskDefinitionFamilyStatus');
-  }
+  const TaskDefinitionFamilyStatus(this.value);
+
+  static TaskDefinitionFamilyStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum TaskDefinitionFamilyStatus'));
 }
 
 enum TaskDefinitionField {
-  tags,
-}
+  tags('TAGS'),
+  ;
 
-extension TaskDefinitionFieldValueExtension on TaskDefinitionField {
-  String toValue() {
-    switch (this) {
-      case TaskDefinitionField.tags:
-        return 'TAGS';
-    }
-  }
-}
+  final String value;
 
-extension TaskDefinitionFieldFromString on String {
-  TaskDefinitionField toTaskDefinitionField() {
-    switch (this) {
-      case 'TAGS':
-        return TaskDefinitionField.tags;
-    }
-    throw Exception('$this is not known in enum TaskDefinitionField');
-  }
+  const TaskDefinitionField(this.value);
+
+  static TaskDefinitionField fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum TaskDefinitionField'));
 }
 
 /// The constraint on task placement in the task definition. For more
@@ -15562,8 +15706,8 @@ class TaskDefinitionPlacementConstraint {
       Map<String, dynamic> json) {
     return TaskDefinitionPlacementConstraint(
       expression: json['expression'] as String?,
-      type:
-          (json['type'] as String?)?.toTaskDefinitionPlacementConstraintType(),
+      type: (json['type'] as String?)
+          ?.let(TaskDefinitionPlacementConstraintType.fromString),
     );
   }
 
@@ -15572,90 +15716,317 @@ class TaskDefinitionPlacementConstraint {
     final type = this.type;
     return {
       if (expression != null) 'expression': expression,
-      if (type != null) 'type': type.toValue(),
+      if (type != null) 'type': type.value,
     };
   }
 }
 
 enum TaskDefinitionPlacementConstraintType {
-  memberOf,
-}
+  memberOf('memberOf'),
+  ;
 
-extension TaskDefinitionPlacementConstraintTypeValueExtension
-    on TaskDefinitionPlacementConstraintType {
-  String toValue() {
-    switch (this) {
-      case TaskDefinitionPlacementConstraintType.memberOf:
-        return 'memberOf';
-    }
-  }
-}
+  final String value;
 
-extension TaskDefinitionPlacementConstraintTypeFromString on String {
-  TaskDefinitionPlacementConstraintType
-      toTaskDefinitionPlacementConstraintType() {
-    switch (this) {
-      case 'memberOf':
-        return TaskDefinitionPlacementConstraintType.memberOf;
-    }
-    throw Exception(
-        '$this is not known in enum TaskDefinitionPlacementConstraintType');
-  }
+  const TaskDefinitionPlacementConstraintType(this.value);
+
+  static TaskDefinitionPlacementConstraintType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum TaskDefinitionPlacementConstraintType'));
 }
 
 enum TaskDefinitionStatus {
-  active,
-  inactive,
-  deleteInProgress,
+  active('ACTIVE'),
+  inactive('INACTIVE'),
+  deleteInProgress('DELETE_IN_PROGRESS'),
+  ;
+
+  final String value;
+
+  const TaskDefinitionStatus(this.value);
+
+  static TaskDefinitionStatus fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum TaskDefinitionStatus'));
 }
 
-extension TaskDefinitionStatusValueExtension on TaskDefinitionStatus {
-  String toValue() {
-    switch (this) {
-      case TaskDefinitionStatus.active:
-        return 'ACTIVE';
-      case TaskDefinitionStatus.inactive:
-        return 'INACTIVE';
-      case TaskDefinitionStatus.deleteInProgress:
-        return 'DELETE_IN_PROGRESS';
-    }
-  }
-}
+/// The amount of ephemeral storage to allocate for the task.
+class TaskEphemeralStorage {
+  /// Specify an Key Management Service key ID to encrypt the ephemeral storage
+  /// for the task.
+  final String? kmsKeyId;
 
-extension TaskDefinitionStatusFromString on String {
-  TaskDefinitionStatus toTaskDefinitionStatus() {
-    switch (this) {
-      case 'ACTIVE':
-        return TaskDefinitionStatus.active;
-      case 'INACTIVE':
-        return TaskDefinitionStatus.inactive;
-      case 'DELETE_IN_PROGRESS':
-        return TaskDefinitionStatus.deleteInProgress;
-    }
-    throw Exception('$this is not known in enum TaskDefinitionStatus');
+  /// The total amount, in GiB, of the ephemeral storage to set for the task. The
+  /// minimum supported value is <code>20</code> GiB and the maximum supported
+  /// value is&#x2028; <code>200</code> GiB.
+  final int? sizeInGiB;
+
+  TaskEphemeralStorage({
+    this.kmsKeyId,
+    this.sizeInGiB,
+  });
+
+  factory TaskEphemeralStorage.fromJson(Map<String, dynamic> json) {
+    return TaskEphemeralStorage(
+      kmsKeyId: json['kmsKeyId'] as String?,
+      sizeInGiB: json['sizeInGiB'] as int?,
+    );
   }
 }
 
 enum TaskField {
-  tags,
+  tags('TAGS'),
+  ;
+
+  final String value;
+
+  const TaskField(this.value);
+
+  static TaskField fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum TaskField'));
 }
 
-extension TaskFieldValueExtension on TaskField {
-  String toValue() {
-    switch (this) {
-      case TaskField.tags:
-        return 'TAGS';
-    }
+enum TaskFilesystemType {
+  ext3('ext3'),
+  ext4('ext4'),
+  xfs('xfs'),
+  ;
+
+  final String value;
+
+  const TaskFilesystemType(this.value);
+
+  static TaskFilesystemType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum TaskFilesystemType'));
+}
+
+/// The configuration for the Amazon EBS volume that Amazon ECS creates and
+/// manages on your behalf. These settings are used to create each Amazon EBS
+/// volume, with one volume created for each task.
+class TaskManagedEBSVolumeConfiguration {
+  /// The ARN of the IAM role to associate with this volume. This is the Amazon
+  /// ECS infrastructure IAM role that is used to manage your Amazon Web Services
+  /// infrastructure. We recommend using the Amazon ECS-managed
+  /// <code>AmazonECSInfrastructureRolePolicyForVolumes</code> IAM policy with
+  /// this role. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/infrastructure_IAM_role.html">Amazon
+  /// ECS infrastructure IAM role</a> in the <i>Amazon ECS Developer Guide</i>.
+  final String roleArn;
+
+  /// Indicates whether the volume should be encrypted. If no value is specified,
+  /// encryption is turned on by default. This parameter maps 1:1 with the
+  /// <code>Encrypted</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final bool? encrypted;
+
+  /// The Linux filesystem type for the volume. For volumes created from a
+  /// snapshot, you must specify the same filesystem type that the volume was
+  /// using when the snapshot was created. If there is a filesystem type mismatch,
+  /// the task will fail to start.
+  ///
+  /// The available filesystem types are&#x2028; <code>ext3</code>,
+  /// <code>ext4</code>, and <code>xfs</code>. If no value is specified, the
+  /// <code>xfs</code> filesystem type is used by default.
+  final TaskFilesystemType? filesystemType;
+
+  /// The number of I/O operations per second (IOPS). For <code>gp3</code>,
+  /// <code>io1</code>, and <code>io2</code> volumes, this represents the number
+  /// of IOPS that are provisioned for the volume. For <code>gp2</code> volumes,
+  /// this represents the baseline performance of the volume and the rate at which
+  /// the volume accumulates I/O credits for bursting.
+  ///
+  /// The following are the supported values for each volume type.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>gp3</code>: 3,000 - 16,000 IOPS
+  /// </li>
+  /// <li>
+  /// <code>io1</code>: 100 - 64,000 IOPS
+  /// </li>
+  /// <li>
+  /// <code>io2</code>: 100 - 256,000 IOPS
+  /// </li>
+  /// </ul>
+  /// This parameter is required for <code>io1</code> and <code>io2</code> volume
+  /// types. The default for <code>gp3</code> volumes is <code>3,000 IOPS</code>.
+  /// This parameter is not supported for <code>st1</code>, <code>sc1</code>, or
+  /// <code>standard</code> volume types.
+  ///
+  /// This parameter maps 1:1 with the <code>Iops</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final int? iops;
+
+  /// The Amazon Resource Name (ARN) identifier of the Amazon Web Services Key
+  /// Management Service key to use for Amazon EBS encryption. When encryption is
+  /// turned on and no Amazon Web Services Key Management Service key is
+  /// specified, the default Amazon Web Services managed key for Amazon EBS
+  /// volumes is used. This parameter maps 1:1 with the <code>KmsKeyId</code>
+  /// parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  /// <important>
+  /// Amazon Web Services authenticates the Amazon Web Services Key Management
+  /// Service key asynchronously. Therefore, if you specify an ID, alias, or ARN
+  /// that is invalid, the action can appear to complete, but eventually fails.
+  /// </important>
+  final String? kmsKeyId;
+
+  /// The size of the volume in GiB. You must specify either a volume size or a
+  /// snapshot ID. If you specify a snapshot ID, the snapshot size is used for the
+  /// volume size by default. You can optionally specify a volume size greater
+  /// than or equal to the snapshot size. This parameter maps 1:1 with the
+  /// <code>Size</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  ///
+  /// The following are the supported volume size values for each volume type.
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>gp2</code> and <code>gp3</code>: 1-16,384
+  /// </li>
+  /// <li>
+  /// <code>io1</code> and <code>io2</code>: 4-16,384
+  /// </li>
+  /// <li>
+  /// <code>st1</code> and <code>sc1</code>: 125-16,384
+  /// </li>
+  /// <li>
+  /// <code>standard</code>: 1-1,024
+  /// </li>
+  /// </ul>
+  final int? sizeInGiB;
+
+  /// The snapshot that Amazon ECS uses to create the volume. You must specify
+  /// either a snapshot ID or a volume size. This parameter maps 1:1 with the
+  /// <code>SnapshotId</code> parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final String? snapshotId;
+
+  /// The tags to apply to the volume. Amazon ECS applies service-managed tags by
+  /// default. This parameter maps 1:1 with the <code>TagSpecifications.N</code>
+  /// parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  final List<EBSTagSpecification>? tagSpecifications;
+
+  /// The termination policy for the volume when the task exits. This provides a
+  /// way to control whether Amazon ECS terminates the Amazon EBS volume when the
+  /// task stops.
+  final TaskManagedEBSVolumeTerminationPolicy? terminationPolicy;
+
+  /// The throughput to provision for a volume, in MiB/s, with a maximum of 1,000
+  /// MiB/s. This parameter maps 1:1 with the <code>Throughput</code> parameter of
+  /// the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>.
+  /// <important>
+  /// This parameter is only supported for the <code>gp3</code> volume type.
+  /// </important>
+  final int? throughput;
+
+  /// The volume type. This parameter maps 1:1 with the <code>VolumeType</code>
+  /// parameter of the <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_CreateVolume.html">CreateVolume
+  /// API</a> in the <i>Amazon EC2 API Reference</i>. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-volume-types.html">Amazon
+  /// EBS volume types</a> in the <i>Amazon EC2 User Guide</i>.
+  ///
+  /// The following are the supported volume types.
+  ///
+  /// <ul>
+  /// <li>
+  /// General Purpose SSD: <code>gp2</code>|<code>gp3</code>
+  /// </li>
+  /// <li>
+  /// Provisioned IOPS SSD: <code>io1</code>|<code>io2</code>
+  /// </li>
+  /// <li>
+  /// Throughput Optimized HDD: <code>st1</code>
+  /// </li>
+  /// <li>
+  /// Cold HDD: <code>sc1</code>
+  /// </li>
+  /// <li>
+  /// Magnetic: <code>standard</code>
+  /// <note>
+  /// The magnetic volume type is not supported on Fargate.
+  /// </note> </li>
+  /// </ul>
+  final String? volumeType;
+
+  TaskManagedEBSVolumeConfiguration({
+    required this.roleArn,
+    this.encrypted,
+    this.filesystemType,
+    this.iops,
+    this.kmsKeyId,
+    this.sizeInGiB,
+    this.snapshotId,
+    this.tagSpecifications,
+    this.terminationPolicy,
+    this.throughput,
+    this.volumeType,
+  });
+
+  Map<String, dynamic> toJson() {
+    final roleArn = this.roleArn;
+    final encrypted = this.encrypted;
+    final filesystemType = this.filesystemType;
+    final iops = this.iops;
+    final kmsKeyId = this.kmsKeyId;
+    final sizeInGiB = this.sizeInGiB;
+    final snapshotId = this.snapshotId;
+    final tagSpecifications = this.tagSpecifications;
+    final terminationPolicy = this.terminationPolicy;
+    final throughput = this.throughput;
+    final volumeType = this.volumeType;
+    return {
+      'roleArn': roleArn,
+      if (encrypted != null) 'encrypted': encrypted,
+      if (filesystemType != null) 'filesystemType': filesystemType.value,
+      if (iops != null) 'iops': iops,
+      if (kmsKeyId != null) 'kmsKeyId': kmsKeyId,
+      if (sizeInGiB != null) 'sizeInGiB': sizeInGiB,
+      if (snapshotId != null) 'snapshotId': snapshotId,
+      if (tagSpecifications != null) 'tagSpecifications': tagSpecifications,
+      if (terminationPolicy != null) 'terminationPolicy': terminationPolicy,
+      if (throughput != null) 'throughput': throughput,
+      if (volumeType != null) 'volumeType': volumeType,
+    };
   }
 }
 
-extension TaskFieldFromString on String {
-  TaskField toTaskField() {
-    switch (this) {
-      case 'TAGS':
-        return TaskField.tags;
-    }
-    throw Exception('$this is not known in enum TaskField');
+/// The termination policy for the Amazon EBS volume when the task exits. For
+/// more information, see <a
+/// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/ebs-volumes.html#ebs-volume-types">Amazon
+/// ECS volume termination policy</a>.
+class TaskManagedEBSVolumeTerminationPolicy {
+  /// Indicates whether the volume should be deleted on when the task stops. If a
+  /// value of <code>true</code> is specified, &#x2028;Amazon ECS deletes the
+  /// Amazon EBS volume on your behalf when the task goes into the
+  /// <code>STOPPED</code> state. If no value is specified, the &#x2028;default
+  /// value is <code>true</code> is used. When set to <code>false</code>, Amazon
+  /// ECS leaves the volume in your &#x2028;account.
+  final bool deleteOnTermination;
+
+  TaskManagedEBSVolumeTerminationPolicy({
+    required this.deleteOnTermination,
+  });
+
+  Map<String, dynamic> toJson() {
+    final deleteOnTermination = this.deleteOnTermination;
+    return {
+      'deleteOnTermination': deleteOnTermination,
+    };
   }
 }
 
@@ -15716,7 +16087,7 @@ class TaskOverride {
   factory TaskOverride.fromJson(Map<String, dynamic> json) {
     return TaskOverride(
       containerOverrides: (json['containerOverrides'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ContainerOverride.fromJson(e as Map<String, dynamic>))
           .toList(),
       cpu: json['cpu'] as String?,
@@ -15727,7 +16098,7 @@ class TaskOverride {
       executionRoleArn: json['executionRoleArn'] as String?,
       inferenceAcceleratorOverrides: (json['inferenceAcceleratorOverrides']
               as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               InferenceAcceleratorOverride.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -15787,6 +16158,9 @@ class TaskSet {
   /// service discovery registry, the <code>externalId</code> parameter contains
   /// the <code>ECS_TASK_SET_EXTERNAL_ID</code> Cloud Map attribute.
   final String? externalId;
+
+  /// The Fargate ephemeral storage settings for the task set.
+  final DeploymentEphemeralStorage? fargateEphemeralStorage;
 
   /// The ID of the task set.
   final String? id;
@@ -15943,6 +16317,7 @@ class TaskSet {
     this.computedDesiredCount,
     this.createdAt,
     this.externalId,
+    this.fargateEphemeralStorage,
     this.id,
     this.launchType,
     this.loadBalancers,
@@ -15967,7 +16342,7 @@ class TaskSet {
   factory TaskSet.fromJson(Map<String, dynamic> json) {
     return TaskSet(
       capacityProviderStrategy: (json['capacityProviderStrategy'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               CapacityProviderStrategyItem.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -15975,10 +16350,14 @@ class TaskSet {
       computedDesiredCount: json['computedDesiredCount'] as int?,
       createdAt: timeStampFromJson(json['createdAt']),
       externalId: json['externalId'] as String?,
+      fargateEphemeralStorage: json['fargateEphemeralStorage'] != null
+          ? DeploymentEphemeralStorage.fromJson(
+              json['fargateEphemeralStorage'] as Map<String, dynamic>)
+          : null,
       id: json['id'] as String?,
-      launchType: (json['launchType'] as String?)?.toLaunchType(),
+      launchType: (json['launchType'] as String?)?.let(LaunchType.fromString),
       loadBalancers: (json['loadBalancers'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => LoadBalancer.fromJson(e as Map<String, dynamic>))
           .toList(),
       networkConfiguration: json['networkConfiguration'] != null
@@ -15994,16 +16373,16 @@ class TaskSet {
           : null,
       serviceArn: json['serviceArn'] as String?,
       serviceRegistries: (json['serviceRegistries'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ServiceRegistry.fromJson(e as Map<String, dynamic>))
           .toList(),
       stabilityStatus:
-          (json['stabilityStatus'] as String?)?.toStabilityStatus(),
+          (json['stabilityStatus'] as String?)?.let(StabilityStatus.fromString),
       stabilityStatusAt: timeStampFromJson(json['stabilityStatusAt']),
       startedBy: json['startedBy'] as String?,
       status: json['status'] as String?,
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       taskDefinition: json['taskDefinition'] as String?,
@@ -16014,73 +16393,112 @@ class TaskSet {
 }
 
 enum TaskSetField {
-  tags,
-}
+  tags('TAGS'),
+  ;
 
-extension TaskSetFieldValueExtension on TaskSetField {
-  String toValue() {
-    switch (this) {
-      case TaskSetField.tags:
-        return 'TAGS';
-    }
-  }
-}
+  final String value;
 
-extension TaskSetFieldFromString on String {
-  TaskSetField toTaskSetField() {
-    switch (this) {
-      case 'TAGS':
-        return TaskSetField.tags;
-    }
-    throw Exception('$this is not known in enum TaskSetField');
-  }
+  const TaskSetField(this.value);
+
+  static TaskSetField fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum TaskSetField'));
 }
 
 enum TaskStopCode {
-  taskFailedToStart,
-  essentialContainerExited,
-  userInitiated,
-  serviceSchedulerInitiated,
-  spotInterruption,
-  terminationNotice,
+  taskFailedToStart('TaskFailedToStart'),
+  essentialContainerExited('EssentialContainerExited'),
+  userInitiated('UserInitiated'),
+  serviceSchedulerInitiated('ServiceSchedulerInitiated'),
+  spotInterruption('SpotInterruption'),
+  terminationNotice('TerminationNotice'),
+  ;
+
+  final String value;
+
+  const TaskStopCode(this.value);
+
+  static TaskStopCode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum TaskStopCode'));
 }
 
-extension TaskStopCodeValueExtension on TaskStopCode {
-  String toValue() {
-    switch (this) {
-      case TaskStopCode.taskFailedToStart:
-        return 'TaskFailedToStart';
-      case TaskStopCode.essentialContainerExited:
-        return 'EssentialContainerExited';
-      case TaskStopCode.userInitiated:
-        return 'UserInitiated';
-      case TaskStopCode.serviceSchedulerInitiated:
-        return 'ServiceSchedulerInitiated';
-      case TaskStopCode.spotInterruption:
-        return 'SpotInterruption';
-      case TaskStopCode.terminationNotice:
-        return 'TerminationNotice';
-    }
+/// Configuration settings for the task volume that was
+/// <code>configuredAtLaunch</code> that weren't set during
+/// <code>RegisterTaskDef</code>.
+class TaskVolumeConfiguration {
+  /// The name of the volume. This value must match the volume name from the
+  /// <code>Volume</code> object in the task definition.
+  final String name;
+
+  /// The configuration for the Amazon EBS volume that Amazon ECS creates and
+  /// manages on your behalf. These settings are used to create each Amazon EBS
+  /// volume, with one volume created for each task. The Amazon EBS volumes are
+  /// visible in your account in the Amazon EC2 console once they are created.
+  final TaskManagedEBSVolumeConfiguration? managedEBSVolume;
+
+  TaskVolumeConfiguration({
+    required this.name,
+    this.managedEBSVolume,
+  });
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final managedEBSVolume = this.managedEBSVolume;
+    return {
+      'name': name,
+      if (managedEBSVolume != null) 'managedEBSVolume': managedEBSVolume,
+    };
   }
 }
 
-extension TaskStopCodeFromString on String {
-  TaskStopCode toTaskStopCode() {
-    switch (this) {
-      case 'TaskFailedToStart':
-        return TaskStopCode.taskFailedToStart;
-      case 'EssentialContainerExited':
-        return TaskStopCode.essentialContainerExited;
-      case 'UserInitiated':
-        return TaskStopCode.userInitiated;
-      case 'ServiceSchedulerInitiated':
-        return TaskStopCode.serviceSchedulerInitiated;
-      case 'SpotInterruption':
-        return TaskStopCode.spotInterruption;
-      case 'TerminationNotice':
-        return TaskStopCode.terminationNotice;
-    }
-    throw Exception('$this is not known in enum TaskStopCode');
+/// An object that represents the timeout configurations for Service Connect.
+/// <note>
+/// If <code>idleTimeout</code> is set to a time that is less than
+/// <code>perRequestTimeout</code>, the connection will close when the
+/// <code>idleTimeout</code> is reached and not the
+/// <code>perRequestTimeout</code>.
+/// </note>
+class TimeoutConfiguration {
+  /// The amount of time in seconds a connection will stay active while idle. A
+  /// value of <code>0</code> can be set to disable <code>idleTimeout</code>.
+  ///
+  /// The <code>idleTimeout</code> default for
+  /// <code>HTTP</code>/<code>HTTP2</code>/<code>GRPC</code> is 5 minutes.
+  ///
+  /// The <code>idleTimeout</code> default for <code>TCP</code> is 1 hour.
+  final int? idleTimeoutSeconds;
+
+  /// The amount of time waiting for the upstream to respond with a complete
+  /// response per request. A value of <code>0</code> can be set to disable
+  /// <code>perRequestTimeout</code>. <code>perRequestTimeout</code> can only be
+  /// set if Service Connect <code>appProtocol</code> isn't <code>TCP</code>. Only
+  /// <code>idleTimeout</code> is allowed for <code>TCP</code>
+  /// <code>appProtocol</code>.
+  final int? perRequestTimeoutSeconds;
+
+  TimeoutConfiguration({
+    this.idleTimeoutSeconds,
+    this.perRequestTimeoutSeconds,
+  });
+
+  factory TimeoutConfiguration.fromJson(Map<String, dynamic> json) {
+    return TimeoutConfiguration(
+      idleTimeoutSeconds: json['idleTimeoutSeconds'] as int?,
+      perRequestTimeoutSeconds: json['perRequestTimeoutSeconds'] as int?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final idleTimeoutSeconds = this.idleTimeoutSeconds;
+    final perRequestTimeoutSeconds = this.perRequestTimeoutSeconds;
+    return {
+      if (idleTimeoutSeconds != null) 'idleTimeoutSeconds': idleTimeoutSeconds,
+      if (perRequestTimeoutSeconds != null)
+        'perRequestTimeoutSeconds': perRequestTimeoutSeconds,
+    };
   }
 }
 
@@ -16114,7 +16532,7 @@ class Tmpfs {
       containerPath: json['containerPath'] as String,
       size: json['size'] as int,
       mountOptions: (json['mountOptions'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -16133,31 +16551,18 @@ class Tmpfs {
 }
 
 enum TransportProtocol {
-  tcp,
-  udp,
-}
+  tcp('tcp'),
+  udp('udp'),
+  ;
 
-extension TransportProtocolValueExtension on TransportProtocol {
-  String toValue() {
-    switch (this) {
-      case TransportProtocol.tcp:
-        return 'tcp';
-      case TransportProtocol.udp:
-        return 'udp';
-    }
-  }
-}
+  final String value;
 
-extension TransportProtocolFromString on String {
-  TransportProtocol toTransportProtocol() {
-    switch (this) {
-      case 'tcp':
-        return TransportProtocol.tcp;
-      case 'udp':
-        return TransportProtocol.udp;
-    }
-    throw Exception('$this is not known in enum TransportProtocol');
-  }
+  const TransportProtocol(this.value);
+
+  static TransportProtocol fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum TransportProtocol'));
 }
 
 /// The <code>ulimit</code> settings to pass to the container.
@@ -16166,8 +16571,8 @@ extension TransportProtocolFromString on String {
 /// by the operating system with the exception of the <code>nofile</code>
 /// resource limit parameter which Fargate overrides. The <code>nofile</code>
 /// resource limit sets a restriction on the number of open files that a
-/// container can use. The default <code>nofile</code> soft limit is
-/// <code>1024</code> and the default hard limit is <code>4096</code>.
+/// container can use. The default <code>nofile</code> soft limit is <code>
+/// 65535</code> and the default hard limit is <code>65535</code>.
 ///
 /// You can specify the <code>ulimit</code> settings for a container in a task
 /// definition.
@@ -16190,7 +16595,7 @@ class Ulimit {
   factory Ulimit.fromJson(Map<String, dynamic> json) {
     return Ulimit(
       hardLimit: json['hardLimit'] as int,
-      name: (json['name'] as String).toUlimitName(),
+      name: UlimitName.fromString((json['name'] as String)),
       softLimit: json['softLimit'] as int,
     );
   }
@@ -16201,103 +16606,37 @@ class Ulimit {
     final softLimit = this.softLimit;
     return {
       'hardLimit': hardLimit,
-      'name': name.toValue(),
+      'name': name.value,
       'softLimit': softLimit,
     };
   }
 }
 
 enum UlimitName {
-  core,
-  cpu,
-  data,
-  fsize,
-  locks,
-  memlock,
-  msgqueue,
-  nice,
-  nofile,
-  nproc,
-  rss,
-  rtprio,
-  rttime,
-  sigpending,
-  stack,
-}
+  core('core'),
+  cpu('cpu'),
+  data('data'),
+  fsize('fsize'),
+  locks('locks'),
+  memlock('memlock'),
+  msgqueue('msgqueue'),
+  nice('nice'),
+  nofile('nofile'),
+  nproc('nproc'),
+  rss('rss'),
+  rtprio('rtprio'),
+  rttime('rttime'),
+  sigpending('sigpending'),
+  stack('stack'),
+  ;
 
-extension UlimitNameValueExtension on UlimitName {
-  String toValue() {
-    switch (this) {
-      case UlimitName.core:
-        return 'core';
-      case UlimitName.cpu:
-        return 'cpu';
-      case UlimitName.data:
-        return 'data';
-      case UlimitName.fsize:
-        return 'fsize';
-      case UlimitName.locks:
-        return 'locks';
-      case UlimitName.memlock:
-        return 'memlock';
-      case UlimitName.msgqueue:
-        return 'msgqueue';
-      case UlimitName.nice:
-        return 'nice';
-      case UlimitName.nofile:
-        return 'nofile';
-      case UlimitName.nproc:
-        return 'nproc';
-      case UlimitName.rss:
-        return 'rss';
-      case UlimitName.rtprio:
-        return 'rtprio';
-      case UlimitName.rttime:
-        return 'rttime';
-      case UlimitName.sigpending:
-        return 'sigpending';
-      case UlimitName.stack:
-        return 'stack';
-    }
-  }
-}
+  final String value;
 
-extension UlimitNameFromString on String {
-  UlimitName toUlimitName() {
-    switch (this) {
-      case 'core':
-        return UlimitName.core;
-      case 'cpu':
-        return UlimitName.cpu;
-      case 'data':
-        return UlimitName.data;
-      case 'fsize':
-        return UlimitName.fsize;
-      case 'locks':
-        return UlimitName.locks;
-      case 'memlock':
-        return UlimitName.memlock;
-      case 'msgqueue':
-        return UlimitName.msgqueue;
-      case 'nice':
-        return UlimitName.nice;
-      case 'nofile':
-        return UlimitName.nofile;
-      case 'nproc':
-        return UlimitName.nproc;
-      case 'rss':
-        return UlimitName.rss;
-      case 'rtprio':
-        return UlimitName.rtprio;
-      case 'rttime':
-        return UlimitName.rttime;
-      case 'sigpending':
-        return UlimitName.sigpending;
-      case 'stack':
-        return UlimitName.stack;
-    }
-    throw Exception('$this is not known in enum UlimitName');
-  }
+  const UlimitName(this.value);
+
+  static UlimitName fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum UlimitName'));
 }
 
 class UntagResourceResponse {
@@ -16394,11 +16733,11 @@ class UpdateContainerInstancesStateResponse {
       Map<String, dynamic> json) {
     return UpdateContainerInstancesStateResponse(
       containerInstances: (json['containerInstances'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ContainerInstance.fromJson(e as Map<String, dynamic>))
           .toList(),
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -16470,11 +16809,11 @@ class UpdateTaskProtectionResponse {
   factory UpdateTaskProtectionResponse.fromJson(Map<String, dynamic> json) {
     return UpdateTaskProtectionResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Failure.fromJson(e as Map<String, dynamic>))
           .toList(),
       protectedTasks: (json['protectedTasks'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ProtectedTask.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -16538,17 +16877,30 @@ class VersionInfo {
   }
 }
 
-/// A data volume that's used in a task definition. For tasks that use the
-/// Amazon Elastic File System (Amazon EFS), specify an
-/// <code>efsVolumeConfiguration</code>. For Windows tasks that use Amazon FSx
-/// for Windows File Server file system, specify a
-/// <code>fsxWindowsFileServerVolumeConfiguration</code>. For tasks that use a
-/// Docker volume, specify a <code>DockerVolumeConfiguration</code>. For tasks
-/// that use a bind mount host volume, specify a <code>host</code> and optional
-/// <code>sourcePath</code>. For more information, see <a
+/// The data volume configuration for tasks launched using this task definition.
+/// Specifying a volume configuration in a task definition is optional. The
+/// volume configuration may contain multiple volumes but only one volume
+/// configured at launch is supported. Each volume defined in the volume
+/// configuration may only specify a <code>name</code> and one of either
+/// <code>configuredAtLaunch</code>, <code>dockerVolumeConfiguration</code>,
+/// <code>efsVolumeConfiguration</code>,
+/// <code>fsxWindowsFileServerVolumeConfiguration</code>, or <code>host</code>.
+/// If an empty volume configuration is specified, by default Amazon ECS uses a
+/// host volume. For more information, see <a
 /// href="https://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_data_volumes.html">Using
-/// Data Volumes in Tasks</a>.
+/// data volumes in tasks</a>.
 class Volume {
+  /// Indicates whether the volume should be configured at launch time. This is
+  /// used to create Amazon EBS volumes for standalone tasks or tasks created as
+  /// part of a service. Each task definition revision may only have one volume
+  /// configured at launch in the volume configuration.
+  ///
+  /// To configure a volume at launch time, use this task definition revision and
+  /// specify a <code>volumeConfigurations</code> object when calling the
+  /// <code>CreateService</code>, <code>UpdateService</code>, <code>RunTask</code>
+  /// or <code>StartTask</code> APIs.
+  final bool? configuredAtLaunch;
+
   /// This parameter is specified when you use Docker volumes.
   ///
   /// Windows containers only support the use of the <code>local</code> driver. To
@@ -16582,12 +16934,24 @@ class Volume {
   final HostVolumeProperties? host;
 
   /// The name of the volume. Up to 255 letters (uppercase and lowercase),
-  /// numbers, underscores, and hyphens are allowed. This name is referenced in
-  /// the <code>sourceVolume</code> parameter of container definition
-  /// <code>mountPoints</code>.
+  /// numbers, underscores, and hyphens are allowed.
+  ///
+  /// When using a volume configured at launch, the <code>name</code> is required
+  /// and must also be specified as the volume name in the
+  /// <code>ServiceVolumeConfiguration</code> or
+  /// <code>TaskVolumeConfiguration</code> parameter when creating your service or
+  /// standalone task.
+  ///
+  /// For all other types of volumes, this name is referenced in the
+  /// <code>sourceVolume</code> parameter of the <code>mountPoints</code> object
+  /// in the container definition.
+  ///
+  /// When a volume is using the <code>efsVolumeConfiguration</code>, the name is
+  /// required.
   final String? name;
 
   Volume({
+    this.configuredAtLaunch,
     this.dockerVolumeConfiguration,
     this.efsVolumeConfiguration,
     this.fsxWindowsFileServerVolumeConfiguration,
@@ -16597,6 +16961,7 @@ class Volume {
 
   factory Volume.fromJson(Map<String, dynamic> json) {
     return Volume(
+      configuredAtLaunch: json['configuredAtLaunch'] as bool?,
       dockerVolumeConfiguration: json['dockerVolumeConfiguration'] != null
           ? DockerVolumeConfiguration.fromJson(
               json['dockerVolumeConfiguration'] as Map<String, dynamic>)
@@ -16619,6 +16984,7 @@ class Volume {
   }
 
   Map<String, dynamic> toJson() {
+    final configuredAtLaunch = this.configuredAtLaunch;
     final dockerVolumeConfiguration = this.dockerVolumeConfiguration;
     final efsVolumeConfiguration = this.efsVolumeConfiguration;
     final fsxWindowsFileServerVolumeConfiguration =
@@ -16626,6 +16992,7 @@ class Volume {
     final host = this.host;
     final name = this.name;
     return {
+      if (configuredAtLaunch != null) 'configuredAtLaunch': configuredAtLaunch,
       if (dockerVolumeConfiguration != null)
         'dockerVolumeConfiguration': dockerVolumeConfiguration,
       if (efsVolumeConfiguration != null)
@@ -16723,6 +17090,11 @@ class ClusterContainsTasksException extends _s.GenericAwsException {
 class ClusterNotFoundException extends _s.GenericAwsException {
   ClusterNotFoundException({String? type, String? message})
       : super(type: type, code: 'ClusterNotFoundException', message: message);
+}
+
+class ConflictException extends _s.GenericAwsException {
+  ConflictException({String? type, String? message})
+      : super(type: type, code: 'ConflictException', message: message);
 }
 
 class InvalidParameterException extends _s.GenericAwsException {
@@ -16834,6 +17206,8 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       ClusterContainsTasksException(type: type, message: message),
   'ClusterNotFoundException': (type, message) =>
       ClusterNotFoundException(type: type, message: message),
+  'ConflictException': (type, message) =>
+      ConflictException(type: type, message: message),
   'InvalidParameterException': (type, message) =>
       InvalidParameterException(type: type, message: message),
   'LimitExceededException': (type, message) =>

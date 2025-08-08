@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -303,10 +304,10 @@ class Location {
     return BatchPutGeofenceResponse.fromJson(response);
   }
 
-  /// Uploads position update data for one or more devices to a tracker
-  /// resource. Amazon Location uses the data when it reports the last known
-  /// device position and position history. Amazon Location retains location
-  /// data for 30 days.
+  /// Uploads position update data for one or more devices to a tracker resource
+  /// (up to 10 devices per batch). Amazon Location uses the data when it
+  /// reports the last known device position and position history. Amazon
+  /// Location retains location data for 30 days.
   /// <note>
   /// Position updates are handled based on the <code>PositionFiltering</code>
   /// property of the tracker. When <code>PositionFiltering</code> is set to
@@ -341,7 +342,7 @@ class Location {
   /// The name of the tracker resource to update.
   ///
   /// Parameter [updates] :
-  /// Contains the position update details for each device.
+  /// Contains the position update details for each device, up to 10 devices.
   Future<BatchUpdateDevicePositionResponse> batchUpdateDevicePosition({
     required String trackerName,
     required List<DevicePositionUpdate> updates,
@@ -445,6 +446,14 @@ class Location {
   /// </note>
   /// Valid Values: <code>[-180 to 180,-90 to 90]</code>
   ///
+  /// Parameter [arrivalTime] :
+  /// Specifies the desired time of arrival. Uses the given time to calculate
+  /// the route. Otherwise, the best time of day to travel with the best traffic
+  /// conditions is used to calculate the route.
+  /// <note>
+  /// ArrivalTime is not supported Esri.
+  /// </note>
+  ///
   /// Parameter [carModeOptions] :
   /// Specifies route preferences when traveling by <code>Car</code>, such as
   /// avoiding routes that use ferries or tolls.
@@ -465,10 +474,7 @@ class Location {
   /// Specifies the desired time of departure. Uses the given time to calculate
   /// the route. Otherwise, the best time of day to travel with the best traffic
   /// conditions is used to calculate the route.
-  /// <note>
-  /// Setting a departure time in the past returns a <code>400
-  /// ValidationException</code> error.
-  /// </note>
+  ///
   /// <ul>
   /// <li>
   /// In <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO
@@ -489,6 +495,14 @@ class Location {
   /// Default Value: <code>false</code>
   ///
   /// Valid Values: <code>false</code> | <code>true</code>
+  ///
+  /// Parameter [key] :
+  /// The optional <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">API
+  /// key</a> to authorize the request.
+  ///
+  /// Parameter [optimizeFor] :
+  /// Specifies the distance to optimize for when calculating a route.
   ///
   /// Parameter [travelMode] :
   /// Specifies the mode of transport when calculating a route. Used in
@@ -558,24 +572,32 @@ class Location {
     required String calculatorName,
     required List<double> departurePosition,
     required List<double> destinationPosition,
+    DateTime? arrivalTime,
     CalculateRouteCarModeOptions? carModeOptions,
     bool? departNow,
     DateTime? departureTime,
     DistanceUnit? distanceUnit,
     bool? includeLegGeometry,
+    String? key,
+    OptimizationMode? optimizeFor,
     TravelMode? travelMode,
     CalculateRouteTruckModeOptions? truckModeOptions,
     List<List<double>>? waypointPositions,
   }) async {
+    final $query = <String, List<String>>{
+      if (key != null) 'key': [key],
+    };
     final $payload = <String, dynamic>{
       'DeparturePosition': departurePosition,
       'DestinationPosition': destinationPosition,
+      if (arrivalTime != null) 'ArrivalTime': iso8601ToJson(arrivalTime),
       if (carModeOptions != null) 'CarModeOptions': carModeOptions,
       if (departNow != null) 'DepartNow': departNow,
       if (departureTime != null) 'DepartureTime': iso8601ToJson(departureTime),
-      if (distanceUnit != null) 'DistanceUnit': distanceUnit.toValue(),
+      if (distanceUnit != null) 'DistanceUnit': distanceUnit.value,
       if (includeLegGeometry != null) 'IncludeLegGeometry': includeLegGeometry,
-      if (travelMode != null) 'TravelMode': travelMode.toValue(),
+      if (optimizeFor != null) 'OptimizeFor': optimizeFor.value,
+      if (travelMode != null) 'TravelMode': travelMode.value,
       if (truckModeOptions != null) 'TruckModeOptions': truckModeOptions,
       if (waypointPositions != null) 'WaypointPositions': waypointPositions,
     };
@@ -584,6 +606,7 @@ class Location {
       method: 'POST',
       requestUri:
           '/routes/v0/calculators/${Uri.encodeComponent(calculatorName)}/calculate/route',
+      queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return CalculateRouteResponse.fromJson(response);
@@ -730,6 +753,11 @@ class Location {
   ///
   /// Default Value: <code>Kilometers</code>
   ///
+  /// Parameter [key] :
+  /// The optional <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">API
+  /// key</a> to authorize the request.
+  ///
   /// Parameter [travelMode] :
   /// Specifies the mode of transport when calculating a route. Used in
   /// estimating the speed of travel and road compatibility.
@@ -773,17 +801,21 @@ class Location {
     bool? departNow,
     DateTime? departureTime,
     DistanceUnit? distanceUnit,
+    String? key,
     TravelMode? travelMode,
     CalculateRouteTruckModeOptions? truckModeOptions,
   }) async {
+    final $query = <String, List<String>>{
+      if (key != null) 'key': [key],
+    };
     final $payload = <String, dynamic>{
       'DeparturePositions': departurePositions,
       'DestinationPositions': destinationPositions,
       if (carModeOptions != null) 'CarModeOptions': carModeOptions,
       if (departNow != null) 'DepartNow': departNow,
       if (departureTime != null) 'DepartureTime': iso8601ToJson(departureTime),
-      if (distanceUnit != null) 'DistanceUnit': distanceUnit.toValue(),
-      if (travelMode != null) 'TravelMode': travelMode.toValue(),
+      if (distanceUnit != null) 'DistanceUnit': distanceUnit.value,
+      if (travelMode != null) 'TravelMode': travelMode.value,
       if (truckModeOptions != null) 'TruckModeOptions': truckModeOptions,
     };
     final response = await _protocol.send(
@@ -791,6 +823,7 @@ class Location {
       method: 'POST',
       requestUri:
           '/routes/v0/calculators/${Uri.encodeComponent(calculatorName)}/calculate/route-matrix',
+      queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return CalculateRouteMatrixResponse.fromJson(response);
@@ -881,7 +914,7 @@ class Location {
       'CollectionName': collectionName,
       if (description != null) 'Description': description,
       if (kmsKeyId != null) 'KmsKeyId': kmsKeyId,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
       if (tags != null) 'Tags': tags,
@@ -896,14 +929,13 @@ class Location {
   }
 
   /// Creates an API key resource in your Amazon Web Services account, which
-  /// lets you grant <code>geo:GetMap*</code> actions for Amazon Location Map
-  /// resources to the API key bearer.
-  /// <important>
-  /// The API keys feature is in preview. We may add, change, or remove features
-  /// before announcing general availability. For more information, see <a
+  /// lets you grant actions for Amazon Location resources to the API key
+  /// bearer.
+  /// <note>
+  /// For more information, see <a
   /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">Using
   /// API keys</a>.
-  /// </important>
+  /// </note>
   ///
   /// May throw [InternalServerException].
   /// May throw [ConflictException].
@@ -1089,7 +1121,7 @@ class Location {
       'Configuration': configuration,
       'MapName': mapName,
       if (description != null) 'Description': description,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (tags != null) 'Tags': tags,
     };
     final response = await _protocol.send(
@@ -1236,7 +1268,7 @@ class Location {
       if (dataSourceConfiguration != null)
         'DataSourceConfiguration': dataSourceConfiguration,
       if (description != null) 'Description': description,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (tags != null) 'Tags': tags,
     };
     final response = await _protocol.send(
@@ -1381,7 +1413,7 @@ class Location {
       'CalculatorName': calculatorName,
       'DataSource': dataSource,
       if (description != null) 'Description': description,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (tags != null) 'Tags': tags,
     };
     final response = await _protocol.send(
@@ -1400,6 +1432,7 @@ class Location {
   /// May throw [ConflictException].
   /// May throw [AccessDeniedException].
   /// May throw [ValidationException].
+  /// May throw [ServiceQuotaExceededException].
   /// May throw [ThrottlingException].
   ///
   /// Parameter [trackerName] :
@@ -1422,6 +1455,33 @@ class Location {
   ///
   /// Parameter [description] :
   /// An optional description for the tracker resource.
+  ///
+  /// Parameter [eventBridgeEnabled] :
+  /// Whether to enable position <code>UPDATE</code> events from this tracker to
+  /// be sent to EventBridge.
+  /// <note>
+  /// You do not need enable this feature to get <code>ENTER</code> and
+  /// <code>EXIT</code> events for geofences with this tracker. Those events are
+  /// always sent to EventBridge.
+  /// </note>
+  ///
+  /// Parameter [kmsKeyEnableGeospatialQueries] :
+  /// Enables <code>GeospatialQueries</code> for a tracker that uses a <a
+  /// href="https://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html">Amazon
+  /// Web Services KMS customer managed key</a>.
+  ///
+  /// This parameter is only used if you are using a KMS customer managed key.
+  /// <note>
+  /// If you wish to encrypt your data using your own KMS customer managed key,
+  /// then the Bounding Polygon Queries feature will be disabled by default.
+  /// This is because by using this feature, a representation of your device
+  /// positions will not be encrypted using the your KMS managed key. The exact
+  /// device position, however; is still encrypted using your managed key.
+  ///
+  /// You can choose to opt-in to the Bounding Polygon Quseries feature. This is
+  /// done by setting the <code>KmsKeyEnableGeospatialQueries</code> parameter
+  /// to true when creating or updating a Tracker.
+  /// </note>
   ///
   /// Parameter [kmsKeyId] :
   /// A key identifier for an <a
@@ -1504,6 +1564,8 @@ class Location {
   Future<CreateTrackerResponse> createTracker({
     required String trackerName,
     String? description,
+    bool? eventBridgeEnabled,
+    bool? kmsKeyEnableGeospatialQueries,
     String? kmsKeyId,
     PositionFiltering? positionFiltering,
     PricingPlan? pricingPlan,
@@ -1513,10 +1575,13 @@ class Location {
     final $payload = <String, dynamic>{
       'TrackerName': trackerName,
       if (description != null) 'Description': description,
+      if (eventBridgeEnabled != null) 'EventBridgeEnabled': eventBridgeEnabled,
+      if (kmsKeyEnableGeospatialQueries != null)
+        'KmsKeyEnableGeospatialQueries': kmsKeyEnableGeospatialQueries,
       if (kmsKeyId != null) 'KmsKeyId': kmsKeyId,
       if (positionFiltering != null)
-        'PositionFiltering': positionFiltering.toValue(),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+        'PositionFiltering': positionFiltering.value,
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
       if (tags != null) 'Tags': tags,
@@ -1568,13 +1633,31 @@ class Location {
   ///
   /// Parameter [keyName] :
   /// The name of the API key to delete.
+  ///
+  /// Parameter [forceDelete] :
+  /// ForceDelete bypasses an API key's expiry conditions and deletes the key.
+  /// Set the parameter <code>true</code> to delete the key or to
+  /// <code>false</code> to not preemptively delete the API key.
+  ///
+  /// Valid values: <code>true</code>, or <code>false</code>.
+  ///
+  /// Required: No
+  /// <note>
+  /// This action is irreversible. Only use ForceDelete if you are certain the
+  /// key is no longer in use.
+  /// </note>
   Future<void> deleteKey({
     required String keyName,
+    bool? forceDelete,
   }) async {
+    final $query = <String, List<String>>{
+      if (forceDelete != null) 'forceDelete': [forceDelete.toString()],
+    };
     final response = await _protocol.send(
       payload: null,
       method: 'DELETE',
       requestUri: '/metadata/v0/keys/${Uri.encodeComponent(keyName)}',
+      queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
   }
@@ -1703,12 +1786,6 @@ class Location {
   }
 
   /// Retrieves the API key resource details.
-  /// <important>
-  /// The API keys feature is in preview. We may add, change, or remove features
-  /// before announcing general availability. For more information, see <a
-  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">Using
-  /// API keys</a>.
-  /// </important>
   ///
   /// May throw [InternalServerException].
   /// May throw [ResourceNotFoundException].
@@ -1859,6 +1936,103 @@ class Location {
     );
   }
 
+  /// Evaluates device positions against geofence geometries from a given
+  /// geofence collection. The event forecasts three states for which a device
+  /// can be in relative to a geofence:
+  ///
+  /// <code>ENTER</code>: If a device is outside of a geofence, but would breach
+  /// the fence if the device is moving at its current speed within time horizon
+  /// window.
+  ///
+  /// <code>EXIT</code>: If a device is inside of a geofence, but would breach
+  /// the fence if the device is moving at its current speed within time horizon
+  /// window.
+  ///
+  /// <code>IDLE</code>: If a device is inside of a geofence, and the device is
+  /// not moving.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ValidationException].
+  /// May throw [ThrottlingException].
+  ///
+  /// Parameter [collectionName] :
+  /// The name of the geofence collection.
+  ///
+  /// Parameter [deviceState] :
+  /// The device's state, including current position and speed.
+  ///
+  /// Parameter [distanceUnit] :
+  /// The distance unit used for the <code>NearestDistance</code> property
+  /// returned in a forecasted event. The measurement system must match for
+  /// <code>DistanceUnit</code> and <code>SpeedUnit</code>; if
+  /// <code>Kilometers</code> is specified for <code>DistanceUnit</code>, then
+  /// <code>SpeedUnit</code> must be <code>KilometersPerHour</code>.
+  ///
+  /// Default Value: <code>Kilometers</code>
+  ///
+  /// Parameter [maxResults] :
+  /// An optional limit for the number of resources returned in a single call.
+  ///
+  /// Default value: <code>20</code>
+  ///
+  /// Parameter [nextToken] :
+  /// The pagination token specifying which page of results to return in the
+  /// response. If no token is provided, the default page is the first page.
+  ///
+  /// Default value: <code>null</code>
+  ///
+  /// Parameter [speedUnit] :
+  /// The speed unit for the device captured by the device state. The
+  /// measurement system must match for <code>DistanceUnit</code> and
+  /// <code>SpeedUnit</code>; if <code>Kilometers</code> is specified for
+  /// <code>DistanceUnit</code>, then <code>SpeedUnit</code> must be
+  /// <code>KilometersPerHour</code>.
+  ///
+  /// Default Value: <code>KilometersPerHour</code>.
+  ///
+  /// Parameter [timeHorizonMinutes] :
+  /// Specifies the time horizon in minutes for the forecasted events.
+  Future<ForecastGeofenceEventsResponse> forecastGeofenceEvents({
+    required String collectionName,
+    required ForecastGeofenceEventsDeviceState deviceState,
+    DistanceUnit? distanceUnit,
+    int? maxResults,
+    String? nextToken,
+    SpeedUnit? speedUnit,
+    double? timeHorizonMinutes,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      20,
+    );
+    _s.validateNumRange(
+      'timeHorizonMinutes',
+      timeHorizonMinutes,
+      0,
+      1152921504606846976,
+    );
+    final $payload = <String, dynamic>{
+      'DeviceState': deviceState,
+      if (distanceUnit != null) 'DistanceUnit': distanceUnit.value,
+      if (maxResults != null) 'MaxResults': maxResults,
+      if (nextToken != null) 'NextToken': nextToken,
+      if (speedUnit != null) 'SpeedUnit': speedUnit.value,
+      if (timeHorizonMinutes != null) 'TimeHorizonMinutes': timeHorizonMinutes,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri:
+          '/geofencing/v0/collections/${Uri.encodeComponent(collectionName)}/forecast-geofence-events',
+      exceptionFnMap: _exceptionFns,
+    );
+    return ForecastGeofenceEventsResponse.fromJson(response);
+  }
+
   /// Retrieves a device's most recent position according to its sample time.
   /// <note>
   /// Device positions are deleted after 30 days.
@@ -1982,6 +2156,10 @@ class Location {
   }
 
   /// Retrieves the geofence details from a geofence collection.
+  /// <note>
+  /// The returned geometry will always match the geometry format used when the
+  /// geofence was created.
+  /// </note>
   ///
   /// May throw [InternalServerException].
   /// May throw [ResourceNotFoundException].
@@ -2020,7 +2198,7 @@ class Location {
   /// A comma-separated list of fonts to load glyphs from in order of
   /// preference. For example, <code>Noto Sans Regular, Arial Unicode</code>.
   ///
-  /// Valid fonts stacks for <a
+  /// Valid font stacks for <a
   /// href="https://docs.aws.amazon.com/location/latest/developerguide/esri.html">Esri</a>
   /// styles:
   ///
@@ -2087,7 +2265,14 @@ class Location {
   /// Bold,Noto Sans Bold</code> | <code>Amazon Ember Medium,Noto Sans
   /// Medium</code> | <code>Amazon Ember Regular Italic,Noto Sans Italic</code>
   /// | <code>Amazon Ember Condensed RC Regular,Noto Sans Regular</code> |
-  /// <code>Amazon Ember Condensed RC Bold,Noto Sans Bold</code>
+  /// <code>Amazon Ember Condensed RC Bold,Noto Sans Bold</code> | <code>Amazon
+  /// Ember Regular,Noto Sans Regular,Noto Sans Arabic Regular</code> |
+  /// <code>Amazon Ember Condensed RC Bold,Noto Sans Bold,Noto Sans Arabic
+  /// Condensed Bold</code> | <code>Amazon Ember Bold,Noto Sans Bold,Noto Sans
+  /// Arabic Bold</code> | <code>Amazon Ember Regular Italic,Noto Sans
+  /// Italic,Noto Sans Arabic Regular</code> | <code>Amazon Ember Condensed RC
+  /// Regular,Noto Sans Regular,Noto Sans Arabic Condensed Regular</code> |
+  /// <code>Amazon Ember Medium,Noto Sans Medium,Noto Sans Arabic Medium</code>
   /// </li>
   /// </ul> <note>
   /// The fonts used by the Open Data map styles are combined fonts that use
@@ -2332,6 +2517,11 @@ class Location {
   /// Parameter [placeId] :
   /// The identifier of the place to find.
   ///
+  /// Parameter [key] :
+  /// The optional <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">API
+  /// key</a> to authorize the request.
+  ///
   /// Parameter [language] :
   /// The preferred language used to return results. The value must be a valid
   /// <a href="https://tools.ietf.org/search/bcp47">BCP 47</a> language tag, for
@@ -2356,9 +2546,11 @@ class Location {
   Future<GetPlaceResponse> getPlace({
     required String indexName,
     required String placeId,
+    String? key,
     String? language,
   }) async {
     final $query = <String, List<String>>{
+      if (key != null) 'key': [key],
       if (language != null) 'language': [language],
     };
     final response = await _protocol.send(
@@ -2382,6 +2574,9 @@ class Location {
   /// Parameter [trackerName] :
   /// The tracker resource containing the requested devices.
   ///
+  /// Parameter [filterGeometry] :
+  /// The geometry used to filter device positions.
+  ///
   /// Parameter [maxResults] :
   /// An optional limit for the number of entries returned in a single call.
   ///
@@ -2394,6 +2589,7 @@ class Location {
   /// Default value: <code>null</code>
   Future<ListDevicePositionsResponse> listDevicePositions({
     required String trackerName,
+    TrackingFilterGeometry? filterGeometry,
     int? maxResults,
     String? nextToken,
   }) async {
@@ -2404,6 +2600,7 @@ class Location {
       100,
     );
     final $payload = <String, dynamic>{
+      if (filterGeometry != null) 'FilterGeometry': filterGeometry,
       if (maxResults != null) 'MaxResults': maxResults,
       if (nextToken != null) 'NextToken': nextToken,
     };
@@ -2504,12 +2701,6 @@ class Location {
   }
 
   /// Lists API key resources in your Amazon Web Services account.
-  /// <important>
-  /// The API keys feature is in preview. We may add, change, or remove features
-  /// before announcing general availability. For more information, see <a
-  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">Using
-  /// API keys</a>.
-  /// </important>
   ///
   /// May throw [InternalServerException].
   /// May throw [AccessDeniedException].
@@ -2814,21 +3005,32 @@ class Location {
   /// <code>ExampleGeofence-1</code>.
   ///
   /// Parameter [geometry] :
-  /// Contains the details to specify the position of the geofence. Can be
-  /// either a polygon or a circle. Including both will return a validation
-  /// error.
+  /// Contains the details to specify the position of the geofence. Can be a
+  /// polygon, a circle or a polygon encoded in Geobuf format. Including
+  /// multiple selections will return a validation error.
   /// <note>
-  /// Each <a
+  /// The <a
   /// href="https://docs.aws.amazon.com/location-geofences/latest/APIReference/API_GeofenceGeometry.html">
-  /// geofence polygon</a> can have a maximum of 1,000 vertices.
+  /// geofence polygon</a> format supports a maximum of 1,000 vertices. The <a
+  /// href="https://docs.aws.amazon.com/location-geofences/latest/APIReference/API_GeofenceGeometry.html">Geofence
+  /// Geobuf</a> format supports a maximum of 100,000 vertices.
   /// </note>
+  ///
+  /// Parameter [geofenceProperties] :
+  /// Associates one of more properties with the geofence. A property is a
+  /// key-value pair stored with the geofence and added to any geofence event
+  /// triggered with that geofence.
+  ///
+  /// Format: <code>"key" : "value"</code>
   Future<PutGeofenceResponse> putGeofence({
     required String collectionName,
     required String geofenceId,
     required GeofenceGeometry geometry,
+    Map<String, String>? geofenceProperties,
   }) async {
     final $payload = <String, dynamic>{
       'Geometry': geometry,
+      if (geofenceProperties != null) 'GeofenceProperties': geofenceProperties,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -2862,6 +3064,11 @@ class Location {
   /// For example, <code>[-123.1174, 49.2847]</code> represents a position with
   /// longitude <code>-123.1174</code> and latitude <code>49.2847</code>.
   ///
+  /// Parameter [key] :
+  /// The optional <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">API
+  /// key</a> to authorize the request.
+  ///
   /// Parameter [language] :
   /// The preferred language used to return results. The value must be a valid
   /// <a href="https://tools.ietf.org/search/bcp47">BCP 47</a> language tag, for
@@ -2891,6 +3098,7 @@ class Location {
   Future<SearchPlaceIndexForPositionResponse> searchPlaceIndexForPosition({
     required String indexName,
     required List<double> position,
+    String? key,
     String? language,
     int? maxResults,
   }) async {
@@ -2900,6 +3108,9 @@ class Location {
       1,
       50,
     );
+    final $query = <String, List<String>>{
+      if (key != null) 'key': [key],
+    };
     final $payload = <String, dynamic>{
       'Position': position,
       if (language != null) 'Language': language,
@@ -2910,6 +3121,7 @@ class Location {
       method: 'POST',
       requestUri:
           '/places/v0/indexes/${Uri.encodeComponent(indexName)}/search/position',
+      queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return SearchPlaceIndexForPositionResponse.fromJson(response);
@@ -2978,6 +3190,16 @@ class Location {
   /// exclusive. Specifying both options results in an error.
   /// </note>
   ///
+  /// Parameter [filterCategories] :
+  /// A list of one or more Amazon Location categories to filter the returned
+  /// places. If you include more than one category, the results will include
+  /// results that match <i>any</i> of the categories listed.
+  ///
+  /// For more information about using categories, including a list of Amazon
+  /// Location categories, see <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/category-filtering.html">Categories
+  /// and filtering</a>, in the <i>Amazon Location Service Developer Guide</i>.
+  ///
   /// Parameter [filterCountries] :
   /// An optional parameter that limits the search results by returning only
   /// suggestions within the provided list of countries.
@@ -2989,6 +3211,11 @@ class Location {
   /// upper-case characters: <code>AUS</code>.
   /// </li>
   /// </ul>
+  ///
+  /// Parameter [key] :
+  /// The optional <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">API
+  /// key</a> to authorize the request.
   ///
   /// Parameter [language] :
   /// The preferred language used to return results. The value must be a valid
@@ -3021,7 +3248,9 @@ class Location {
     required String text,
     List<double>? biasPosition,
     List<double>? filterBBox,
+    List<String>? filterCategories,
     List<String>? filterCountries,
+    String? key,
     String? language,
     int? maxResults,
   }) async {
@@ -3031,10 +3260,14 @@ class Location {
       1,
       15,
     );
+    final $query = <String, List<String>>{
+      if (key != null) 'key': [key],
+    };
     final $payload = <String, dynamic>{
       'Text': text,
       if (biasPosition != null) 'BiasPosition': biasPosition,
       if (filterBBox != null) 'FilterBBox': filterBBox,
+      if (filterCategories != null) 'FilterCategories': filterCategories,
       if (filterCountries != null) 'FilterCountries': filterCountries,
       if (language != null) 'Language': language,
       if (maxResults != null) 'MaxResults': maxResults,
@@ -3044,6 +3277,7 @@ class Location {
       method: 'POST',
       requestUri:
           '/places/v0/indexes/${Uri.encodeComponent(indexName)}/search/suggestions',
+      queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return SearchPlaceIndexForSuggestionsResponse.fromJson(response);
@@ -3111,6 +3345,16 @@ class Location {
   /// exclusive. Specifying both options results in an error.
   /// </note>
   ///
+  /// Parameter [filterCategories] :
+  /// A list of one or more Amazon Location categories to filter the returned
+  /// places. If you include more than one category, the results will include
+  /// results that match <i>any</i> of the categories listed.
+  ///
+  /// For more information about using categories, including a list of Amazon
+  /// Location categories, see <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/category-filtering.html">Categories
+  /// and filtering</a>, in the <i>Amazon Location Service Developer Guide</i>.
+  ///
   /// Parameter [filterCountries] :
   /// An optional parameter that limits the search results by returning only
   /// places that are in a specified list of countries.
@@ -3123,6 +3367,11 @@ class Location {
   /// characters: <code>AUS</code>.
   /// </li>
   /// </ul>
+  ///
+  /// Parameter [key] :
+  /// The optional <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">API
+  /// key</a> to authorize the request.
   ///
   /// Parameter [language] :
   /// The preferred language used to return results. The value must be a valid
@@ -3155,7 +3404,9 @@ class Location {
     required String text,
     List<double>? biasPosition,
     List<double>? filterBBox,
+    List<String>? filterCategories,
     List<String>? filterCountries,
+    String? key,
     String? language,
     int? maxResults,
   }) async {
@@ -3165,10 +3416,14 @@ class Location {
       1,
       50,
     );
+    final $query = <String, List<String>>{
+      if (key != null) 'key': [key],
+    };
     final $payload = <String, dynamic>{
       'Text': text,
       if (biasPosition != null) 'BiasPosition': biasPosition,
       if (filterBBox != null) 'FilterBBox': filterBBox,
+      if (filterCategories != null) 'FilterCategories': filterCategories,
       if (filterCountries != null) 'FilterCountries': filterCountries,
       if (language != null) 'Language': language,
       if (maxResults != null) 'MaxResults': maxResults,
@@ -3178,6 +3433,7 @@ class Location {
       method: 'POST',
       requestUri:
           '/places/v0/indexes/${Uri.encodeComponent(indexName)}/search/text',
+      queryParams: $query,
       exceptionFnMap: _exceptionFns,
     );
     return SearchPlaceIndexForTextResponse.fromJson(response);
@@ -3325,7 +3581,7 @@ class Location {
   }) async {
     final $payload = <String, dynamic>{
       if (description != null) 'Description': description,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
     };
@@ -3340,12 +3596,6 @@ class Location {
   }
 
   /// Updates the specified properties of a given API key resource.
-  /// <important>
-  /// The API keys feature is in preview. We may add, change, or remove features
-  /// before announcing general availability. For more information, see <a
-  /// href="https://docs.aws.amazon.com/location/latest/developerguide/using-apikeys.html">Using
-  /// API keys</a>.
-  /// </important>
   ///
   /// May throw [InternalServerException].
   /// May throw [ResourceNotFoundException].
@@ -3416,6 +3666,10 @@ class Location {
   /// Parameter [mapName] :
   /// The name of the map resource to update.
   ///
+  /// Parameter [configurationUpdate] :
+  /// Updates the parts of the map configuration that can be updated, including
+  /// the political view.
+  ///
   /// Parameter [description] :
   /// Updates the description for the map resource.
   ///
@@ -3424,12 +3678,15 @@ class Location {
   /// <code>RequestBasedUsage</code>.
   Future<UpdateMapResponse> updateMap({
     required String mapName,
+    MapConfigurationUpdate? configurationUpdate,
     String? description,
     PricingPlan? pricingPlan,
   }) async {
     final $payload = <String, dynamic>{
+      if (configurationUpdate != null)
+        'ConfigurationUpdate': configurationUpdate,
       if (description != null) 'Description': description,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -3470,7 +3727,7 @@ class Location {
       if (dataSourceConfiguration != null)
         'DataSourceConfiguration': dataSourceConfiguration,
       if (description != null) 'Description': description,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -3505,7 +3762,7 @@ class Location {
   }) async {
     final $payload = <String, dynamic>{
       if (description != null) 'Description': description,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
     };
     final response = await _protocol.send(
       payload: $payload,
@@ -3530,6 +3787,22 @@ class Location {
   ///
   /// Parameter [description] :
   /// Updates the description for the tracker resource.
+  ///
+  /// Parameter [eventBridgeEnabled] :
+  /// Whether to enable position <code>UPDATE</code> events from this tracker to
+  /// be sent to EventBridge.
+  /// <note>
+  /// You do not need enable this feature to get <code>ENTER</code> and
+  /// <code>EXIT</code> events for geofences with this tracker. Those events are
+  /// always sent to EventBridge.
+  /// </note>
+  ///
+  /// Parameter [kmsKeyEnableGeospatialQueries] :
+  /// Enables <code>GeospatialQueries</code> for a tracker that uses a <a
+  /// href="https://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html">Amazon
+  /// Web Services KMS customer managed key</a>.
+  ///
+  /// This parameter is only used if you are using a KMS customer managed key.
   ///
   /// Parameter [positionFiltering] :
   /// Updates the position filtering for the tracker resource.
@@ -3573,15 +3846,20 @@ class Location {
   Future<UpdateTrackerResponse> updateTracker({
     required String trackerName,
     String? description,
+    bool? eventBridgeEnabled,
+    bool? kmsKeyEnableGeospatialQueries,
     PositionFiltering? positionFiltering,
     PricingPlan? pricingPlan,
     String? pricingPlanDataSource,
   }) async {
     final $payload = <String, dynamic>{
       if (description != null) 'Description': description,
+      if (eventBridgeEnabled != null) 'EventBridgeEnabled': eventBridgeEnabled,
+      if (kmsKeyEnableGeospatialQueries != null)
+        'KmsKeyEnableGeospatialQueries': kmsKeyEnableGeospatialQueries,
       if (positionFiltering != null)
-        'PositionFiltering': positionFiltering.toValue(),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+        'PositionFiltering': positionFiltering.value,
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
     };
@@ -3592,6 +3870,47 @@ class Location {
       exceptionFnMap: _exceptionFns,
     );
     return UpdateTrackerResponse.fromJson(response);
+  }
+
+  /// Verifies the integrity of the device's position by determining if it was
+  /// reported behind a proxy, and by comparing it to an inferred position
+  /// estimated based on the device's state.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [AccessDeniedException].
+  /// May throw [ValidationException].
+  /// May throw [ThrottlingException].
+  ///
+  /// Parameter [deviceState] :
+  /// The device's state, including position, IP address, cell signals and Wi-Fi
+  /// access points.
+  ///
+  /// Parameter [trackerName] :
+  /// The name of the tracker resource to be associated with verification
+  /// request.
+  ///
+  /// Parameter [distanceUnit] :
+  /// The distance unit for the verification request.
+  ///
+  /// Default Value: <code>Kilometers</code>
+  Future<VerifyDevicePositionResponse> verifyDevicePosition({
+    required DeviceState deviceState,
+    required String trackerName,
+    DistanceUnit? distanceUnit,
+  }) async {
+    final $payload = <String, dynamic>{
+      'DeviceState': deviceState,
+      if (distanceUnit != null) 'DistanceUnit': distanceUnit.value,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri:
+          '/tracking/v0/trackers/${Uri.encodeComponent(trackerName)}/positions/verify',
+      exceptionFnMap: _exceptionFns,
+    );
+    return VerifyDevicePositionResponse.fromJson(response);
   }
 }
 
@@ -3607,7 +3926,7 @@ class ApiKeyFilter {
   Map<String, dynamic> toJson() {
     final keyStatus = this.keyStatus;
     return {
-      if (keyStatus != null) 'KeyStatus': keyStatus.toValue(),
+      if (keyStatus != null) 'KeyStatus': keyStatus.value,
     };
   }
 }
@@ -3616,56 +3935,89 @@ class ApiKeyFilter {
 /// key resource.
 class ApiKeyRestrictions {
   /// A list of allowed actions that an API key resource grants permissions to
-  /// perform
-  /// <note>
-  /// Currently, the only valid action is <code>geo:GetMap*</code> as an input to
-  /// the list. For example, <code>["geo:GetMap*"]</code> is valid but
-  /// <code>["geo:GetMapTile"]</code> is not.
-  /// </note>
-  final List<String> allowActions;
-
-  /// A list of allowed resource ARNs that a API key bearer can perform actions on
+  /// perform. You must have at least one action for each type of resource. For
+  /// example, if you have a place resource, you must include at least one place
+  /// action.
   ///
-  /// For more information about ARN format, see <a
-  /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon
-  /// Resource Names (ARNs)</a>.
-  /// <note>
-  /// In this preview, you can allow only map resources.
-  /// </note>
-  /// Requirements:
+  /// The following are valid values for the actions.
   ///
   /// <ul>
   /// <li>
-  /// Must be prefixed with <code>arn</code>.
-  /// </li>
-  /// <li>
-  /// <code>partition</code> and <code>service</code> must not be empty and should
-  /// begin with only alphanumeric characters (A–Z, a–z, 0–9) and contain only
-  /// alphanumeric numbers, hyphens (-) and periods (.).
-  /// </li>
-  /// <li>
-  /// <code>region</code> and <code>account-id</code> can be empty or should begin
-  /// with only alphanumeric characters (A–Z, a–z, 0–9) and contain only
-  /// alphanumeric numbers, hyphens (-) and periods (.).
-  /// </li>
-  /// <li>
-  /// <code>resource-id</code> can begin with any character except for forward
-  /// slash (/) and contain any characters after, including forward slashes to
-  /// form a path.
+  /// <b>Map actions</b>
   ///
-  /// <code>resource-id</code> can also include wildcard characters, denoted by an
-  /// asterisk (*).
+  /// <ul>
+  /// <li>
+  /// <code>geo:GetMap*</code> - Allows all actions needed for map rendering.
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// <b>Place actions</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>geo:SearchPlaceIndexForText</code> - Allows geocoding.
   /// </li>
   /// <li>
+  /// <code>geo:SearchPlaceIndexForPosition</code> - Allows reverse geocoding.
+  /// </li>
+  /// <li>
+  /// <code>geo:SearchPlaceIndexForSuggestions</code> - Allows generating
+  /// suggestions from text.
+  /// </li>
+  /// <li>
+  /// <code>GetPlace</code> - Allows finding a place by place ID.
+  /// </li>
+  /// </ul> </li>
+  /// <li>
+  /// <b>Route actions</b>
+  ///
+  /// <ul>
+  /// <li>
+  /// <code>geo:CalculateRoute</code> - Allows point to point routing.
+  /// </li>
+  /// <li>
+  /// <code>geo:CalculateRouteMatrix</code> - Allows calculating a matrix of
+  /// routes.
+  /// </li>
+  /// </ul> </li>
+  /// </ul> <note>
+  /// You must use these strings exactly. For example, to provide access to map
+  /// rendering, the only valid action is <code>geo:GetMap*</code> as an input to
+  /// the list. <code>["geo:GetMap*"]</code> is valid but
+  /// <code>["geo:GetMapTile"]</code> is not. Similarly, you cannot use
+  /// <code>["geo:SearchPlaceIndexFor*"]</code> - you must list each of the Place
+  /// actions separately.
+  /// </note>
+  final List<String> allowActions;
+
+  /// A list of allowed resource ARNs that a API key bearer can perform actions
+  /// on.
+  ///
+  /// <ul>
+  /// <li>
+  /// The ARN must be the correct ARN for a map, place, or route ARN. You may
+  /// include wildcards in the resource-id to match multiple resources of the same
+  /// type.
+  /// </li>
+  /// <li>
+  /// The resources must be in the same <code>partition</code>,
+  /// <code>region</code>, and <code>account-id</code> as the key that is being
+  /// created.
+  /// </li>
+  /// <li>
+  /// Other than wildcards, you must include the full ARN, including the
   /// <code>arn</code>, <code>partition</code>, <code>service</code>,
   /// <code>region</code>, <code>account-id</code> and <code>resource-id</code>
-  /// must be delimited by a colon (:).
+  /// delimited by colons (:).
   /// </li>
   /// <li>
-  /// No spaces allowed. For example,
+  /// No spaces allowed, even with wildcards. For example,
   /// <code>arn:aws:geo:region:<i>account-id</i>:map/ExampleMap*</code>.
   /// </li>
   /// </ul>
+  /// For more information about ARN format, see <a
+  /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon
+  /// Resource Names (ARNs)</a>.
   final List<String> allowResources;
 
   /// An optional list of allowed HTTP referers for which requests must originate
@@ -3706,15 +4058,15 @@ class ApiKeyRestrictions {
   factory ApiKeyRestrictions.fromJson(Map<String, dynamic> json) {
     return ApiKeyRestrictions(
       allowActions: (json['AllowActions'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as String)
           .toList(),
       allowResources: (json['AllowResources'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as String)
           .toList(),
       allowReferers: (json['AllowReferers'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -3785,7 +4137,7 @@ class BatchDeleteDevicePositionHistoryResponse {
       Map<String, dynamic> json) {
     return BatchDeleteDevicePositionHistoryResponse(
       errors: (json['Errors'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => BatchDeleteDevicePositionHistoryError.fromJson(
               e as Map<String, dynamic>))
           .toList(),
@@ -3842,7 +4194,7 @@ class BatchDeleteGeofenceResponse {
   factory BatchDeleteGeofenceResponse.fromJson(Map<String, dynamic> json) {
     return BatchDeleteGeofenceResponse(
       errors: (json['Errors'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               BatchDeleteGeofenceError.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -3909,7 +4261,7 @@ class BatchEvaluateGeofencesResponse {
   factory BatchEvaluateGeofencesResponse.fromJson(Map<String, dynamic> json) {
     return BatchEvaluateGeofencesResponse(
       errors: (json['Errors'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               BatchEvaluateGeofencesError.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -3971,11 +4323,11 @@ class BatchGetDevicePositionResponse {
   factory BatchGetDevicePositionResponse.fromJson(Map<String, dynamic> json) {
     return BatchGetDevicePositionResponse(
       devicePositions: (json['DevicePositions'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => DevicePosition.fromJson(e as Map<String, dynamic>))
           .toList(),
       errors: (json['Errors'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               BatchGetDevicePositionError.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -4007,7 +4359,7 @@ class BatchItemError {
 
   factory BatchItemError.fromJson(Map<String, dynamic> json) {
     return BatchItemError(
-      code: (json['Code'] as String?)?.toBatchItemErrorCode(),
+      code: (json['Code'] as String?)?.let(BatchItemErrorCode.fromString),
       message: json['Message'] as String?,
     );
   }
@@ -4016,58 +4368,29 @@ class BatchItemError {
     final code = this.code;
     final message = this.message;
     return {
-      if (code != null) 'Code': code.toValue(),
+      if (code != null) 'Code': code.value,
       if (message != null) 'Message': message,
     };
   }
 }
 
 enum BatchItemErrorCode {
-  accessDeniedError,
-  conflictError,
-  internalServerError,
-  resourceNotFoundError,
-  throttlingError,
-  validationError,
-}
+  accessDeniedError('AccessDeniedError'),
+  conflictError('ConflictError'),
+  internalServerError('InternalServerError'),
+  resourceNotFoundError('ResourceNotFoundError'),
+  throttlingError('ThrottlingError'),
+  validationError('ValidationError'),
+  ;
 
-extension BatchItemErrorCodeValueExtension on BatchItemErrorCode {
-  String toValue() {
-    switch (this) {
-      case BatchItemErrorCode.accessDeniedError:
-        return 'AccessDeniedError';
-      case BatchItemErrorCode.conflictError:
-        return 'ConflictError';
-      case BatchItemErrorCode.internalServerError:
-        return 'InternalServerError';
-      case BatchItemErrorCode.resourceNotFoundError:
-        return 'ResourceNotFoundError';
-      case BatchItemErrorCode.throttlingError:
-        return 'ThrottlingError';
-      case BatchItemErrorCode.validationError:
-        return 'ValidationError';
-    }
-  }
-}
+  final String value;
 
-extension BatchItemErrorCodeFromString on String {
-  BatchItemErrorCode toBatchItemErrorCode() {
-    switch (this) {
-      case 'AccessDeniedError':
-        return BatchItemErrorCode.accessDeniedError;
-      case 'ConflictError':
-        return BatchItemErrorCode.conflictError;
-      case 'InternalServerError':
-        return BatchItemErrorCode.internalServerError;
-      case 'ResourceNotFoundError':
-        return BatchItemErrorCode.resourceNotFoundError;
-      case 'ThrottlingError':
-        return BatchItemErrorCode.throttlingError;
-      case 'ValidationError':
-        return BatchItemErrorCode.validationError;
-    }
-    throw Exception('$this is not known in enum BatchItemErrorCode');
-  }
+  const BatchItemErrorCode(this.value);
+
+  static BatchItemErrorCode fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum BatchItemErrorCode'));
 }
 
 /// Contains error details for each geofence that failed to be stored in a given
@@ -4106,26 +4429,39 @@ class BatchPutGeofenceRequestEntry {
   /// The identifier for the geofence to be stored in a given geofence collection.
   final String geofenceId;
 
-  /// Contains the details of the position of the geofence. Can be either a
-  /// polygon or a circle. Including both will return a validation error.
+  /// Contains the details to specify the position of the geofence. Can be a
+  /// polygon, a circle or a polygon encoded in Geobuf format. Including multiple
+  /// selections will return a validation error.
   /// <note>
-  /// Each <a
+  /// The <a
   /// href="https://docs.aws.amazon.com/location-geofences/latest/APIReference/API_GeofenceGeometry.html">
-  /// geofence polygon</a> can have a maximum of 1,000 vertices.
+  /// geofence polygon</a> format supports a maximum of 1,000 vertices. The <a
+  /// href="https://docs.aws.amazon.com/location-geofences/latest/APIReference/API_GeofenceGeometry.html">Geofence
+  /// geobuf</a> format supports a maximum of 100,000 vertices.
   /// </note>
   final GeofenceGeometry geometry;
+
+  /// Associates one of more properties with the geofence. A property is a
+  /// key-value pair stored with the geofence and added to any geofence event
+  /// triggered with that geofence.
+  ///
+  /// Format: <code>"key" : "value"</code>
+  final Map<String, String>? geofenceProperties;
 
   BatchPutGeofenceRequestEntry({
     required this.geofenceId,
     required this.geometry,
+    this.geofenceProperties,
   });
 
   Map<String, dynamic> toJson() {
     final geofenceId = this.geofenceId;
     final geometry = this.geometry;
+    final geofenceProperties = this.geofenceProperties;
     return {
       'GeofenceId': geofenceId,
       'Geometry': geometry,
+      if (geofenceProperties != null) 'GeofenceProperties': geofenceProperties,
     };
   }
 }
@@ -4147,11 +4483,11 @@ class BatchPutGeofenceResponse {
   factory BatchPutGeofenceResponse.fromJson(Map<String, dynamic> json) {
     return BatchPutGeofenceResponse(
       errors: (json['Errors'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => BatchPutGeofenceError.fromJson(e as Map<String, dynamic>))
           .toList(),
       successes: (json['Successes'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               BatchPutGeofenceSuccess.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -4262,7 +4598,7 @@ class BatchUpdateDevicePositionResponse {
       Map<String, dynamic> json) {
     return BatchUpdateDevicePositionResponse(
       errors: (json['Errors'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => BatchUpdateDevicePositionError.fromJson(
               e as Map<String, dynamic>))
           .toList(),
@@ -4344,24 +4680,22 @@ class CalculateRouteMatrixResponse {
   factory CalculateRouteMatrixResponse.fromJson(Map<String, dynamic> json) {
     return CalculateRouteMatrixResponse(
       routeMatrix: (json['RouteMatrix'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => (e as List)
-              .whereNotNull()
+              .nonNulls
               .map((e) => RouteMatrixEntry.fromJson(e as Map<String, dynamic>))
               .toList())
           .toList(),
       summary: CalculateRouteMatrixSummary.fromJson(
           json['Summary'] as Map<String, dynamic>),
       snappedDeparturePositions: (json['SnappedDeparturePositions'] as List?)
-          ?.whereNotNull()
-          .map((e) =>
-              (e as List).whereNotNull().map((e) => e as double).toList())
+          ?.nonNulls
+          .map((e) => (e as List).nonNulls.map((e) => e as double).toList())
           .toList(),
       snappedDestinationPositions:
           (json['SnappedDestinationPositions'] as List?)
-              ?.whereNotNull()
-              .map((e) =>
-                  (e as List).whereNotNull().map((e) => e as double).toList())
+              ?.nonNulls
+              .map((e) => (e as List).nonNulls.map((e) => e as double).toList())
               .toList(),
     );
   }
@@ -4425,7 +4759,7 @@ class CalculateRouteMatrixSummary {
   factory CalculateRouteMatrixSummary.fromJson(Map<String, dynamic> json) {
     return CalculateRouteMatrixSummary(
       dataSource: json['DataSource'] as String,
-      distanceUnit: (json['DistanceUnit'] as String).toDistanceUnit(),
+      distanceUnit: DistanceUnit.fromString((json['DistanceUnit'] as String)),
       errorCount: json['ErrorCount'] as int,
       routeCount: json['RouteCount'] as int,
     );
@@ -4438,7 +4772,7 @@ class CalculateRouteMatrixSummary {
     final routeCount = this.routeCount;
     return {
       'DataSource': dataSource,
-      'DistanceUnit': distanceUnit.toValue(),
+      'DistanceUnit': distanceUnit.value,
       'ErrorCount': errorCount,
       'RouteCount': routeCount,
     };
@@ -4495,7 +4829,7 @@ class CalculateRouteResponse {
   factory CalculateRouteResponse.fromJson(Map<String, dynamic> json) {
     return CalculateRouteResponse(
       legs: (json['Legs'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => Leg.fromJson(e as Map<String, dynamic>))
           .toList(),
       summary: CalculateRouteSummary.fromJson(
@@ -4593,12 +4927,10 @@ class CalculateRouteSummary {
     return CalculateRouteSummary(
       dataSource: json['DataSource'] as String,
       distance: json['Distance'] as double,
-      distanceUnit: (json['DistanceUnit'] as String).toDistanceUnit(),
+      distanceUnit: DistanceUnit.fromString((json['DistanceUnit'] as String)),
       durationSeconds: json['DurationSeconds'] as double,
-      routeBBox: (json['RouteBBox'] as List)
-          .whereNotNull()
-          .map((e) => e as double)
-          .toList(),
+      routeBBox:
+          (json['RouteBBox'] as List).nonNulls.map((e) => e as double).toList(),
     );
   }
 
@@ -4611,7 +4943,7 @@ class CalculateRouteSummary {
     return {
       'DataSource': dataSource,
       'Distance': distance,
-      'DistanceUnit': distanceUnit.toValue(),
+      'DistanceUnit': distanceUnit.value,
       'DurationSeconds': durationSeconds,
       'RouteBBox': routeBBox,
     };
@@ -4665,6 +4997,24 @@ class CalculateRouteTruckModeOptions {
   }
 }
 
+/// The cellular network communication infrastructure that the device uses.
+class CellSignals {
+  /// Information about the Long-Term Evolution (LTE) network the device is
+  /// connected to.
+  final List<LteCellDetails> lteCellDetails;
+
+  CellSignals({
+    required this.lteCellDetails,
+  });
+
+  Map<String, dynamic> toJson() {
+    final lteCellDetails = this.lteCellDetails;
+    return {
+      'LteCellDetails': lteCellDetails,
+    };
+  }
+}
+
 /// A circle on the earth, as defined by a center point and a radius.
 class Circle {
   /// A single point geometry, specifying the center of the circle, using <a
@@ -4683,10 +5033,8 @@ class Circle {
 
   factory Circle.fromJson(Map<String, dynamic> json) {
     return Circle(
-      center: (json['Center'] as List)
-          .whereNotNull()
-          .map((e) => e as double)
-          .toList(),
+      center:
+          (json['Center'] as List).nonNulls.map((e) => e as double).toList(),
       radius: json['Radius'] as double,
     );
   }
@@ -5040,14 +5388,15 @@ class DataSourceConfiguration {
 
   factory DataSourceConfiguration.fromJson(Map<String, dynamic> json) {
     return DataSourceConfiguration(
-      intendedUse: (json['IntendedUse'] as String?)?.toIntendedUse(),
+      intendedUse:
+          (json['IntendedUse'] as String?)?.let(IntendedUse.fromString),
     );
   }
 
   Map<String, dynamic> toJson() {
     final intendedUse = this.intendedUse;
     return {
-      if (intendedUse != null) 'IntendedUse': intendedUse.toValue(),
+      if (intendedUse != null) 'IntendedUse': intendedUse.value,
     };
   }
 }
@@ -5152,6 +5501,9 @@ class DescribeGeofenceCollectionResponse {
   /// format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>
   final DateTime updateTime;
 
+  /// The number of geofences in the geofence collection.
+  final int? geofenceCount;
+
   /// A key identifier for an <a
   /// href="https://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html">Amazon
   /// Web Services KMS customer managed key</a> assigned to the Amazon Location
@@ -5173,6 +5525,7 @@ class DescribeGeofenceCollectionResponse {
     required this.createTime,
     required this.description,
     required this.updateTime,
+    this.geofenceCount,
     this.kmsKeyId,
     this.pricingPlan,
     this.pricingPlanDataSource,
@@ -5187,8 +5540,10 @@ class DescribeGeofenceCollectionResponse {
       createTime: nonNullableTimeStampFromJson(json['CreateTime'] as Object),
       description: json['Description'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
+      geofenceCount: json['GeofenceCount'] as int?,
       kmsKeyId: json['KmsKeyId'] as String?,
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
       pricingPlanDataSource: json['PricingPlanDataSource'] as String?,
       tags: (json['Tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -5201,6 +5556,7 @@ class DescribeGeofenceCollectionResponse {
     final createTime = this.createTime;
     final description = this.description;
     final updateTime = this.updateTime;
+    final geofenceCount = this.geofenceCount;
     final kmsKeyId = this.kmsKeyId;
     final pricingPlan = this.pricingPlan;
     final pricingPlanDataSource = this.pricingPlanDataSource;
@@ -5211,8 +5567,9 @@ class DescribeGeofenceCollectionResponse {
       'CreateTime': iso8601ToJson(createTime),
       'Description': description,
       'UpdateTime': iso8601ToJson(updateTime),
+      if (geofenceCount != null) 'GeofenceCount': geofenceCount,
       if (kmsKeyId != null) 'KmsKeyId': kmsKeyId,
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
       if (tags != null) 'Tags': tags,
@@ -5372,7 +5729,8 @@ class DescribeMapResponse {
       mapArn: json['MapArn'] as String,
       mapName: json['MapName'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
       tags: (json['Tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -5396,7 +5754,7 @@ class DescribeMapResponse {
       'MapArn': mapArn,
       'MapName': mapName,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (tags != null) 'Tags': tags,
     };
   }
@@ -5479,7 +5837,8 @@ class DescribePlaceIndexResponse {
       indexArn: json['IndexArn'] as String,
       indexName: json['IndexName'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
       tags: (json['Tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -5503,7 +5862,7 @@ class DescribePlaceIndexResponse {
       'IndexArn': indexArn,
       'IndexName': indexName,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (tags != null) 'Tags': tags,
     };
   }
@@ -5593,7 +5952,8 @@ class DescribeRouteCalculatorResponse {
       dataSource: json['DataSource'] as String,
       description: json['Description'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
       tags: (json['Tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
     );
@@ -5615,7 +5975,7 @@ class DescribeRouteCalculatorResponse {
       'DataSource': dataSource,
       'Description': description,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (tags != null) 'Tags': tags,
     };
   }
@@ -5649,6 +6009,29 @@ class DescribeTrackerResponse {
   /// format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>.
   final DateTime updateTime;
 
+  /// Whether <code>UPDATE</code> events from this tracker in EventBridge are
+  /// enabled. If set to <code>true</code> these events will be sent to
+  /// EventBridge.
+  final bool? eventBridgeEnabled;
+
+  /// Enables <code>GeospatialQueries</code> for a tracker that uses a <a
+  /// href="https://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html">Amazon
+  /// Web Services KMS customer managed key</a>.
+  ///
+  /// This parameter is only used if you are using a KMS customer managed key.
+  /// <note>
+  /// If you wish to encrypt your data using your own KMS customer managed key,
+  /// then the Bounding Polygon Queries feature will be disabled by default. This
+  /// is because by using this feature, a representation of your device positions
+  /// will not be encrypted using the your KMS managed key. The exact device
+  /// position, however; is still encrypted using your managed key.
+  ///
+  /// You can choose to opt-in to the Bounding Polygon Quseries feature. This is
+  /// done by setting the <code>KmsKeyEnableGeospatialQueries</code> parameter to
+  /// true when creating or updating a Tracker.
+  /// </note>
+  final bool? kmsKeyEnableGeospatialQueries;
+
   /// A key identifier for an <a
   /// href="https://docs.aws.amazon.com/kms/latest/developerguide/create-keys.html">Amazon
   /// Web Services KMS customer managed key</a> assigned to the Amazon Location
@@ -5673,6 +6056,8 @@ class DescribeTrackerResponse {
     required this.trackerArn,
     required this.trackerName,
     required this.updateTime,
+    this.eventBridgeEnabled,
+    this.kmsKeyEnableGeospatialQueries,
     this.kmsKeyId,
     this.positionFiltering,
     this.pricingPlan,
@@ -5687,10 +6072,14 @@ class DescribeTrackerResponse {
       trackerArn: json['TrackerArn'] as String,
       trackerName: json['TrackerName'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
+      eventBridgeEnabled: json['EventBridgeEnabled'] as bool?,
+      kmsKeyEnableGeospatialQueries:
+          json['KmsKeyEnableGeospatialQueries'] as bool?,
       kmsKeyId: json['KmsKeyId'] as String?,
-      positionFiltering:
-          (json['PositionFiltering'] as String?)?.toPositionFiltering(),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      positionFiltering: (json['PositionFiltering'] as String?)
+          ?.let(PositionFiltering.fromString),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
       pricingPlanDataSource: json['PricingPlanDataSource'] as String?,
       tags: (json['Tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
@@ -5703,6 +6092,8 @@ class DescribeTrackerResponse {
     final trackerArn = this.trackerArn;
     final trackerName = this.trackerName;
     final updateTime = this.updateTime;
+    final eventBridgeEnabled = this.eventBridgeEnabled;
+    final kmsKeyEnableGeospatialQueries = this.kmsKeyEnableGeospatialQueries;
     final kmsKeyId = this.kmsKeyId;
     final positionFiltering = this.positionFiltering;
     final pricingPlan = this.pricingPlan;
@@ -5714,10 +6105,13 @@ class DescribeTrackerResponse {
       'TrackerArn': trackerArn,
       'TrackerName': trackerName,
       'UpdateTime': iso8601ToJson(updateTime),
+      if (eventBridgeEnabled != null) 'EventBridgeEnabled': eventBridgeEnabled,
+      if (kmsKeyEnableGeospatialQueries != null)
+        'KmsKeyEnableGeospatialQueries': kmsKeyEnableGeospatialQueries,
       if (kmsKeyId != null) 'KmsKeyId': kmsKeyId,
       if (positionFiltering != null)
-        'PositionFiltering': positionFiltering.toValue(),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+        'PositionFiltering': positionFiltering.value,
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
       if (tags != null) 'Tags': tags,
@@ -5760,10 +6154,8 @@ class DevicePosition {
 
   factory DevicePosition.fromJson(Map<String, dynamic> json) {
     return DevicePosition(
-      position: (json['Position'] as List)
-          .whereNotNull()
-          .map((e) => e as double)
-          .toList(),
+      position:
+          (json['Position'] as List).nonNulls.map((e) => e as double).toList(),
       receivedTime:
           nonNullableTimeStampFromJson(json['ReceivedTime'] as Object),
       sampleTime: nonNullableTimeStampFromJson(json['SampleTime'] as Object),
@@ -5844,32 +6236,72 @@ class DevicePositionUpdate {
   }
 }
 
+/// The device's position, IP address, and Wi-Fi access points.
+class DeviceState {
+  /// The device identifier.
+  final String deviceId;
+
+  /// The last known device position.
+  final List<double> position;
+
+  /// The timestamp at which the device's position was determined. Uses <a
+  /// href="https://www.iso.org/iso-8601-date-and-time-format.html"> ISO 8601 </a>
+  /// format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>.
+  final DateTime sampleTime;
+  final PositionalAccuracy? accuracy;
+
+  /// The cellular network infrastructure that the device is connected to.
+  final CellSignals? cellSignals;
+
+  /// The device's Ipv4 address.
+  final String? ipv4Address;
+
+  /// The Wi-Fi access points the device is using.
+  final List<WiFiAccessPoint>? wiFiAccessPoints;
+
+  DeviceState({
+    required this.deviceId,
+    required this.position,
+    required this.sampleTime,
+    this.accuracy,
+    this.cellSignals,
+    this.ipv4Address,
+    this.wiFiAccessPoints,
+  });
+
+  Map<String, dynamic> toJson() {
+    final deviceId = this.deviceId;
+    final position = this.position;
+    final sampleTime = this.sampleTime;
+    final accuracy = this.accuracy;
+    final cellSignals = this.cellSignals;
+    final ipv4Address = this.ipv4Address;
+    final wiFiAccessPoints = this.wiFiAccessPoints;
+    return {
+      'DeviceId': deviceId,
+      'Position': position,
+      'SampleTime': iso8601ToJson(sampleTime),
+      if (accuracy != null) 'Accuracy': accuracy,
+      if (cellSignals != null) 'CellSignals': cellSignals,
+      if (ipv4Address != null) 'Ipv4Address': ipv4Address,
+      if (wiFiAccessPoints != null) 'WiFiAccessPoints': wiFiAccessPoints,
+    };
+  }
+}
+
 enum DimensionUnit {
-  meters,
-  feet,
-}
+  meters('Meters'),
+  feet('Feet'),
+  ;
 
-extension DimensionUnitValueExtension on DimensionUnit {
-  String toValue() {
-    switch (this) {
-      case DimensionUnit.meters:
-        return 'Meters';
-      case DimensionUnit.feet:
-        return 'Feet';
-    }
-  }
-}
+  final String value;
 
-extension DimensionUnitFromString on String {
-  DimensionUnit toDimensionUnit() {
-    switch (this) {
-      case 'Meters':
-        return DimensionUnit.meters;
-      case 'Feet':
-        return DimensionUnit.feet;
-    }
-    throw Exception('$this is not known in enum DimensionUnit');
-  }
+  const DimensionUnit(this.value);
+
+  static DimensionUnit fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum DimensionUnit'));
 }
 
 class DisassociateTrackerConsumerResponse {
@@ -5885,37 +6317,195 @@ class DisassociateTrackerConsumerResponse {
 }
 
 enum DistanceUnit {
-  kilometers,
-  miles,
+  kilometers('Kilometers'),
+  miles('Miles'),
+  ;
+
+  final String value;
+
+  const DistanceUnit(this.value);
+
+  static DistanceUnit fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum DistanceUnit'));
 }
 
-extension DistanceUnitValueExtension on DistanceUnit {
-  String toValue() {
-    switch (this) {
-      case DistanceUnit.kilometers:
-        return 'Kilometers';
-      case DistanceUnit.miles:
-        return 'Miles';
-    }
+/// The device's position, IP address, and WiFi access points.
+class ForecastGeofenceEventsDeviceState {
+  /// The device's position.
+  final List<double> position;
+
+  /// The device's speed.
+  final double? speed;
+
+  ForecastGeofenceEventsDeviceState({
+    required this.position,
+    this.speed,
+  });
+
+  Map<String, dynamic> toJson() {
+    final position = this.position;
+    final speed = this.speed;
+    return {
+      'Position': position,
+      if (speed != null) 'Speed': speed,
+    };
   }
 }
 
-extension DistanceUnitFromString on String {
-  DistanceUnit toDistanceUnit() {
-    switch (this) {
-      case 'Kilometers':
-        return DistanceUnit.kilometers;
-      case 'Miles':
-        return DistanceUnit.miles;
-    }
-    throw Exception('$this is not known in enum DistanceUnit');
+class ForecastGeofenceEventsResponse {
+  /// The distance unit for the forecasted events.
+  final DistanceUnit distanceUnit;
+
+  /// The list of forecasted events.
+  final List<ForecastedEvent> forecastedEvents;
+
+  /// The speed unit for the forecasted events.
+  final SpeedUnit speedUnit;
+
+  /// The pagination token specifying which page of results to return in the
+  /// response. If no token is provided, the default page is the first page.
+  final String? nextToken;
+
+  ForecastGeofenceEventsResponse({
+    required this.distanceUnit,
+    required this.forecastedEvents,
+    required this.speedUnit,
+    this.nextToken,
+  });
+
+  factory ForecastGeofenceEventsResponse.fromJson(Map<String, dynamic> json) {
+    return ForecastGeofenceEventsResponse(
+      distanceUnit: DistanceUnit.fromString((json['DistanceUnit'] as String)),
+      forecastedEvents: (json['ForecastedEvents'] as List)
+          .nonNulls
+          .map((e) => ForecastedEvent.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      speedUnit: SpeedUnit.fromString((json['SpeedUnit'] as String)),
+      nextToken: json['NextToken'] as String?,
+    );
   }
+
+  Map<String, dynamic> toJson() {
+    final distanceUnit = this.distanceUnit;
+    final forecastedEvents = this.forecastedEvents;
+    final speedUnit = this.speedUnit;
+    final nextToken = this.nextToken;
+    return {
+      'DistanceUnit': distanceUnit.value,
+      'ForecastedEvents': forecastedEvents,
+      'SpeedUnit': speedUnit.value,
+      if (nextToken != null) 'NextToken': nextToken,
+    };
+  }
+}
+
+/// A forecasted event represents a geofence event in relation to the requested
+/// device state, that may occur given the provided device state and time
+/// horizon.
+class ForecastedEvent {
+  /// The forecasted event identifier.
+  final String eventId;
+
+  /// The event type, forecasting three states for which a device can be in
+  /// relative to a geofence:
+  ///
+  /// <code>ENTER</code>: If a device is outside of a geofence, but would breach
+  /// the fence if the device is moving at its current speed within time horizon
+  /// window.
+  ///
+  /// <code>EXIT</code>: If a device is inside of a geofence, but would breach the
+  /// fence if the device is moving at its current speed within time horizon
+  /// window.
+  ///
+  /// <code>IDLE</code>: If a device is inside of a geofence, and the device is
+  /// not moving.
+  final ForecastedGeofenceEventType eventType;
+
+  /// The geofence identifier pertaining to the forecasted event.
+  final String geofenceId;
+
+  /// Indicates if the device is located within the geofence.
+  final bool isDeviceInGeofence;
+
+  /// The closest distance from the device's position to the geofence.
+  final double nearestDistance;
+
+  /// The forecasted time the device will breach the geofence in <a
+  /// href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO 8601</a>
+  /// format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>
+  final DateTime? forecastedBreachTime;
+
+  /// The geofence properties.
+  final Map<String, String>? geofenceProperties;
+
+  ForecastedEvent({
+    required this.eventId,
+    required this.eventType,
+    required this.geofenceId,
+    required this.isDeviceInGeofence,
+    required this.nearestDistance,
+    this.forecastedBreachTime,
+    this.geofenceProperties,
+  });
+
+  factory ForecastedEvent.fromJson(Map<String, dynamic> json) {
+    return ForecastedEvent(
+      eventId: json['EventId'] as String,
+      eventType:
+          ForecastedGeofenceEventType.fromString((json['EventType'] as String)),
+      geofenceId: json['GeofenceId'] as String,
+      isDeviceInGeofence: json['IsDeviceInGeofence'] as bool,
+      nearestDistance: json['NearestDistance'] as double,
+      forecastedBreachTime: timeStampFromJson(json['ForecastedBreachTime']),
+      geofenceProperties: (json['GeofenceProperties'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final eventId = this.eventId;
+    final eventType = this.eventType;
+    final geofenceId = this.geofenceId;
+    final isDeviceInGeofence = this.isDeviceInGeofence;
+    final nearestDistance = this.nearestDistance;
+    final forecastedBreachTime = this.forecastedBreachTime;
+    final geofenceProperties = this.geofenceProperties;
+    return {
+      'EventId': eventId,
+      'EventType': eventType.value,
+      'GeofenceId': geofenceId,
+      'IsDeviceInGeofence': isDeviceInGeofence,
+      'NearestDistance': nearestDistance,
+      if (forecastedBreachTime != null)
+        'ForecastedBreachTime': iso8601ToJson(forecastedBreachTime),
+      if (geofenceProperties != null) 'GeofenceProperties': geofenceProperties,
+    };
+  }
+}
+
+enum ForecastedGeofenceEventType {
+  enter('ENTER'),
+  exit('EXIT'),
+  idle('IDLE'),
+  ;
+
+  final String value;
+
+  const ForecastedGeofenceEventType(this.value);
+
+  static ForecastedGeofenceEventType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ForecastedGeofenceEventType'));
 }
 
 /// Contains the geofence geometry details.
 ///
-/// A geofence geometry is made up of either a polygon or a circle. Can be
-/// either a polygon or a circle. Including both will return a validation error.
+/// A geofence geometry is made up of either a polygon or a circle. Can be a
+/// polygon, a circle or a polygon encoded in Geobuf format. Including multiple
+/// selections will return a validation error.
 /// <note>
 /// Amazon Location doesn't currently support polygons with holes,
 /// multipolygons, polygons that are wound clockwise, or that cross the
@@ -5924,6 +6514,12 @@ extension DistanceUnitFromString on String {
 class GeofenceGeometry {
   /// A circle on the earth, as defined by a center point and a radius.
   final Circle? circle;
+
+  /// Geobuf is a compact binary encoding for geographic data that provides
+  /// lossless compression of GeoJSON polygons. The Geobuf must be Base64-encoded.
+  ///
+  /// A polygon in Geobuf format can have up to 100,000 vertices.
+  final Uint8List? geobuf;
 
   /// A polygon is a list of linear rings which are each made up of a list of
   /// vertices.
@@ -5949,6 +6545,7 @@ class GeofenceGeometry {
 
   GeofenceGeometry({
     this.circle,
+    this.geobuf,
     this.polygon,
   });
 
@@ -5957,12 +6554,12 @@ class GeofenceGeometry {
       circle: json['Circle'] != null
           ? Circle.fromJson(json['Circle'] as Map<String, dynamic>)
           : null,
+      geobuf: _s.decodeNullableUint8List(json['Geobuf'] as String?),
       polygon: (json['Polygon'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => (e as List)
-              .whereNotNull()
-              .map((e) =>
-                  (e as List).whereNotNull().map((e) => e as double).toList())
+              .nonNulls
+              .map((e) => (e as List).nonNulls.map((e) => e as double).toList())
               .toList())
           .toList(),
     );
@@ -5970,9 +6567,11 @@ class GeofenceGeometry {
 
   Map<String, dynamic> toJson() {
     final circle = this.circle;
+    final geobuf = this.geobuf;
     final polygon = this.polygon;
     return {
       if (circle != null) 'Circle': circle,
+      if (geobuf != null) 'Geobuf': base64Encode(geobuf),
       if (polygon != null) 'Polygon': polygon,
     };
   }
@@ -5994,7 +6593,7 @@ class GetDevicePositionHistoryResponse {
   factory GetDevicePositionHistoryResponse.fromJson(Map<String, dynamic> json) {
     return GetDevicePositionHistoryResponse(
       devicePositions: (json['DevicePositions'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => DevicePosition.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -6015,9 +6614,9 @@ class GetDevicePositionResponse {
   /// The last known device position.
   final List<double> position;
 
-  /// The timestamp for when the tracker resource received the device position in
-  /// <a href="https://www.iso.org/iso-8601-date-and-time-format.html"> ISO 8601
-  /// </a> format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>.
+  /// The timestamp for when the tracker resource received the device position.
+  /// Uses <a href="https://www.iso.org/iso-8601-date-and-time-format.html"> ISO
+  /// 8601 </a> format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>.
   final DateTime receivedTime;
 
   /// The timestamp at which the device's position was determined. Uses <a
@@ -6045,10 +6644,8 @@ class GetDevicePositionResponse {
 
   factory GetDevicePositionResponse.fromJson(Map<String, dynamic> json) {
     return GetDevicePositionResponse(
-      position: (json['Position'] as List)
-          .whereNotNull()
-          .map((e) => e as double)
-          .toList(),
+      position:
+          (json['Position'] as List).nonNulls.map((e) => e as double).toList(),
       receivedTime:
           nonNullableTimeStampFromJson(json['ReceivedTime'] as Object),
       sampleTime: nonNullableTimeStampFromJson(json['SampleTime'] as Object),
@@ -6119,12 +6716,20 @@ class GetGeofenceResponse {
   /// format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>
   final DateTime updateTime;
 
+  /// User defined properties of the geofence. A property is a key-value pair
+  /// stored with the geofence and added to any geofence event triggered with that
+  /// geofence.
+  ///
+  /// Format: <code>"key" : "value"</code>
+  final Map<String, String>? geofenceProperties;
+
   GetGeofenceResponse({
     required this.createTime,
     required this.geofenceId,
     required this.geometry,
     required this.status,
     required this.updateTime,
+    this.geofenceProperties,
   });
 
   factory GetGeofenceResponse.fromJson(Map<String, dynamic> json) {
@@ -6135,6 +6740,8 @@ class GetGeofenceResponse {
           GeofenceGeometry.fromJson(json['Geometry'] as Map<String, dynamic>),
       status: json['Status'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
+      geofenceProperties: (json['GeofenceProperties'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
     );
   }
 
@@ -6144,12 +6751,14 @@ class GetGeofenceResponse {
     final geometry = this.geometry;
     final status = this.status;
     final updateTime = this.updateTime;
+    final geofenceProperties = this.geofenceProperties;
     return {
       'CreateTime': iso8601ToJson(createTime),
       'GeofenceId': geofenceId,
       'Geometry': geometry,
       'Status': status,
       'UpdateTime': iso8601ToJson(updateTime),
+      if (geofenceProperties != null) 'GeofenceProperties': geofenceProperties,
     };
   }
 }
@@ -6285,32 +6894,71 @@ class GetPlaceResponse {
   }
 }
 
+/// The inferred state of the device, given the provided position, IP address,
+/// cellular signals, and Wi-Fi- access points.
+class InferredState {
+  /// Indicates if a proxy was used.
+  final bool proxyDetected;
+
+  /// The level of certainty of the inferred position.
+  final PositionalAccuracy? accuracy;
+
+  /// The distance between the inferred position and the device's self-reported
+  /// position.
+  final double? deviationDistance;
+
+  /// The device position inferred by the provided position, IP address, cellular
+  /// signals, and Wi-Fi- access points.
+  final List<double>? position;
+
+  InferredState({
+    required this.proxyDetected,
+    this.accuracy,
+    this.deviationDistance,
+    this.position,
+  });
+
+  factory InferredState.fromJson(Map<String, dynamic> json) {
+    return InferredState(
+      proxyDetected: json['ProxyDetected'] as bool,
+      accuracy: json['Accuracy'] != null
+          ? PositionalAccuracy.fromJson(
+              json['Accuracy'] as Map<String, dynamic>)
+          : null,
+      deviationDistance: json['DeviationDistance'] as double?,
+      position: (json['Position'] as List?)
+          ?.nonNulls
+          .map((e) => e as double)
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final proxyDetected = this.proxyDetected;
+    final accuracy = this.accuracy;
+    final deviationDistance = this.deviationDistance;
+    final position = this.position;
+    return {
+      'ProxyDetected': proxyDetected,
+      if (accuracy != null) 'Accuracy': accuracy,
+      if (deviationDistance != null) 'DeviationDistance': deviationDistance,
+      if (position != null) 'Position': position,
+    };
+  }
+}
+
 enum IntendedUse {
-  singleUse,
-  storage,
-}
+  singleUse('SingleUse'),
+  storage('Storage'),
+  ;
 
-extension IntendedUseValueExtension on IntendedUse {
-  String toValue() {
-    switch (this) {
-      case IntendedUse.singleUse:
-        return 'SingleUse';
-      case IntendedUse.storage:
-        return 'Storage';
-    }
-  }
-}
+  final String value;
 
-extension IntendedUseFromString on String {
-  IntendedUse toIntendedUse() {
-    switch (this) {
-      case 'SingleUse':
-        return IntendedUse.singleUse;
-      case 'Storage':
-        return IntendedUse.storage;
-    }
-    throw Exception('$this is not known in enum IntendedUse');
-  }
+  const IntendedUse(this.value);
+
+  static IntendedUse fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum IntendedUse'));
 }
 
 /// Contains the calculated route's details for each path between a pair of
@@ -6401,15 +7049,15 @@ class Leg {
       distance: json['Distance'] as double,
       durationSeconds: json['DurationSeconds'] as double,
       endPosition: (json['EndPosition'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as double)
           .toList(),
       startPosition: (json['StartPosition'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as double)
           .toList(),
       steps: (json['Steps'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => Step.fromJson(e as Map<String, dynamic>))
           .toList(),
       geometry: json['Geometry'] != null
@@ -6459,9 +7107,8 @@ class LegGeometry {
   factory LegGeometry.fromJson(Map<String, dynamic> json) {
     return LegGeometry(
       lineString: (json['LineString'] as List?)
-          ?.whereNotNull()
-          .map((e) =>
-              (e as List).whereNotNull().map((e) => e as double).toList())
+          ?.nonNulls
+          .map((e) => (e as List).nonNulls.map((e) => e as double).toList())
           .toList(),
     );
   }
@@ -6475,10 +7122,7 @@ class LegGeometry {
 }
 
 class ListDevicePositionsResponse {
-  /// Contains details about each device's last known position. These details
-  /// includes the device ID, the time when the position was sampled on the
-  /// device, the time that the service received the update, and the most recent
-  /// coordinates.
+  /// Contains details about each device's last known position.
   final List<ListDevicePositionsResponseEntry> entries;
 
   /// A pagination token indicating there are additional pages available. You can
@@ -6493,7 +7137,7 @@ class ListDevicePositionsResponse {
   factory ListDevicePositionsResponse.fromJson(Map<String, dynamic> json) {
     return ListDevicePositionsResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ListDevicePositionsResponseEntry.fromJson(
               e as Map<String, dynamic>))
           .toList(),
@@ -6541,10 +7185,8 @@ class ListDevicePositionsResponseEntry {
   factory ListDevicePositionsResponseEntry.fromJson(Map<String, dynamic> json) {
     return ListDevicePositionsResponseEntry(
       deviceId: json['DeviceId'] as String,
-      position: (json['Position'] as List)
-          .whereNotNull()
-          .map((e) => e as double)
-          .toList(),
+      position:
+          (json['Position'] as List).nonNulls.map((e) => e as double).toList(),
       sampleTime: nonNullableTimeStampFromJson(json['SampleTime'] as Object),
       accuracy: json['Accuracy'] != null
           ? PositionalAccuracy.fromJson(
@@ -6588,7 +7230,7 @@ class ListGeofenceCollectionsResponse {
   factory ListGeofenceCollectionsResponse.fromJson(Map<String, dynamic> json) {
     return ListGeofenceCollectionsResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ListGeofenceCollectionsResponseEntry.fromJson(
               e as Map<String, dynamic>))
           .toList(),
@@ -6607,6 +7249,10 @@ class ListGeofenceCollectionsResponse {
 }
 
 /// Contains the geofence collection details.
+/// <note>
+/// The returned geometry will always match the geometry format used when the
+/// geofence was created.
+/// </note>
 class ListGeofenceCollectionsResponseEntry {
   /// The name of the geofence collection.
   final String collectionName;
@@ -6646,7 +7292,8 @@ class ListGeofenceCollectionsResponseEntry {
       createTime: nonNullableTimeStampFromJson(json['CreateTime'] as Object),
       description: json['Description'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
       pricingPlanDataSource: json['PricingPlanDataSource'] as String?,
     );
   }
@@ -6663,7 +7310,7 @@ class ListGeofenceCollectionsResponseEntry {
       'CreateTime': iso8601ToJson(createTime),
       'Description': description,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
     };
@@ -6671,6 +7318,10 @@ class ListGeofenceCollectionsResponseEntry {
 }
 
 /// Contains a list of geofences stored in a given geofence collection.
+/// <note>
+/// The returned geometry will always match the geometry format used when the
+/// geofence was created.
+/// </note>
 class ListGeofenceResponseEntry {
   /// The timestamp for when the geofence was stored in a geofence collection in
   /// <a href="https://www.iso.org/iso-8601-date-and-time-format.html">ISO
@@ -6710,12 +7361,20 @@ class ListGeofenceResponseEntry {
   /// format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>
   final DateTime updateTime;
 
+  /// User defined properties of the geofence. A property is a key-value pair
+  /// stored with the geofence and added to any geofence event triggered with that
+  /// geofence.
+  ///
+  /// Format: <code>"key" : "value"</code>
+  final Map<String, String>? geofenceProperties;
+
   ListGeofenceResponseEntry({
     required this.createTime,
     required this.geofenceId,
     required this.geometry,
     required this.status,
     required this.updateTime,
+    this.geofenceProperties,
   });
 
   factory ListGeofenceResponseEntry.fromJson(Map<String, dynamic> json) {
@@ -6726,6 +7385,8 @@ class ListGeofenceResponseEntry {
           GeofenceGeometry.fromJson(json['Geometry'] as Map<String, dynamic>),
       status: json['Status'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
+      geofenceProperties: (json['GeofenceProperties'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as String)),
     );
   }
 
@@ -6735,12 +7396,14 @@ class ListGeofenceResponseEntry {
     final geometry = this.geometry;
     final status = this.status;
     final updateTime = this.updateTime;
+    final geofenceProperties = this.geofenceProperties;
     return {
       'CreateTime': iso8601ToJson(createTime),
       'GeofenceId': geofenceId,
       'Geometry': geometry,
       'Status': status,
       'UpdateTime': iso8601ToJson(updateTime),
+      if (geofenceProperties != null) 'GeofenceProperties': geofenceProperties,
     };
   }
 }
@@ -6761,7 +7424,7 @@ class ListGeofencesResponse {
   factory ListGeofencesResponse.fromJson(Map<String, dynamic> json) {
     return ListGeofencesResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               ListGeofenceResponseEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -6797,7 +7460,7 @@ class ListKeysResponse {
   factory ListKeysResponse.fromJson(Map<String, dynamic> json) {
     return ListKeysResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ListKeysResponseEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -6893,7 +7556,7 @@ class ListMapsResponse {
   factory ListMapsResponse.fromJson(Map<String, dynamic> json) {
     return ListMapsResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ListMapsResponseEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -6951,7 +7614,8 @@ class ListMapsResponseEntry {
       description: json['Description'] as String,
       mapName: json['MapName'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
     );
   }
 
@@ -6968,7 +7632,7 @@ class ListMapsResponseEntry {
       'Description': description,
       'MapName': mapName,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
     };
   }
 }
@@ -6990,7 +7654,7 @@ class ListPlaceIndexesResponse {
   factory ListPlaceIndexesResponse.fromJson(Map<String, dynamic> json) {
     return ListPlaceIndexesResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               ListPlaceIndexesResponseEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -7063,7 +7727,8 @@ class ListPlaceIndexesResponseEntry {
       description: json['Description'] as String,
       indexName: json['IndexName'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
     );
   }
 
@@ -7080,7 +7745,7 @@ class ListPlaceIndexesResponseEntry {
       'Description': description,
       'IndexName': indexName,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
     };
   }
 }
@@ -7102,7 +7767,7 @@ class ListRouteCalculatorsResponse {
   factory ListRouteCalculatorsResponse.fromJson(Map<String, dynamic> json) {
     return ListRouteCalculatorsResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ListRouteCalculatorsResponseEntry.fromJson(
               e as Map<String, dynamic>))
           .toList(),
@@ -7189,7 +7854,8 @@ class ListRouteCalculatorsResponseEntry {
       dataSource: json['DataSource'] as String,
       description: json['Description'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
     );
   }
 
@@ -7206,7 +7872,7 @@ class ListRouteCalculatorsResponseEntry {
       'DataSource': dataSource,
       'Description': description,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
     };
   }
 }
@@ -7258,7 +7924,7 @@ class ListTrackerConsumersResponse {
   factory ListTrackerConsumersResponse.fromJson(Map<String, dynamic> json) {
     return ListTrackerConsumersResponse(
       consumerArns: (json['ConsumerArns'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as String)
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -7293,7 +7959,7 @@ class ListTrackersResponse {
   factory ListTrackersResponse.fromJson(Map<String, dynamic> json) {
     return ListTrackersResponse(
       entries: (json['Entries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               ListTrackersResponseEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -7350,7 +8016,8 @@ class ListTrackersResponseEntry {
       description: json['Description'] as String,
       trackerName: json['TrackerName'] as String,
       updateTime: nonNullableTimeStampFromJson(json['UpdateTime'] as Object),
-      pricingPlan: (json['PricingPlan'] as String?)?.toPricingPlan(),
+      pricingPlan:
+          (json['PricingPlan'] as String?)?.let(PricingPlan.fromString),
       pricingPlanDataSource: json['PricingPlanDataSource'] as String?,
     );
   }
@@ -7367,9 +8034,149 @@ class ListTrackersResponseEntry {
       'Description': description,
       'TrackerName': trackerName,
       'UpdateTime': iso8601ToJson(updateTime),
-      if (pricingPlan != null) 'PricingPlan': pricingPlan.toValue(),
+      if (pricingPlan != null) 'PricingPlan': pricingPlan.value,
       if (pricingPlanDataSource != null)
         'PricingPlanDataSource': pricingPlanDataSource,
+    };
+  }
+}
+
+/// Details about the Long-Term Evolution (LTE) network.
+class LteCellDetails {
+  /// The E-UTRAN Cell Identifier (ECI).
+  final int cellId;
+
+  /// The Mobile Country Code (MCC).
+  final int mcc;
+
+  /// The Mobile Network Code (MNC)
+  final int mnc;
+
+  /// The LTE local identification information (local ID).
+  final LteLocalId? localId;
+
+  /// The network measurements.
+  final List<LteNetworkMeasurements>? networkMeasurements;
+
+  /// Indicates whether the LTE object is capable of supporting NR (new radio).
+  final bool? nrCapable;
+
+  /// Signal power of the reference signal received, measured in
+  /// decibel-milliwatts (dBm).
+  final int? rsrp;
+
+  /// Signal quality of the reference Signal received, measured in decibels (dB).
+  final double? rsrq;
+
+  /// LTE Tracking Area Code (TAC).
+  final int? tac;
+
+  /// Timing Advance (TA).
+  final int? timingAdvance;
+
+  LteCellDetails({
+    required this.cellId,
+    required this.mcc,
+    required this.mnc,
+    this.localId,
+    this.networkMeasurements,
+    this.nrCapable,
+    this.rsrp,
+    this.rsrq,
+    this.tac,
+    this.timingAdvance,
+  });
+
+  Map<String, dynamic> toJson() {
+    final cellId = this.cellId;
+    final mcc = this.mcc;
+    final mnc = this.mnc;
+    final localId = this.localId;
+    final networkMeasurements = this.networkMeasurements;
+    final nrCapable = this.nrCapable;
+    final rsrp = this.rsrp;
+    final rsrq = this.rsrq;
+    final tac = this.tac;
+    final timingAdvance = this.timingAdvance;
+    return {
+      'CellId': cellId,
+      'Mcc': mcc,
+      'Mnc': mnc,
+      if (localId != null) 'LocalId': localId,
+      if (networkMeasurements != null)
+        'NetworkMeasurements': networkMeasurements,
+      if (nrCapable != null) 'NrCapable': nrCapable,
+      if (rsrp != null) 'Rsrp': rsrp,
+      if (rsrq != null) 'Rsrq': rsrq,
+      if (tac != null) 'Tac': tac,
+      if (timingAdvance != null) 'TimingAdvance': timingAdvance,
+    };
+  }
+}
+
+/// LTE local identification information (local ID).
+class LteLocalId {
+  /// E-UTRA (Evolved Universal Terrestrial Radio Access) absolute radio frequency
+  /// channel number (EARFCN).
+  final int earfcn;
+
+  /// Physical Cell ID (PCI).
+  final int pci;
+
+  LteLocalId({
+    required this.earfcn,
+    required this.pci,
+  });
+
+  Map<String, dynamic> toJson() {
+    final earfcn = this.earfcn;
+    final pci = this.pci;
+    return {
+      'Earfcn': earfcn,
+      'Pci': pci,
+    };
+  }
+}
+
+/// LTE network measurements.
+class LteNetworkMeasurements {
+  /// E-UTRAN Cell Identifier (ECI).
+  final int cellId;
+
+  /// E-UTRA (Evolved Universal Terrestrial Radio Access) absolute radio frequency
+  /// channel number (EARFCN).
+  final int earfcn;
+
+  /// Physical Cell ID (PCI).
+  final int pci;
+
+  /// Signal power of the reference signal received, measured in dBm
+  /// (decibel-milliwatts).
+  final int? rsrp;
+
+  /// Signal quality of the reference Signal received, measured in decibels (dB).
+  final double? rsrq;
+
+  LteNetworkMeasurements({
+    required this.cellId,
+    required this.earfcn,
+    required this.pci,
+    this.rsrp,
+    this.rsrq,
+  });
+
+  Map<String, dynamic> toJson() {
+    final cellId = this.cellId;
+    final earfcn = this.earfcn;
+    final pci = this.pci;
+    final rsrp = this.rsrp;
+    final rsrq = this.rsrq;
+    return {
+      'CellId': cellId,
+      'Earfcn': earfcn,
+      'Pci': pci,
+      if (rsrp != null) 'Rsrp': rsrp,
+      if (rsrq != null) 'Rsrq': rsrq,
     };
   }
 }
@@ -7405,14 +8212,14 @@ class MapConfiguration {
   /// provides a detailed vector basemap with a classic Esri map style.
   /// </li>
   /// <li>
-  /// <code>VectorEsriStreets</code> – The Esri World Streets map style, which
-  /// provides a detailed vector basemap for the world symbolized with a classic
-  /// Esri street map style. The vector tile layer is similar in content and style
-  /// to the World Street Map raster map.
+  /// <code>VectorEsriStreets</code> – The Esri Street Map style, which provides a
+  /// detailed vector basemap for the world symbolized with a classic Esri street
+  /// map style. The vector tile layer is similar in content and style to the
+  /// World Street Map raster map.
   /// </li>
   /// <li>
-  /// <code>VectorEsriNavigation</code> – The Esri World Navigation map style,
-  /// which provides a detailed basemap for the world symbolized with a custom
+  /// <code>VectorEsriNavigation</code> – The Esri Navigation map style, which
+  /// provides a detailed basemap for the world symbolized with a custom
   /// navigation map style that's designed for use during the day in mobile
   /// devices.
   /// </li>
@@ -7510,22 +8317,107 @@ class MapConfiguration {
   /// </ul>
   final String style;
 
+  /// Specifies the custom layers for the style. Leave unset to not enable any
+  /// custom layer, or, for styles that support custom layers, you can enable
+  /// layer(s), such as POI layer for the VectorEsriNavigation style. Default is
+  /// <code>unset</code>.
+  /// <note>
+  /// Not all map resources or styles support custom layers. See Custom Layers for
+  /// more information.
+  /// </note>
+  final List<String>? customLayers;
+
+  /// Specifies the political view for the style. Leave unset to not use a
+  /// political view, or, for styles that support specific political views, you
+  /// can choose a view, such as <code>IND</code> for the Indian view.
+  ///
+  /// Default is unset.
+  /// <note>
+  /// Not all map resources or styles support political view styles. See <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/map-concepts.html#political-views">Political
+  /// views</a> for more information.
+  /// </note>
+  final String? politicalView;
+
   MapConfiguration({
     required this.style,
+    this.customLayers,
+    this.politicalView,
   });
 
   factory MapConfiguration.fromJson(Map<String, dynamic> json) {
     return MapConfiguration(
       style: json['Style'] as String,
+      customLayers: (json['CustomLayers'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
+      politicalView: json['PoliticalView'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final style = this.style;
+    final customLayers = this.customLayers;
+    final politicalView = this.politicalView;
     return {
       'Style': style,
+      if (customLayers != null) 'CustomLayers': customLayers,
+      if (politicalView != null) 'PoliticalView': politicalView,
     };
   }
+}
+
+/// Specifies the political view for the style.
+class MapConfigurationUpdate {
+  /// Specifies the custom layers for the style. Leave unset to not enable any
+  /// custom layer, or, for styles that support custom layers, you can enable
+  /// layer(s), such as POI layer for the VectorEsriNavigation style. Default is
+  /// <code>unset</code>.
+  /// <note>
+  /// Not all map resources or styles support custom layers. See Custom Layers for
+  /// more information.
+  /// </note>
+  final List<String>? customLayers;
+
+  /// Specifies the political view for the style. Set to an empty string to not
+  /// use a political view, or, for styles that support specific political views,
+  /// you can choose a view, such as <code>IND</code> for the Indian view.
+  /// <note>
+  /// Not all map resources or styles support political view styles. See <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/map-concepts.html#political-views">Political
+  /// views</a> for more information.
+  /// </note>
+  final String? politicalView;
+
+  MapConfigurationUpdate({
+    this.customLayers,
+    this.politicalView,
+  });
+
+  Map<String, dynamic> toJson() {
+    final customLayers = this.customLayers;
+    final politicalView = this.politicalView;
+    return {
+      if (customLayers != null) 'CustomLayers': customLayers,
+      if (politicalView != null) 'PoliticalView': politicalView,
+    };
+  }
+}
+
+enum OptimizationMode {
+  fastestRoute('FastestRoute'),
+  shortestRoute('ShortestRoute'),
+  ;
+
+  final String value;
+
+  const OptimizationMode(this.value);
+
+  static OptimizationMode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum OptimizationMode'));
 }
 
 /// Contains details about addresses or points of interest that match the search
@@ -7538,6 +8430,14 @@ class Place {
 
   /// The numerical portion of an address, such as a building number.
   final String? addressNumber;
+
+  /// The Amazon Location categories that describe this Place.
+  ///
+  /// For more information about using categories, including a list of Amazon
+  /// Location categories, see <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/category-filtering.html">Categories
+  /// and filtering</a>, in the <i>Amazon Location Service Developer Guide</i>.
+  final List<String>? categories;
 
   /// A country/region specified using <a
   /// href="https://www.iso.org/iso-3166-country-codes.html">ISO 3166</a> 3-digit
@@ -7579,29 +8479,45 @@ class Place {
   /// <code>Main Street</code>.
   final String? street;
 
+  /// An area that's part of a larger municipality. For example, <code>Blissville
+  /// </code> is a submunicipality in the Queen County in New York.
+  /// <note>
+  /// This property supported by Esri and OpenData. The Esri property is
+  /// <code>district</code>, and the OpenData property is <code>borough</code>.
+  /// </note>
+  final String? subMunicipality;
+
   /// A county, or an area that's part of a larger region. For example,
   /// <code>Metro Vancouver</code>.
   final String? subRegion;
 
+  /// Categories from the data provider that describe the Place that are not
+  /// mapped to any Amazon Location categories.
+  final List<String>? supplementalCategories;
+
   /// The time zone in which the <code>Place</code> is located. Returned only when
-  /// using HERE as the selected partner.
+  /// using HERE or Grab as the selected partner.
   final TimeZone? timeZone;
 
   /// For addresses with multiple units, the unit identifier. Can include numbers
   /// and letters, for example <code>3B</code> or <code>Unit 123</code>.
   /// <note>
-  /// Returned only for a place index that uses Esri as a data provider. Is not
-  /// returned for <code>SearchPlaceIndexForPosition</code>.
+  /// Returned only for a place index that uses Esri or Grab as a data provider.
+  /// Is not returned for <code>SearchPlaceIndexForPosition</code>.
   /// </note>
   final String? unitNumber;
 
   /// For addresses with a <code>UnitNumber</code>, the type of unit. For example,
   /// <code>Apartment</code>.
+  /// <note>
+  /// Returned only for a place index that uses Esri as a data provider.
+  /// </note>
   final String? unitType;
 
   Place({
     required this.geometry,
     this.addressNumber,
+    this.categories,
     this.country,
     this.interpolated,
     this.label,
@@ -7610,7 +8526,9 @@ class Place {
     this.postalCode,
     this.region,
     this.street,
+    this.subMunicipality,
     this.subRegion,
+    this.supplementalCategories,
     this.timeZone,
     this.unitNumber,
     this.unitType,
@@ -7621,6 +8539,10 @@ class Place {
       geometry:
           PlaceGeometry.fromJson(json['Geometry'] as Map<String, dynamic>),
       addressNumber: json['AddressNumber'] as String?,
+      categories: (json['Categories'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       country: json['Country'] as String?,
       interpolated: json['Interpolated'] as bool?,
       label: json['Label'] as String?,
@@ -7629,7 +8551,12 @@ class Place {
       postalCode: json['PostalCode'] as String?,
       region: json['Region'] as String?,
       street: json['Street'] as String?,
+      subMunicipality: json['SubMunicipality'] as String?,
       subRegion: json['SubRegion'] as String?,
+      supplementalCategories: (json['SupplementalCategories'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       timeZone: json['TimeZone'] != null
           ? TimeZone.fromJson(json['TimeZone'] as Map<String, dynamic>)
           : null,
@@ -7641,6 +8568,7 @@ class Place {
   Map<String, dynamic> toJson() {
     final geometry = this.geometry;
     final addressNumber = this.addressNumber;
+    final categories = this.categories;
     final country = this.country;
     final interpolated = this.interpolated;
     final label = this.label;
@@ -7649,13 +8577,16 @@ class Place {
     final postalCode = this.postalCode;
     final region = this.region;
     final street = this.street;
+    final subMunicipality = this.subMunicipality;
     final subRegion = this.subRegion;
+    final supplementalCategories = this.supplementalCategories;
     final timeZone = this.timeZone;
     final unitNumber = this.unitNumber;
     final unitType = this.unitType;
     return {
       'Geometry': geometry,
       if (addressNumber != null) 'AddressNumber': addressNumber,
+      if (categories != null) 'Categories': categories,
       if (country != null) 'Country': country,
       if (interpolated != null) 'Interpolated': interpolated,
       if (label != null) 'Label': label,
@@ -7664,7 +8595,10 @@ class Place {
       if (postalCode != null) 'PostalCode': postalCode,
       if (region != null) 'Region': region,
       if (street != null) 'Street': street,
+      if (subMunicipality != null) 'SubMunicipality': subMunicipality,
       if (subRegion != null) 'SubRegion': subRegion,
+      if (supplementalCategories != null)
+        'SupplementalCategories': supplementalCategories,
       if (timeZone != null) 'TimeZone': timeZone,
       if (unitNumber != null) 'UnitNumber': unitNumber,
       if (unitType != null) 'UnitType': unitType,
@@ -7694,10 +8628,8 @@ class PlaceGeometry {
 
   factory PlaceGeometry.fromJson(Map<String, dynamic> json) {
     return PlaceGeometry(
-      point: (json['Point'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as double)
-          .toList(),
+      point:
+          (json['Point'] as List?)?.nonNulls.map((e) => e as double).toList(),
     );
   }
 
@@ -7710,36 +8642,19 @@ class PlaceGeometry {
 }
 
 enum PositionFiltering {
-  timeBased,
-  distanceBased,
-  accuracyBased,
-}
+  timeBased('TimeBased'),
+  distanceBased('DistanceBased'),
+  accuracyBased('AccuracyBased'),
+  ;
 
-extension PositionFilteringValueExtension on PositionFiltering {
-  String toValue() {
-    switch (this) {
-      case PositionFiltering.timeBased:
-        return 'TimeBased';
-      case PositionFiltering.distanceBased:
-        return 'DistanceBased';
-      case PositionFiltering.accuracyBased:
-        return 'AccuracyBased';
-    }
-  }
-}
+  final String value;
 
-extension PositionFilteringFromString on String {
-  PositionFiltering toPositionFiltering() {
-    switch (this) {
-      case 'TimeBased':
-        return PositionFiltering.timeBased;
-      case 'DistanceBased':
-        return PositionFiltering.distanceBased;
-      case 'AccuracyBased':
-        return PositionFiltering.accuracyBased;
-    }
-    throw Exception('$this is not known in enum PositionFiltering');
-  }
+  const PositionFiltering(this.value);
+
+  static PositionFiltering fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum PositionFiltering'));
 }
 
 /// Defines the level of certainty of the position.
@@ -7767,36 +8682,18 @@ class PositionalAccuracy {
 }
 
 enum PricingPlan {
-  requestBasedUsage,
-  mobileAssetTracking,
-  mobileAssetManagement,
-}
+  requestBasedUsage('RequestBasedUsage'),
+  mobileAssetTracking('MobileAssetTracking'),
+  mobileAssetManagement('MobileAssetManagement'),
+  ;
 
-extension PricingPlanValueExtension on PricingPlan {
-  String toValue() {
-    switch (this) {
-      case PricingPlan.requestBasedUsage:
-        return 'RequestBasedUsage';
-      case PricingPlan.mobileAssetTracking:
-        return 'MobileAssetTracking';
-      case PricingPlan.mobileAssetManagement:
-        return 'MobileAssetManagement';
-    }
-  }
-}
+  final String value;
 
-extension PricingPlanFromString on String {
-  PricingPlan toPricingPlan() {
-    switch (this) {
-      case 'RequestBasedUsage':
-        return PricingPlan.requestBasedUsage;
-      case 'MobileAssetTracking':
-        return PricingPlan.mobileAssetTracking;
-      case 'MobileAssetManagement':
-        return PricingPlan.mobileAssetManagement;
-    }
-    throw Exception('$this is not known in enum PricingPlan');
-  }
+  const PricingPlan(this.value);
+
+  static PricingPlan fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum PricingPlan'));
 }
 
 class PutGeofenceResponse {
@@ -7937,7 +8834,7 @@ class RouteMatrixEntryError {
 
   factory RouteMatrixEntryError.fromJson(Map<String, dynamic> json) {
     return RouteMatrixEntryError(
-      code: (json['Code'] as String).toRouteMatrixErrorCode(),
+      code: RouteMatrixErrorCode.fromString((json['Code'] as String)),
       message: json['Message'] as String?,
     );
   }
@@ -7946,58 +8843,29 @@ class RouteMatrixEntryError {
     final code = this.code;
     final message = this.message;
     return {
-      'Code': code.toValue(),
+      'Code': code.value,
       if (message != null) 'Message': message,
     };
   }
 }
 
 enum RouteMatrixErrorCode {
-  routeNotFound,
-  routeTooLong,
-  positionsNotFound,
-  destinationPositionNotFound,
-  departurePositionNotFound,
-  otherValidationError,
-}
+  routeNotFound('RouteNotFound'),
+  routeTooLong('RouteTooLong'),
+  positionsNotFound('PositionsNotFound'),
+  destinationPositionNotFound('DestinationPositionNotFound'),
+  departurePositionNotFound('DeparturePositionNotFound'),
+  otherValidationError('OtherValidationError'),
+  ;
 
-extension RouteMatrixErrorCodeValueExtension on RouteMatrixErrorCode {
-  String toValue() {
-    switch (this) {
-      case RouteMatrixErrorCode.routeNotFound:
-        return 'RouteNotFound';
-      case RouteMatrixErrorCode.routeTooLong:
-        return 'RouteTooLong';
-      case RouteMatrixErrorCode.positionsNotFound:
-        return 'PositionsNotFound';
-      case RouteMatrixErrorCode.destinationPositionNotFound:
-        return 'DestinationPositionNotFound';
-      case RouteMatrixErrorCode.departurePositionNotFound:
-        return 'DeparturePositionNotFound';
-      case RouteMatrixErrorCode.otherValidationError:
-        return 'OtherValidationError';
-    }
-  }
-}
+  final String value;
 
-extension RouteMatrixErrorCodeFromString on String {
-  RouteMatrixErrorCode toRouteMatrixErrorCode() {
-    switch (this) {
-      case 'RouteNotFound':
-        return RouteMatrixErrorCode.routeNotFound;
-      case 'RouteTooLong':
-        return RouteMatrixErrorCode.routeTooLong;
-      case 'PositionsNotFound':
-        return RouteMatrixErrorCode.positionsNotFound;
-      case 'DestinationPositionNotFound':
-        return RouteMatrixErrorCode.destinationPositionNotFound;
-      case 'DeparturePositionNotFound':
-        return RouteMatrixErrorCode.departurePositionNotFound;
-      case 'OtherValidationError':
-        return RouteMatrixErrorCode.otherValidationError;
-    }
-    throw Exception('$this is not known in enum RouteMatrixErrorCode');
-  }
+  const RouteMatrixErrorCode(this.value);
+
+  static RouteMatrixErrorCode fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum RouteMatrixErrorCode'));
 }
 
 /// Contains a search result from a position search query that is run on a place
@@ -8055,8 +8923,21 @@ class SearchForSuggestionsResult {
   /// The text of the place suggestion, typically formatted as an address string.
   final String text;
 
-  /// The unique identifier of the place. You can use this with the
-  /// <code>GetPlace</code> operation to find the place again later.
+  /// The Amazon Location categories that describe the Place.
+  ///
+  /// For more information about using categories, including a list of Amazon
+  /// Location categories, see <a
+  /// href="https://docs.aws.amazon.com/location/latest/developerguide/category-filtering.html">Categories
+  /// and filtering</a>, in the <i>Amazon Location Service Developer Guide</i>.
+  final List<String>? categories;
+
+  /// The unique identifier of the Place. You can use this with the
+  /// <code>GetPlace</code> operation to find the place again later, or to get
+  /// full information for the Place.
+  ///
+  /// The <code>GetPlace</code> request must use the same <code>PlaceIndex</code>
+  /// resource as the <code>SearchPlaceIndexForSuggestions</code> that generated
+  /// the Place ID.
   /// <note>
   /// For <code>SearchPlaceIndexForSuggestions</code> operations, the
   /// <code>PlaceId</code> is returned by place indexes that use Esri, Grab, or
@@ -8064,24 +8945,43 @@ class SearchForSuggestionsResult {
   /// </note>
   final String? placeId;
 
+  /// Categories from the data provider that describe the Place that are not
+  /// mapped to any Amazon Location categories.
+  final List<String>? supplementalCategories;
+
   SearchForSuggestionsResult({
     required this.text,
+    this.categories,
     this.placeId,
+    this.supplementalCategories,
   });
 
   factory SearchForSuggestionsResult.fromJson(Map<String, dynamic> json) {
     return SearchForSuggestionsResult(
       text: json['Text'] as String,
+      categories: (json['Categories'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       placeId: json['PlaceId'] as String?,
+      supplementalCategories: (json['SupplementalCategories'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     final text = this.text;
+    final categories = this.categories;
     final placeId = this.placeId;
+    final supplementalCategories = this.supplementalCategories;
     return {
       'Text': text,
+      if (categories != null) 'Categories': categories,
       if (placeId != null) 'PlaceId': placeId,
+      if (supplementalCategories != null)
+        'SupplementalCategories': supplementalCategories,
     };
   }
 }
@@ -8167,7 +9067,7 @@ class SearchPlaceIndexForPositionResponse {
       Map<String, dynamic> json) {
     return SearchPlaceIndexForPositionResponse(
       results: (json['Results'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               SearchForPositionResult.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -8233,10 +9133,8 @@ class SearchPlaceIndexForPositionSummary {
       Map<String, dynamic> json) {
     return SearchPlaceIndexForPositionSummary(
       dataSource: json['DataSource'] as String,
-      position: (json['Position'] as List)
-          .whereNotNull()
-          .map((e) => e as double)
-          .toList(),
+      position:
+          (json['Position'] as List).nonNulls.map((e) => e as double).toList(),
       language: json['Language'] as String?,
       maxResults: json['MaxResults'] as int?,
     );
@@ -8276,7 +9174,7 @@ class SearchPlaceIndexForSuggestionsResponse {
       Map<String, dynamic> json) {
     return SearchPlaceIndexForSuggestionsResponse(
       results: (json['Results'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               SearchForSuggestionsResult.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -8335,6 +9233,9 @@ class SearchPlaceIndexForSuggestionsSummary {
   /// request.
   final List<double>? filterBBox;
 
+  /// The optional category filter specified in the request.
+  final List<String>? filterCategories;
+
   /// Contains the optional country filter specified in the request.
   final List<String>? filterCountries;
 
@@ -8352,6 +9253,7 @@ class SearchPlaceIndexForSuggestionsSummary {
     required this.text,
     this.biasPosition,
     this.filterBBox,
+    this.filterCategories,
     this.filterCountries,
     this.language,
     this.maxResults,
@@ -8363,15 +9265,19 @@ class SearchPlaceIndexForSuggestionsSummary {
       dataSource: json['DataSource'] as String,
       text: json['Text'] as String,
       biasPosition: (json['BiasPosition'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as double)
           .toList(),
       filterBBox: (json['FilterBBox'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as double)
           .toList(),
+      filterCategories: (json['FilterCategories'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       filterCountries: (json['FilterCountries'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       language: json['Language'] as String?,
@@ -8384,6 +9290,7 @@ class SearchPlaceIndexForSuggestionsSummary {
     final text = this.text;
     final biasPosition = this.biasPosition;
     final filterBBox = this.filterBBox;
+    final filterCategories = this.filterCategories;
     final filterCountries = this.filterCountries;
     final language = this.language;
     final maxResults = this.maxResults;
@@ -8392,6 +9299,7 @@ class SearchPlaceIndexForSuggestionsSummary {
       'Text': text,
       if (biasPosition != null) 'BiasPosition': biasPosition,
       if (filterBBox != null) 'FilterBBox': filterBBox,
+      if (filterCategories != null) 'FilterCategories': filterCategories,
       if (filterCountries != null) 'FilterCountries': filterCountries,
       if (language != null) 'Language': language,
       if (maxResults != null) 'MaxResults': maxResults,
@@ -8423,7 +9331,7 @@ class SearchPlaceIndexForTextResponse {
   factory SearchPlaceIndexForTextResponse.fromJson(Map<String, dynamic> json) {
     return SearchPlaceIndexForTextResponse(
       results: (json['Results'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => SearchForTextResult.fromJson(e as Map<String, dynamic>))
           .toList(),
       summary: SearchPlaceIndexForTextSummary.fromJson(
@@ -8480,6 +9388,9 @@ class SearchPlaceIndexForTextSummary {
   /// request.
   final List<double>? filterBBox;
 
+  /// The optional category filter specified in the request.
+  final List<String>? filterCategories;
+
   /// Contains the optional country filter specified in the request.
   final List<String>? filterCountries;
 
@@ -8505,6 +9416,7 @@ class SearchPlaceIndexForTextSummary {
     required this.text,
     this.biasPosition,
     this.filterBBox,
+    this.filterCategories,
     this.filterCountries,
     this.language,
     this.maxResults,
@@ -8516,21 +9428,25 @@ class SearchPlaceIndexForTextSummary {
       dataSource: json['DataSource'] as String,
       text: json['Text'] as String,
       biasPosition: (json['BiasPosition'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as double)
           .toList(),
       filterBBox: (json['FilterBBox'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as double)
           .toList(),
+      filterCategories: (json['FilterCategories'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
       filterCountries: (json['FilterCountries'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       language: json['Language'] as String?,
       maxResults: json['MaxResults'] as int?,
       resultBBox: (json['ResultBBox'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as double)
           .toList(),
     );
@@ -8541,6 +9457,7 @@ class SearchPlaceIndexForTextSummary {
     final text = this.text;
     final biasPosition = this.biasPosition;
     final filterBBox = this.filterBBox;
+    final filterCategories = this.filterCategories;
     final filterCountries = this.filterCountries;
     final language = this.language;
     final maxResults = this.maxResults;
@@ -8550,6 +9467,7 @@ class SearchPlaceIndexForTextSummary {
       'Text': text,
       if (biasPosition != null) 'BiasPosition': biasPosition,
       if (filterBBox != null) 'FilterBBox': filterBBox,
+      if (filterCategories != null) 'FilterCategories': filterCategories,
       if (filterCountries != null) 'FilterCountries': filterCountries,
       if (language != null) 'Language': language,
       if (maxResults != null) 'MaxResults': maxResults,
@@ -8558,32 +9476,32 @@ class SearchPlaceIndexForTextSummary {
   }
 }
 
+enum SpeedUnit {
+  kilometersPerHour('KilometersPerHour'),
+  milesPerHour('MilesPerHour'),
+  ;
+
+  final String value;
+
+  const SpeedUnit(this.value);
+
+  static SpeedUnit fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum SpeedUnit'));
+}
+
 enum Status {
-  active,
-  expired,
-}
+  active('Active'),
+  expired('Expired'),
+  ;
 
-extension StatusValueExtension on Status {
-  String toValue() {
-    switch (this) {
-      case Status.active:
-        return 'Active';
-      case Status.expired:
-        return 'Expired';
-    }
-  }
-}
+  final String value;
 
-extension StatusFromString on String {
-  Status toStatus() {
-    switch (this) {
-      case 'Active':
-        return Status.active;
-      case 'Expired':
-        return Status.expired;
-    }
-    throw Exception('$this is not known in enum Status');
-  }
+  const Status(this.value);
+
+  static Status fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception('$value is not known in enum Status'));
 }
 
 /// Represents an element of a leg within a route. A step contains instructions
@@ -8628,11 +9546,11 @@ class Step {
       distance: json['Distance'] as double,
       durationSeconds: json['DurationSeconds'] as double,
       endPosition: (json['EndPosition'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as double)
           .toList(),
       startPosition: (json['StartPosition'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as double)
           .toList(),
       geometryOffset: json['GeometryOffset'] as int?,
@@ -8700,47 +9618,39 @@ class TimeZone {
   }
 }
 
+/// The geomerty used to filter device positions.
+class TrackingFilterGeometry {
+  /// The set of arrays which define the polygon. A polygon can have between 4 and
+  /// 1000 vertices.
+  final List<List<List<double>>>? polygon;
+
+  TrackingFilterGeometry({
+    this.polygon,
+  });
+
+  Map<String, dynamic> toJson() {
+    final polygon = this.polygon;
+    return {
+      if (polygon != null) 'Polygon': polygon,
+    };
+  }
+}
+
 enum TravelMode {
-  car,
-  truck,
-  walking,
-  bicycle,
-  motorcycle,
-}
+  car('Car'),
+  truck('Truck'),
+  walking('Walking'),
+  bicycle('Bicycle'),
+  motorcycle('Motorcycle'),
+  ;
 
-extension TravelModeValueExtension on TravelMode {
-  String toValue() {
-    switch (this) {
-      case TravelMode.car:
-        return 'Car';
-      case TravelMode.truck:
-        return 'Truck';
-      case TravelMode.walking:
-        return 'Walking';
-      case TravelMode.bicycle:
-        return 'Bicycle';
-      case TravelMode.motorcycle:
-        return 'Motorcycle';
-    }
-  }
-}
+  final String value;
 
-extension TravelModeFromString on String {
-  TravelMode toTravelMode() {
-    switch (this) {
-      case 'Car':
-        return TravelMode.car;
-      case 'Truck':
-        return TravelMode.truck;
-      case 'Walking':
-        return TravelMode.walking;
-      case 'Bicycle':
-        return TravelMode.bicycle;
-      case 'Motorcycle':
-        return TravelMode.motorcycle;
-    }
-    throw Exception('$this is not known in enum TravelMode');
-  }
+  const TravelMode(this.value);
+
+  static TravelMode fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum TravelMode'));
 }
 
 /// Contains details about the truck dimensions in the unit of measurement that
@@ -8804,7 +9714,7 @@ class TruckDimensions {
     return {
       if (height != null) 'Height': height,
       if (length != null) 'Length': length,
-      if (unit != null) 'Unit': unit.toValue(),
+      if (unit != null) 'Unit': unit.value,
       if (width != null) 'Width': width,
     };
   }
@@ -8838,7 +9748,7 @@ class TruckWeight {
     final unit = this.unit;
     return {
       if (total != null) 'Total': total,
-      if (unit != null) 'Unit': unit.toValue(),
+      if (unit != null) 'Unit': unit.value,
     };
   }
 }
@@ -9130,30 +10040,97 @@ class UpdateTrackerResponse {
 }
 
 enum VehicleWeightUnit {
-  kilograms,
-  pounds,
+  kilograms('Kilograms'),
+  pounds('Pounds'),
+  ;
+
+  final String value;
+
+  const VehicleWeightUnit(this.value);
+
+  static VehicleWeightUnit fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum VehicleWeightUnit'));
 }
 
-extension VehicleWeightUnitValueExtension on VehicleWeightUnit {
-  String toValue() {
-    switch (this) {
-      case VehicleWeightUnit.kilograms:
-        return 'Kilograms';
-      case VehicleWeightUnit.pounds:
-        return 'Pounds';
-    }
+class VerifyDevicePositionResponse {
+  /// The device identifier.
+  final String deviceId;
+
+  /// The distance unit for the verification response.
+  final DistanceUnit distanceUnit;
+
+  /// The inferred state of the device, given the provided position, IP address,
+  /// cellular signals, and Wi-Fi- access points.
+  final InferredState inferredState;
+
+  /// The timestamp for when the tracker resource received the device position in
+  /// <a href="https://www.iso.org/iso-8601-date-and-time-format.html"> ISO 8601
+  /// </a> format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>.
+  final DateTime receivedTime;
+
+  /// The timestamp at which the device's position was determined. Uses <a
+  /// href="https://www.iso.org/iso-8601-date-and-time-format.html"> ISO 8601 </a>
+  /// format: <code>YYYY-MM-DDThh:mm:ss.sssZ</code>.
+  final DateTime sampleTime;
+
+  VerifyDevicePositionResponse({
+    required this.deviceId,
+    required this.distanceUnit,
+    required this.inferredState,
+    required this.receivedTime,
+    required this.sampleTime,
+  });
+
+  factory VerifyDevicePositionResponse.fromJson(Map<String, dynamic> json) {
+    return VerifyDevicePositionResponse(
+      deviceId: json['DeviceId'] as String,
+      distanceUnit: DistanceUnit.fromString((json['DistanceUnit'] as String)),
+      inferredState:
+          InferredState.fromJson(json['InferredState'] as Map<String, dynamic>),
+      receivedTime:
+          nonNullableTimeStampFromJson(json['ReceivedTime'] as Object),
+      sampleTime: nonNullableTimeStampFromJson(json['SampleTime'] as Object),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final deviceId = this.deviceId;
+    final distanceUnit = this.distanceUnit;
+    final inferredState = this.inferredState;
+    final receivedTime = this.receivedTime;
+    final sampleTime = this.sampleTime;
+    return {
+      'DeviceId': deviceId,
+      'DistanceUnit': distanceUnit.value,
+      'InferredState': inferredState,
+      'ReceivedTime': iso8601ToJson(receivedTime),
+      'SampleTime': iso8601ToJson(sampleTime),
+    };
   }
 }
 
-extension VehicleWeightUnitFromString on String {
-  VehicleWeightUnit toVehicleWeightUnit() {
-    switch (this) {
-      case 'Kilograms':
-        return VehicleWeightUnit.kilograms;
-      case 'Pounds':
-        return VehicleWeightUnit.pounds;
-    }
-    throw Exception('$this is not known in enum VehicleWeightUnit');
+/// Wi-Fi access point.
+class WiFiAccessPoint {
+  /// Medium access control address (Mac).
+  final String macAddress;
+
+  /// Received signal strength (dBm) of the WLAN measurement data.
+  final int rss;
+
+  WiFiAccessPoint({
+    required this.macAddress,
+    required this.rss,
+  });
+
+  Map<String, dynamic> toJson() {
+    final macAddress = this.macAddress;
+    final rss = this.rss;
+    return {
+      'MacAddress': macAddress,
+      'Rss': rss,
+    };
   }
 }
 

@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -698,7 +699,7 @@ class ListPlacementsResponse {
   factory ListPlacementsResponse.fromJson(Map<String, dynamic> json) {
     return ListPlacementsResponse(
       placements: (json['placements'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => PlacementSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -722,7 +723,7 @@ class ListProjectsResponse {
   factory ListProjectsResponse.fromJson(Map<String, dynamic> json) {
     return ListProjectsResponse(
       projects: (json['projects'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ProjectSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,

@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -32,6 +33,11 @@ export '../../shared/shared.dart' show AwsClientCredentials;
 /// on the <a
 /// href="https://docs.aws.amazon.com/general/latest/gr/ivs.html">Amazon IVS
 /// page</a> in the <i>AWS General Reference</i>.
+///
+/// This document describes HTTP operations. There is a separate
+/// <i>messaging</i> API for managing Chat resources; see the <a
+/// href="https://docs.aws.amazon.com/ivs/latest/chatmsgapireference/chat-messaging-api.html">
+/// Amazon IVS Chat Messaging API Reference</a>.
 ///
 /// <b>Notes on terminology:</b>
 ///
@@ -142,106 +148,6 @@ export '../../shared/shared.dart' show AwsClientCredentials;
 /// and API calls. For more information, see <a
 /// href="https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html">Amazon
 /// Resource Names</a> in the <i>AWS General Reference</i>.
-///
-/// <b>Messaging Endpoints</b>
-///
-/// <ul>
-/// <li>
-/// <a>DeleteMessage</a> — Sends an event to a specific room which directs
-/// clients to delete a specific message; that is, unrender it from view and
-/// delete it from the client’s chat history. This event’s
-/// <code>EventName</code> is <code>aws:DELETE_MESSAGE</code>. This replicates
-/// the <a
-/// href="https://docs.aws.amazon.com/ivs/latest/chatmsgapireference/actions-deletemessage-publish.html">
-/// DeleteMessage</a> WebSocket operation in the Amazon IVS Chat Messaging API.
-/// </li>
-/// <li>
-/// <a>DisconnectUser</a> — Disconnects all connections using a specified user
-/// ID from a room. This replicates the <a
-/// href="https://docs.aws.amazon.com/ivs/latest/chatmsgapireference/actions-disconnectuser-publish.html">
-/// DisconnectUser</a> WebSocket operation in the Amazon IVS Chat Messaging API.
-/// </li>
-/// <li>
-/// <a>SendEvent</a> — Sends an event to a room. Use this within your
-/// application’s business logic to send events to clients of a room; e.g., to
-/// notify clients to change the way the chat UI is rendered.
-/// </li>
-/// </ul>
-/// <b>Chat Token Endpoint</b>
-///
-/// <ul>
-/// <li>
-/// <a>CreateChatToken</a> — Creates an encrypted token that is used by a chat
-/// participant to establish an individual WebSocket chat connection to a room.
-/// When the token is used to connect to chat, the connection is valid for the
-/// session duration specified in the request. The token becomes invalid at the
-/// token-expiration timestamp included in the response.
-/// </li>
-/// </ul>
-/// <b>Room Endpoints</b>
-///
-/// <ul>
-/// <li>
-/// <a>CreateRoom</a> — Creates a room that allows clients to connect and pass
-/// messages.
-/// </li>
-/// <li>
-/// <a>DeleteRoom</a> — Deletes the specified room.
-/// </li>
-/// <li>
-/// <a>GetRoom</a> — Gets the specified room.
-/// </li>
-/// <li>
-/// <a>ListRooms</a> — Gets summary information about all your rooms in the AWS
-/// region where the API request is processed.
-/// </li>
-/// <li>
-/// <a>UpdateRoom</a> — Updates a room’s configuration.
-/// </li>
-/// </ul>
-/// <b>Logging Configuration Endpoints</b>
-///
-/// <ul>
-/// <li>
-/// <a>CreateLoggingConfiguration</a> — Creates a logging configuration that
-/// allows clients to store and record sent messages.
-/// </li>
-/// <li>
-/// <a>DeleteLoggingConfiguration</a> — Deletes the specified logging
-/// configuration.
-/// </li>
-/// <li>
-/// <a>GetLoggingConfiguration</a> — Gets the specified logging configuration.
-/// </li>
-/// <li>
-/// <a>ListLoggingConfigurations</a> — Gets summary information about all your
-/// logging configurations in the AWS region where the API request is processed.
-/// </li>
-/// <li>
-/// <a>UpdateLoggingConfiguration</a> — Updates a specified logging
-/// configuration.
-/// </li>
-/// </ul>
-/// <b>Tags Endpoints</b>
-///
-/// <ul>
-/// <li>
-/// <a>ListTagsForResource</a> — Gets information about AWS tags for the
-/// specified ARN.
-/// </li>
-/// <li>
-/// <a>TagResource</a> — Adds or updates tags for the AWS resource with the
-/// specified ARN.
-/// </li>
-/// <li>
-/// <a>UntagResource</a> — Removes tags from the resource with the specified
-/// ARN.
-/// </li>
-/// </ul>
-/// All the above are HTTP operations. There is a separate <i>messaging</i> API
-/// for managing Chat resources; see the <a
-/// href="https://docs.aws.amazon.com/ivs/latest/chatmsgapireference/chat-messaging-api.html">
-/// Amazon IVS Chat Messaging API Reference</a>.
 class Ivschat {
   final _s.RestJsonProtocol _protocol;
   Ivschat({
@@ -333,7 +239,7 @@ class Ivschat {
       'userId': userId,
       if (attributes != null) 'attributes': attributes,
       if (capabilities != null)
-        'capabilities': capabilities.map((e) => e.toValue()).toList(),
+        'capabilities': capabilities.map((e) => e.value).toList(),
       if (sessionDurationInMinutes != null)
         'sessionDurationInMinutes': sessionDurationInMinutes,
     };
@@ -966,36 +872,19 @@ class Ivschat {
 }
 
 enum ChatTokenCapability {
-  sendMessage,
-  disconnectUser,
-  deleteMessage,
-}
+  sendMessage('SEND_MESSAGE'),
+  disconnectUser('DISCONNECT_USER'),
+  deleteMessage('DELETE_MESSAGE'),
+  ;
 
-extension ChatTokenCapabilityValueExtension on ChatTokenCapability {
-  String toValue() {
-    switch (this) {
-      case ChatTokenCapability.sendMessage:
-        return 'SEND_MESSAGE';
-      case ChatTokenCapability.disconnectUser:
-        return 'DISCONNECT_USER';
-      case ChatTokenCapability.deleteMessage:
-        return 'DELETE_MESSAGE';
-    }
-  }
-}
+  final String value;
 
-extension ChatTokenCapabilityFromString on String {
-  ChatTokenCapability toChatTokenCapability() {
-    switch (this) {
-      case 'SEND_MESSAGE':
-        return ChatTokenCapability.sendMessage;
-      case 'DISCONNECT_USER':
-        return ChatTokenCapability.disconnectUser;
-      case 'DELETE_MESSAGE':
-        return ChatTokenCapability.deleteMessage;
-    }
-    throw Exception('$this is not known in enum ChatTokenCapability');
-  }
+  const ChatTokenCapability(this.value);
+
+  static ChatTokenCapability fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ChatTokenCapability'));
 }
 
 /// Specifies a CloudWatch Logs location where chat logs will be stored.
@@ -1120,7 +1009,8 @@ class CreateLoggingConfigurationResponse {
           : null,
       id: json['id'] as String?,
       name: json['name'] as String?,
-      state: (json['state'] as String?)?.toCreateLoggingConfigurationState(),
+      state: (json['state'] as String?)
+          ?.let(CreateLoggingConfigurationState.fromString),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       updateTime: timeStampFromJson(json['updateTime']),
@@ -1143,7 +1033,7 @@ class CreateLoggingConfigurationResponse {
         'destinationConfiguration': destinationConfiguration,
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (state != null) 'state': state.toValue(),
+      if (state != null) 'state': state.value,
       if (tags != null) 'tags': tags,
       if (updateTime != null) 'updateTime': iso8601ToJson(updateTime),
     };
@@ -1151,28 +1041,17 @@ class CreateLoggingConfigurationResponse {
 }
 
 enum CreateLoggingConfigurationState {
-  active,
-}
+  active('ACTIVE'),
+  ;
 
-extension CreateLoggingConfigurationStateValueExtension
-    on CreateLoggingConfigurationState {
-  String toValue() {
-    switch (this) {
-      case CreateLoggingConfigurationState.active:
-        return 'ACTIVE';
-    }
-  }
-}
+  final String value;
 
-extension CreateLoggingConfigurationStateFromString on String {
-  CreateLoggingConfigurationState toCreateLoggingConfigurationState() {
-    switch (this) {
-      case 'ACTIVE':
-        return CreateLoggingConfigurationState.active;
-    }
-    throw Exception(
-        '$this is not known in enum CreateLoggingConfigurationState');
-  }
+  const CreateLoggingConfigurationState(this.value);
+
+  static CreateLoggingConfigurationState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum CreateLoggingConfigurationState'));
 }
 
 class CreateRoomResponse {
@@ -1232,7 +1111,7 @@ class CreateRoomResponse {
       id: json['id'] as String?,
       loggingConfigurationIdentifiers:
           (json['loggingConfigurationIdentifiers'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => e as String)
               .toList(),
       maximumMessageLength: json['maximumMessageLength'] as int?,
@@ -1365,31 +1244,18 @@ class DisconnectUserResponse {
 }
 
 enum FallbackResult {
-  allow,
-  deny,
-}
+  allow('ALLOW'),
+  deny('DENY'),
+  ;
 
-extension FallbackResultValueExtension on FallbackResult {
-  String toValue() {
-    switch (this) {
-      case FallbackResult.allow:
-        return 'ALLOW';
-      case FallbackResult.deny:
-        return 'DENY';
-    }
-  }
-}
+  final String value;
 
-extension FallbackResultFromString on String {
-  FallbackResult toFallbackResult() {
-    switch (this) {
-      case 'ALLOW':
-        return FallbackResult.allow;
-      case 'DENY':
-        return FallbackResult.deny;
-    }
-    throw Exception('$this is not known in enum FallbackResult');
-  }
+  const FallbackResult(this.value);
+
+  static FallbackResult fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum FallbackResult'));
 }
 
 /// Specifies a Kinesis Firehose location where chat logs will be stored.
@@ -1472,7 +1338,8 @@ class GetLoggingConfigurationResponse {
           : null,
       id: json['id'] as String?,
       name: json['name'] as String?,
-      state: (json['state'] as String?)?.toLoggingConfigurationState(),
+      state:
+          (json['state'] as String?)?.let(LoggingConfigurationState.fromString),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       updateTime: timeStampFromJson(json['updateTime']),
@@ -1495,7 +1362,7 @@ class GetLoggingConfigurationResponse {
         'destinationConfiguration': destinationConfiguration,
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (state != null) 'state': state.toValue(),
+      if (state != null) 'state': state.value,
       if (tags != null) 'tags': tags,
       if (updateTime != null) 'updateTime': iso8601ToJson(updateTime),
     };
@@ -1560,7 +1427,7 @@ class GetRoomResponse {
       id: json['id'] as String?,
       loggingConfigurationIdentifiers:
           (json['loggingConfigurationIdentifiers'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => e as String)
               .toList(),
       maximumMessageLength: json['maximumMessageLength'] as int?,
@@ -1627,7 +1494,7 @@ class ListLoggingConfigurationsResponse {
       Map<String, dynamic> json) {
     return ListLoggingConfigurationsResponse(
       loggingConfigurations: (json['loggingConfigurations'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               LoggingConfigurationSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -1661,7 +1528,7 @@ class ListRoomsResponse {
   factory ListRoomsResponse.fromJson(Map<String, dynamic> json) {
     return ListRoomsResponse(
       rooms: (json['rooms'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => RoomSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -1703,56 +1570,23 @@ class ListTagsForResourceResponse {
 }
 
 enum LoggingConfigurationState {
-  creating,
-  createFailed,
-  deleting,
-  deleteFailed,
-  updating,
-  updateFailed,
-  active,
-}
+  creating('CREATING'),
+  createFailed('CREATE_FAILED'),
+  deleting('DELETING'),
+  deleteFailed('DELETE_FAILED'),
+  updating('UPDATING'),
+  updateFailed('UPDATE_FAILED'),
+  active('ACTIVE'),
+  ;
 
-extension LoggingConfigurationStateValueExtension on LoggingConfigurationState {
-  String toValue() {
-    switch (this) {
-      case LoggingConfigurationState.creating:
-        return 'CREATING';
-      case LoggingConfigurationState.createFailed:
-        return 'CREATE_FAILED';
-      case LoggingConfigurationState.deleting:
-        return 'DELETING';
-      case LoggingConfigurationState.deleteFailed:
-        return 'DELETE_FAILED';
-      case LoggingConfigurationState.updating:
-        return 'UPDATING';
-      case LoggingConfigurationState.updateFailed:
-        return 'UPDATE_FAILED';
-      case LoggingConfigurationState.active:
-        return 'ACTIVE';
-    }
-  }
-}
+  final String value;
 
-extension LoggingConfigurationStateFromString on String {
-  LoggingConfigurationState toLoggingConfigurationState() {
-    switch (this) {
-      case 'CREATING':
-        return LoggingConfigurationState.creating;
-      case 'CREATE_FAILED':
-        return LoggingConfigurationState.createFailed;
-      case 'DELETING':
-        return LoggingConfigurationState.deleting;
-      case 'DELETE_FAILED':
-        return LoggingConfigurationState.deleteFailed;
-      case 'UPDATING':
-        return LoggingConfigurationState.updating;
-      case 'UPDATE_FAILED':
-        return LoggingConfigurationState.updateFailed;
-      case 'ACTIVE':
-        return LoggingConfigurationState.active;
-    }
-    throw Exception('$this is not known in enum LoggingConfigurationState');
-  }
+  const LoggingConfigurationState(this.value);
+
+  static LoggingConfigurationState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum LoggingConfigurationState'));
 }
 
 /// Summary information about a logging configuration.
@@ -1812,7 +1646,8 @@ class LoggingConfigurationSummary {
           : null,
       id: json['id'] as String?,
       name: json['name'] as String?,
-      state: (json['state'] as String?)?.toLoggingConfigurationState(),
+      state:
+          (json['state'] as String?)?.let(LoggingConfigurationState.fromString),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       updateTime: timeStampFromJson(json['updateTime']),
@@ -1835,7 +1670,7 @@ class LoggingConfigurationSummary {
         'destinationConfiguration': destinationConfiguration,
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (state != null) 'state': state.toValue(),
+      if (state != null) 'state': state.value,
       if (tags != null) 'tags': tags,
       if (updateTime != null) 'updateTime': iso8601ToJson(updateTime),
     };
@@ -1864,7 +1699,8 @@ class MessageReviewHandler {
 
   factory MessageReviewHandler.fromJson(Map<String, dynamic> json) {
     return MessageReviewHandler(
-      fallbackResult: (json['fallbackResult'] as String?)?.toFallbackResult(),
+      fallbackResult:
+          (json['fallbackResult'] as String?)?.let(FallbackResult.fromString),
       uri: json['uri'] as String?,
     );
   }
@@ -1873,7 +1709,7 @@ class MessageReviewHandler {
     final fallbackResult = this.fallbackResult;
     final uri = this.uri;
     return {
-      if (fallbackResult != null) 'fallbackResult': fallbackResult.toValue(),
+      if (fallbackResult != null) 'fallbackResult': fallbackResult.value,
       if (uri != null) 'uri': uri,
     };
   }
@@ -1931,7 +1767,7 @@ class RoomSummary {
       id: json['id'] as String?,
       loggingConfigurationIdentifiers:
           (json['loggingConfigurationIdentifiers'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => e as String)
               .toList(),
       messageReviewHandler: json['messageReviewHandler'] != null
@@ -2096,7 +1932,8 @@ class UpdateLoggingConfigurationResponse {
           : null,
       id: json['id'] as String?,
       name: json['name'] as String?,
-      state: (json['state'] as String?)?.toUpdateLoggingConfigurationState(),
+      state: (json['state'] as String?)
+          ?.let(UpdateLoggingConfigurationState.fromString),
       tags: (json['tags'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       updateTime: timeStampFromJson(json['updateTime']),
@@ -2119,7 +1956,7 @@ class UpdateLoggingConfigurationResponse {
         'destinationConfiguration': destinationConfiguration,
       if (id != null) 'id': id,
       if (name != null) 'name': name,
-      if (state != null) 'state': state.toValue(),
+      if (state != null) 'state': state.value,
       if (tags != null) 'tags': tags,
       if (updateTime != null) 'updateTime': iso8601ToJson(updateTime),
     };
@@ -2127,28 +1964,17 @@ class UpdateLoggingConfigurationResponse {
 }
 
 enum UpdateLoggingConfigurationState {
-  active,
-}
+  active('ACTIVE'),
+  ;
 
-extension UpdateLoggingConfigurationStateValueExtension
-    on UpdateLoggingConfigurationState {
-  String toValue() {
-    switch (this) {
-      case UpdateLoggingConfigurationState.active:
-        return 'ACTIVE';
-    }
-  }
-}
+  final String value;
 
-extension UpdateLoggingConfigurationStateFromString on String {
-  UpdateLoggingConfigurationState toUpdateLoggingConfigurationState() {
-    switch (this) {
-      case 'ACTIVE':
-        return UpdateLoggingConfigurationState.active;
-    }
-    throw Exception(
-        '$this is not known in enum UpdateLoggingConfigurationState');
-  }
+  const UpdateLoggingConfigurationState(this.value);
+
+  static UpdateLoggingConfigurationState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum UpdateLoggingConfigurationState'));
 }
 
 class UpdateRoomResponse {
@@ -2209,7 +2035,7 @@ class UpdateRoomResponse {
       id: json['id'] as String?,
       loggingConfigurationIdentifiers:
           (json['loggingConfigurationIdentifiers'] as List?)
-              ?.whereNotNull()
+              ?.nonNulls
               .map((e) => e as String)
               .toList(),
       maximumMessageLength: json['maximumMessageLength'] as int?,

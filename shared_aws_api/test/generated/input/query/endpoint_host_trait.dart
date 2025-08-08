@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'endpoint_host_trait.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Endpoint host trait
 class EndpointHostTrait {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   EndpointHostTrait({
     required String region,
@@ -31,7 +30,7 @@ class EndpointHostTrait {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'EndpointHostTrait',
@@ -40,9 +39,7 @@ class EndpointHostTrait {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -56,8 +53,9 @@ class EndpointHostTrait {
   Future<void> staticOp0({
     String? name,
   }) async {
-    final $request = <String, dynamic>{};
-    name?.also((arg) => $request['Name'] = arg);
+    final $request = <String, String>{
+      if (name != null) 'Name': name,
+    };
     await _protocol.send(
       $request,
       action: 'StaticOp',
@@ -65,16 +63,15 @@ class EndpointHostTrait {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['StaticInputShape'],
-      shapes: shapes,
     );
   }
 
   Future<void> memberRefOp1({
     String? name,
   }) async {
-    final $request = <String, dynamic>{};
-    name?.also((arg) => $request['Name'] = arg);
+    final $request = <String, String>{
+      if (name != null) 'Name': name,
+    };
     await _protocol.send(
       $request,
       action: 'MemberRefOp',
@@ -82,8 +79,6 @@ class EndpointHostTrait {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['MemberRefInputShape'],
-      shapes: shapes,
     );
   }
 }

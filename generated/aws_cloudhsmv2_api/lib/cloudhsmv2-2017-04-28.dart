@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -19,10 +20,10 @@ import 'package:shared_aws_api/shared.dart'
 
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
-/// For more information about AWS CloudHSM, see <a
-/// href="http://aws.amazon.com/cloudhsm/">AWS CloudHSM</a> and the <a
-/// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/">AWS CloudHSM
-/// User Guide</a>.
+/// For more information about CloudHSM, see <a
+/// href="http://aws.amazon.com/cloudhsm/">CloudHSM</a> and the <a
+/// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/"> CloudHSM User
+/// Guide</a>.
 class CloudHSMV2 {
   final _s.JsonProtocol _protocol;
   CloudHSMV2({
@@ -52,7 +53,10 @@ class CloudHSMV2 {
     _protocol.close();
   }
 
-  /// Copy an AWS CloudHSM cluster backup to a different region.
+  /// Copy an CloudHSM cluster backup to a different region.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM backup in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -97,7 +101,11 @@ class CloudHSMV2 {
     return CopyBackupToRegionResponse.fromJson(jsonResponse.body);
   }
 
-  /// Creates a new AWS CloudHSM cluster.
+  /// Creates a new CloudHSM cluster.
+  ///
+  /// <b>Cross-account use:</b> Yes. To perform this operation with an CloudHSM
+  /// backup in a different AWS account, specify the full backup ARN in the
+  /// value of the SourceBackupId parameter.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -107,8 +115,8 @@ class CloudHSMV2 {
   /// May throw [CloudHsmTagException].
   ///
   /// Parameter [hsmType] :
-  /// The type of HSM to use in the cluster. Currently the only allowed value is
-  /// <code>hsm1.medium</code>.
+  /// The type of HSM to use in the cluster. The allowed values are
+  /// <code>hsm1.medium</code> and <code>hsm2m.medium</code>.
   ///
   /// Parameter [subnetIds] :
   /// The identifiers (IDs) of the subnets where you are creating the cluster.
@@ -127,10 +135,16 @@ class CloudHSMV2 {
   /// Parameter [backupRetentionPolicy] :
   /// A policy that defines how the service retains backups.
   ///
+  /// Parameter [mode] :
+  /// The mode to use in the cluster. The allowed values are <code>FIPS</code>
+  /// and <code>NON_FIPS</code>.
+  ///
   /// Parameter [sourceBackupId] :
-  /// The identifier (ID) of the cluster backup to restore. Use this value to
-  /// restore the cluster from a backup instead of creating a new cluster. To
-  /// find the backup ID, use <a>DescribeBackups</a>.
+  /// The identifier (ID) or the Amazon Resource Name (ARN) of the cluster
+  /// backup to restore. Use this value to restore the cluster from a backup
+  /// instead of creating a new cluster. To find the backup ID or ARN, use
+  /// <a>DescribeBackups</a>. <i>If using a backup in another account, the full
+  /// ARN must be supplied.</i>
   ///
   /// Parameter [tagList] :
   /// Tags to apply to the CloudHSM cluster during creation.
@@ -138,6 +152,7 @@ class CloudHSMV2 {
     required String hsmType,
     required List<String> subnetIds,
     BackupRetentionPolicy? backupRetentionPolicy,
+    ClusterMode? mode,
     String? sourceBackupId,
     List<Tag>? tagList,
   }) async {
@@ -156,6 +171,7 @@ class CloudHSMV2 {
         'SubnetIds': subnetIds,
         if (backupRetentionPolicy != null)
           'BackupRetentionPolicy': backupRetentionPolicy,
+        if (mode != null) 'Mode': mode.value,
         if (sourceBackupId != null) 'SourceBackupId': sourceBackupId,
         if (tagList != null) 'TagList': tagList,
       },
@@ -164,8 +180,11 @@ class CloudHSMV2 {
     return CreateClusterResponse.fromJson(jsonResponse.body);
   }
 
-  /// Creates a new hardware security module (HSM) in the specified AWS CloudHSM
+  /// Creates a new hardware security module (HSM) in the specified CloudHSM
   /// cluster.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM cluster in a different Amazon Web Service account.
   ///
   /// May throw [CloudHsmInternalFailureException].
   /// May throw [CloudHsmServiceException].
@@ -211,9 +230,12 @@ class CloudHSMV2 {
     return CreateHsmResponse.fromJson(jsonResponse.body);
   }
 
-  /// Deletes a specified AWS CloudHSM backup. A backup can be restored up to 7
-  /// days after the DeleteBackup request is made. For more information on
-  /// restoring a backup, see <a>RestoreBackup</a>.
+  /// Deletes a specified CloudHSM backup. A backup can be restored up to 7 days
+  /// after the DeleteBackup request is made. For more information on restoring
+  /// a backup, see <a>RestoreBackup</a>.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM backup in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -245,10 +267,13 @@ class CloudHSMV2 {
     return DeleteBackupResponse.fromJson(jsonResponse.body);
   }
 
-  /// Deletes the specified AWS CloudHSM cluster. Before you can delete a
-  /// cluster, you must delete all HSMs in the cluster. To see if the cluster
-  /// contains any HSMs, use <a>DescribeClusters</a>. To delete an HSM, use
+  /// Deletes the specified CloudHSM cluster. Before you can delete a cluster,
+  /// you must delete all HSMs in the cluster. To see if the cluster contains
+  /// any HSMs, use <a>DescribeClusters</a>. To delete an HSM, use
   /// <a>DeleteHsm</a>.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM cluster in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -285,6 +310,9 @@ class CloudHSMV2 {
   /// (ID), the IP address of the HSM's elastic network interface (ENI), or the
   /// ID of the HSM's ENI. You need to specify only one of these values. To find
   /// these values, use <a>DescribeClusters</a>.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM hsm in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmInternalFailureException].
   /// May throw [CloudHsmServiceException].
@@ -333,7 +361,47 @@ class CloudHSMV2 {
     return DeleteHsmResponse.fromJson(jsonResponse.body);
   }
 
-  /// Gets information about backups of AWS CloudHSM clusters.
+  /// Deletes an CloudHSM resource policy. Deleting a resource policy will
+  /// result in the resource being unshared and removed from any RAM resource
+  /// shares. Deleting the resource policy attached to a backup will not impact
+  /// any clusters created from that backup.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM resource in a different Amazon Web Services account.
+  ///
+  /// May throw [CloudHsmInternalFailureException].
+  /// May throw [CloudHsmServiceException].
+  /// May throw [CloudHsmInvalidRequestException].
+  /// May throw [CloudHsmResourceNotFoundException].
+  /// May throw [CloudHsmAccessDeniedException].
+  ///
+  /// Parameter [resourceArn] :
+  /// Amazon Resource Name (ARN) of the resource from which the policy will be
+  /// removed.
+  Future<DeleteResourcePolicyResponse> deleteResourcePolicy({
+    String? resourceArn,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'BaldrApiService.DeleteResourcePolicy'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (resourceArn != null) 'ResourceArn': resourceArn,
+      },
+    );
+
+    return DeleteResourcePolicyResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Gets information about backups of CloudHSM clusters. Lists either the
+  /// backups you own or the backups shared with you when the Shared parameter
+  /// is true.
   ///
   /// This is a paginated operation, which means that each response might
   /// contain only a subset of all the backups. When the response contains only
@@ -341,6 +409,9 @@ class CloudHSMV2 {
   /// value in a subsequent <code>DescribeBackups</code> request to get more
   /// backups. When you receive a response with no <code>NextToken</code> (or an
   /// empty or null value), that means there are no more backups to get.
+  ///
+  /// <b>Cross-account use:</b> Yes. Customers can describe backups in other
+  /// Amazon Web Services accounts that are shared with them.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -380,6 +451,20 @@ class CloudHSMV2 {
   /// The <code>NextToken</code> value that you received in the previous
   /// response. Use this value to get more backups.
   ///
+  /// Parameter [shared] :
+  /// Describe backups that are shared with you.
+  /// <note>
+  /// By default when using this option, the command returns backups that have
+  /// been shared using a standard Resource Access Manager resource share. In
+  /// order for a backup that was shared using the PutResourcePolicy command to
+  /// be returned, the share must be promoted to a standard resource share using
+  /// the RAM <a
+  /// href="https://docs.aws.amazon.com/cli/latest/reference/ram/promote-resource-share-created-from-policy.html">PromoteResourceShareCreatedFromPolicy</a>
+  /// API operation. For more information about sharing backups, see <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/sharing.html">
+  /// Working with shared backups</a> in the CloudHSM User Guide.
+  /// </note>
+  ///
   /// Parameter [sortAscending] :
   /// Designates whether or not to sort the return backups by ascending
   /// chronological order of generation.
@@ -387,6 +472,7 @@ class CloudHSMV2 {
     Map<String, List<String>>? filters,
     int? maxResults,
     String? nextToken,
+    bool? shared,
     bool? sortAscending,
   }) async {
     _s.validateNumRange(
@@ -409,6 +495,7 @@ class CloudHSMV2 {
         if (filters != null) 'Filters': filters,
         if (maxResults != null) 'MaxResults': maxResults,
         if (nextToken != null) 'NextToken': nextToken,
+        if (shared != null) 'Shared': shared,
         if (sortAscending != null) 'SortAscending': sortAscending,
       },
     );
@@ -416,7 +503,7 @@ class CloudHSMV2 {
     return DescribeBackupsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Gets information about AWS CloudHSM clusters.
+  /// Gets information about CloudHSM clusters.
   ///
   /// This is a paginated operation, which means that each response might
   /// contain only a subset of all the clusters. When the response contains only
@@ -424,6 +511,9 @@ class CloudHSMV2 {
   /// value in a subsequent <code>DescribeClusters</code> request to get more
   /// clusters. When you receive a response with no <code>NextToken</code> (or
   /// an empty or null value), that means there are no more clusters to get.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on
+  /// CloudHSM clusters in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -483,11 +573,48 @@ class CloudHSMV2 {
     return DescribeClustersResponse.fromJson(jsonResponse.body);
   }
 
-  /// Claims an AWS CloudHSM cluster by submitting the cluster certificate
-  /// issued by your issuing certificate authority (CA) and the CA's root
-  /// certificate. Before you can claim a cluster, you must sign the cluster's
-  /// certificate signing request (CSR) with your issuing CA. To get the
-  /// cluster's CSR, use <a>DescribeClusters</a>.
+  /// Retrieves the resource policy document attached to a given resource.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM resource in a different Amazon Web Services account.
+  ///
+  /// May throw [CloudHsmInternalFailureException].
+  /// May throw [CloudHsmServiceException].
+  /// May throw [CloudHsmInvalidRequestException].
+  /// May throw [CloudHsmResourceNotFoundException].
+  /// May throw [CloudHsmAccessDeniedException].
+  ///
+  /// Parameter [resourceArn] :
+  /// Amazon Resource Name (ARN) of the resource to which a policy is attached.
+  Future<GetResourcePolicyResponse> getResourcePolicy({
+    String? resourceArn,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'BaldrApiService.GetResourcePolicy'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (resourceArn != null) 'ResourceArn': resourceArn,
+      },
+    );
+
+    return GetResourcePolicyResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Claims an CloudHSM cluster by submitting the cluster certificate issued by
+  /// your issuing certificate authority (CA) and the CA's root certificate.
+  /// Before you can claim a cluster, you must sign the cluster's certificate
+  /// signing request (CSR) with your issuing CA. To get the cluster's CSR, use
+  /// <a>DescribeClusters</a>.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM cluster in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -535,7 +662,7 @@ class CloudHSMV2 {
     return InitializeClusterResponse.fromJson(jsonResponse.body);
   }
 
-  /// Gets a list of tags for the specified AWS CloudHSM cluster.
+  /// Gets a list of tags for the specified CloudHSM cluster.
   ///
   /// This is a paginated operation, which means that each response might
   /// contain only a subset of all the tags. When the response contains only a
@@ -543,6 +670,9 @@ class CloudHSMV2 {
   /// in a subsequent <code>ListTags</code> request to get more tags. When you
   /// receive a response with no <code>NextToken</code> (or an empty or null
   /// value), that means there are no more tags to get.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM resource in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -594,7 +724,10 @@ class CloudHSMV2 {
     return ListTagsResponse.fromJson(jsonResponse.body);
   }
 
-  /// Modifies attributes for AWS CloudHSM backup.
+  /// Modifies attributes for CloudHSM backup.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM backup in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -634,7 +767,10 @@ class CloudHSMV2 {
     return ModifyBackupAttributesResponse.fromJson(jsonResponse.body);
   }
 
-  /// Modifies AWS CloudHSM cluster.
+  /// Modifies CloudHSM cluster.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM cluster in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -671,9 +807,80 @@ class CloudHSMV2 {
     return ModifyClusterResponse.fromJson(jsonResponse.body);
   }
 
-  /// Restores a specified AWS CloudHSM backup that is in the
-  /// <code>PENDING_DELETION</code> state. For mor information on deleting a
+  /// Creates or updates an CloudHSM resource policy. A resource policy helps
+  /// you to define the IAM entity (for example, an Amazon Web Services account)
+  /// that can manage your CloudHSM resources. The following resources support
+  /// CloudHSM resource policies:
+  ///
+  /// <ul>
+  /// <li>
+  /// Backup - The resource policy allows you to describe the backup and restore
+  /// a cluster from the backup in another Amazon Web Services account.
+  /// </li>
+  /// </ul>
+  /// In order to share a backup, it must be in a 'READY' state and you must own
+  /// it.
+  /// <important>
+  /// While you can share a backup using the CloudHSM PutResourcePolicy
+  /// operation, we recommend using Resource Access Manager (RAM) instead. Using
+  /// RAM provides multiple benefits as it creates the policy for you, allows
+  /// multiple resources to be shared at one time, and increases the
+  /// discoverability of shared resources. If you use PutResourcePolicy and want
+  /// consumers to be able to describe the backups you share with them, you must
+  /// promote the backup to a standard RAM Resource Share using the RAM
+  /// PromoteResourceShareCreatedFromPolicy API operation. For more information,
+  /// see <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/sharing.html">
+  /// Working with shared backups</a> in the CloudHSM User Guide
+  /// </important>
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM resource in a different Amazon Web Services account.
+  ///
+  /// May throw [CloudHsmInternalFailureException].
+  /// May throw [CloudHsmServiceException].
+  /// May throw [CloudHsmInvalidRequestException].
+  /// May throw [CloudHsmResourceNotFoundException].
+  /// May throw [CloudHsmAccessDeniedException].
+  ///
+  /// Parameter [policy] :
+  /// The policy you want to associate with a resource.
+  ///
+  /// For an example policy, see <a
+  /// href="https://docs.aws.amazon.com/cloudhsm/latest/userguide/sharing.html">
+  /// Working with shared backups</a> in the CloudHSM User Guide
+  ///
+  /// Parameter [resourceArn] :
+  /// Amazon Resource Name (ARN) of the resource to which you want to attach a
+  /// policy.
+  Future<PutResourcePolicyResponse> putResourcePolicy({
+    String? policy,
+    String? resourceArn,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'BaldrApiService.PutResourcePolicy'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (policy != null) 'Policy': policy,
+        if (resourceArn != null) 'ResourceArn': resourceArn,
+      },
+    );
+
+    return PutResourcePolicyResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Restores a specified CloudHSM backup that is in the
+  /// <code>PENDING_DELETION</code> state. For more information on deleting a
   /// backup, see <a>DeleteBackup</a>.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM backup in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -705,8 +912,10 @@ class CloudHSMV2 {
     return RestoreBackupResponse.fromJson(jsonResponse.body);
   }
 
-  /// Adds or overwrites one or more tags for the specified AWS CloudHSM
-  /// cluster.
+  /// Adds or overwrites one or more tags for the specified CloudHSM cluster.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM resource in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -742,7 +951,10 @@ class CloudHSMV2 {
     );
   }
 
-  /// Removes the specified tag or tags from the specified AWS CloudHSM cluster.
+  /// Removes the specified tag or tags from the specified CloudHSM cluster.
+  ///
+  /// <b>Cross-account use:</b> No. You cannot perform this operation on an
+  /// CloudHSM resource in a different Amazon Web Services account.
   ///
   /// May throw [CloudHsmAccessDeniedException].
   /// May throw [CloudHsmInternalFailureException].
@@ -780,7 +992,7 @@ class CloudHSMV2 {
   }
 }
 
-/// Contains information about a backup of an AWS CloudHSM cluster. All backup
+/// Contains information about a backup of an CloudHSM cluster. All backup
 /// objects contain the <code>BackupId</code>, <code>BackupState</code>,
 /// <code>ClusterId</code>, and <code>CreateTimestamp</code> parameters. Backups
 /// that were copied into a destination region additionally contain the
@@ -791,6 +1003,9 @@ class CloudHSMV2 {
 class Backup {
   /// The identifier (ID) of the backup.
   final String backupId;
+
+  /// The Amazon Resource Name (ARN) of the backup.
+  final String? backupArn;
 
   /// The state of the backup.
   final BackupState? backupState;
@@ -806,6 +1021,12 @@ class Backup {
 
   /// The date and time when the backup will be permanently deleted.
   final DateTime? deleteTimestamp;
+
+  /// The HSM type used to create the backup.
+  final String? hsmType;
+
+  /// The mode of the cluster that was backed up.
+  final ClusterMode? mode;
 
   /// Specifies whether the service should exempt a backup from the retention
   /// policy for the cluster. <code>True</code> exempts a backup from the
@@ -830,11 +1051,14 @@ class Backup {
 
   Backup({
     required this.backupId,
+    this.backupArn,
     this.backupState,
     this.clusterId,
     this.copyTimestamp,
     this.createTimestamp,
     this.deleteTimestamp,
+    this.hsmType,
+    this.mode,
     this.neverExpires,
     this.sourceBackup,
     this.sourceCluster,
@@ -845,17 +1069,21 @@ class Backup {
   factory Backup.fromJson(Map<String, dynamic> json) {
     return Backup(
       backupId: json['BackupId'] as String,
-      backupState: (json['BackupState'] as String?)?.toBackupState(),
+      backupArn: json['BackupArn'] as String?,
+      backupState:
+          (json['BackupState'] as String?)?.let(BackupState.fromString),
       clusterId: json['ClusterId'] as String?,
       copyTimestamp: timeStampFromJson(json['CopyTimestamp']),
       createTimestamp: timeStampFromJson(json['CreateTimestamp']),
       deleteTimestamp: timeStampFromJson(json['DeleteTimestamp']),
+      hsmType: json['HsmType'] as String?,
+      mode: (json['Mode'] as String?)?.let(ClusterMode.fromString),
       neverExpires: json['NeverExpires'] as bool?,
       sourceBackup: json['SourceBackup'] as String?,
       sourceCluster: json['SourceCluster'] as String?,
       sourceRegion: json['SourceRegion'] as String?,
       tagList: (json['TagList'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -863,26 +1091,17 @@ class Backup {
 }
 
 enum BackupPolicy {
-  $default,
-}
+  $default('DEFAULT'),
+  ;
 
-extension BackupPolicyValueExtension on BackupPolicy {
-  String toValue() {
-    switch (this) {
-      case BackupPolicy.$default:
-        return 'DEFAULT';
-    }
-  }
-}
+  final String value;
 
-extension BackupPolicyFromString on String {
-  BackupPolicy toBackupPolicy() {
-    switch (this) {
-      case 'DEFAULT':
-        return BackupPolicy.$default;
-    }
-    throw Exception('$this is not known in enum BackupPolicy');
-  }
+  const BackupPolicy(this.value);
+
+  static BackupPolicy fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum BackupPolicy'));
 }
 
 /// A policy that defines the number of days to retain backups.
@@ -901,7 +1120,7 @@ class BackupRetentionPolicy {
 
   factory BackupRetentionPolicy.fromJson(Map<String, dynamic> json) {
     return BackupRetentionPolicy(
-      type: (json['Type'] as String?)?.toBackupRetentionType(),
+      type: (json['Type'] as String?)?.let(BackupRetentionType.fromString),
       value: json['Value'] as String?,
     );
   }
@@ -910,76 +1129,45 @@ class BackupRetentionPolicy {
     final type = this.type;
     final value = this.value;
     return {
-      if (type != null) 'Type': type.toValue(),
+      if (type != null) 'Type': type.value,
       if (value != null) 'Value': value,
     };
   }
 }
 
 enum BackupRetentionType {
-  days,
-}
+  days('DAYS'),
+  ;
 
-extension BackupRetentionTypeValueExtension on BackupRetentionType {
-  String toValue() {
-    switch (this) {
-      case BackupRetentionType.days:
-        return 'DAYS';
-    }
-  }
-}
+  final String value;
 
-extension BackupRetentionTypeFromString on String {
-  BackupRetentionType toBackupRetentionType() {
-    switch (this) {
-      case 'DAYS':
-        return BackupRetentionType.days;
-    }
-    throw Exception('$this is not known in enum BackupRetentionType');
-  }
+  const BackupRetentionType(this.value);
+
+  static BackupRetentionType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum BackupRetentionType'));
 }
 
 enum BackupState {
-  createInProgress,
-  ready,
-  deleted,
-  pendingDeletion,
-}
+  createInProgress('CREATE_IN_PROGRESS'),
+  ready('READY'),
+  deleted('DELETED'),
+  pendingDeletion('PENDING_DELETION'),
+  ;
 
-extension BackupStateValueExtension on BackupState {
-  String toValue() {
-    switch (this) {
-      case BackupState.createInProgress:
-        return 'CREATE_IN_PROGRESS';
-      case BackupState.ready:
-        return 'READY';
-      case BackupState.deleted:
-        return 'DELETED';
-      case BackupState.pendingDeletion:
-        return 'PENDING_DELETION';
-    }
-  }
-}
+  final String value;
 
-extension BackupStateFromString on String {
-  BackupState toBackupState() {
-    switch (this) {
-      case 'CREATE_IN_PROGRESS':
-        return BackupState.createInProgress;
-      case 'READY':
-        return BackupState.ready;
-      case 'DELETED':
-        return BackupState.deleted;
-      case 'PENDING_DELETION':
-        return BackupState.pendingDeletion;
-    }
-    throw Exception('$this is not known in enum BackupState');
-  }
+  const BackupState(this.value);
+
+  static BackupState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum BackupState'));
 }
 
 /// Contains one or more certificates or a certificate signing request (CSR).
 class Certificates {
-  /// The HSM hardware certificate issued (signed) by AWS CloudHSM.
+  /// The HSM hardware certificate issued (signed) by CloudHSM.
   final String? awsHardwareCertificate;
 
   /// The cluster certificate issued (signed) by the issuing certificate authority
@@ -1016,7 +1204,7 @@ class Certificates {
   }
 }
 
-/// Contains information about an AWS CloudHSM cluster.
+/// Contains information about an CloudHSM cluster.
 class Cluster {
   /// The cluster's backup policy.
   final BackupPolicy? backupPolicy;
@@ -1038,6 +1226,9 @@ class Cluster {
 
   /// Contains information about the HSMs in the cluster.
   final List<Hsm>? hsms;
+
+  /// The mode of the cluster.
+  final ClusterMode? mode;
 
   /// The default password for the cluster's Pre-Crypto Officer (PRECO) user.
   final String? preCoPassword;
@@ -1074,6 +1265,7 @@ class Cluster {
     this.createTimestamp,
     this.hsmType,
     this.hsms,
+    this.mode,
     this.preCoPassword,
     this.securityGroup,
     this.sourceBackupId,
@@ -1086,7 +1278,8 @@ class Cluster {
 
   factory Cluster.fromJson(Map<String, dynamic> json) {
     return Cluster(
-      backupPolicy: (json['BackupPolicy'] as String?)?.toBackupPolicy(),
+      backupPolicy:
+          (json['BackupPolicy'] as String?)?.let(BackupPolicy.fromString),
       backupRetentionPolicy: json['BackupRetentionPolicy'] != null
           ? BackupRetentionPolicy.fromJson(
               json['BackupRetentionPolicy'] as Map<String, dynamic>)
@@ -1098,18 +1291,19 @@ class Cluster {
       createTimestamp: timeStampFromJson(json['CreateTimestamp']),
       hsmType: json['HsmType'] as String?,
       hsms: (json['Hsms'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Hsm.fromJson(e as Map<String, dynamic>))
           .toList(),
+      mode: (json['Mode'] as String?)?.let(ClusterMode.fromString),
       preCoPassword: json['PreCoPassword'] as String?,
       securityGroup: json['SecurityGroup'] as String?,
       sourceBackupId: json['SourceBackupId'] as String?,
-      state: (json['State'] as String?)?.toClusterState(),
+      state: (json['State'] as String?)?.let(ClusterState.fromString),
       stateMessage: json['StateMessage'] as String?,
       subnetMapping: (json['SubnetMapping'] as Map<String, dynamic>?)
           ?.map((k, e) => MapEntry(k, e as String)),
       tagList: (json['TagList'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       vpcId: json['VpcId'] as String?,
@@ -1117,67 +1311,40 @@ class Cluster {
   }
 }
 
+enum ClusterMode {
+  fips('FIPS'),
+  nonFips('NON_FIPS'),
+  ;
+
+  final String value;
+
+  const ClusterMode(this.value);
+
+  static ClusterMode fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum ClusterMode'));
+}
+
 enum ClusterState {
-  createInProgress,
-  uninitialized,
-  initializeInProgress,
-  initialized,
-  active,
-  updateInProgress,
-  deleteInProgress,
-  deleted,
-  degraded,
-}
+  createInProgress('CREATE_IN_PROGRESS'),
+  uninitialized('UNINITIALIZED'),
+  initializeInProgress('INITIALIZE_IN_PROGRESS'),
+  initialized('INITIALIZED'),
+  active('ACTIVE'),
+  updateInProgress('UPDATE_IN_PROGRESS'),
+  deleteInProgress('DELETE_IN_PROGRESS'),
+  deleted('DELETED'),
+  degraded('DEGRADED'),
+  ;
 
-extension ClusterStateValueExtension on ClusterState {
-  String toValue() {
-    switch (this) {
-      case ClusterState.createInProgress:
-        return 'CREATE_IN_PROGRESS';
-      case ClusterState.uninitialized:
-        return 'UNINITIALIZED';
-      case ClusterState.initializeInProgress:
-        return 'INITIALIZE_IN_PROGRESS';
-      case ClusterState.initialized:
-        return 'INITIALIZED';
-      case ClusterState.active:
-        return 'ACTIVE';
-      case ClusterState.updateInProgress:
-        return 'UPDATE_IN_PROGRESS';
-      case ClusterState.deleteInProgress:
-        return 'DELETE_IN_PROGRESS';
-      case ClusterState.deleted:
-        return 'DELETED';
-      case ClusterState.degraded:
-        return 'DEGRADED';
-    }
-  }
-}
+  final String value;
 
-extension ClusterStateFromString on String {
-  ClusterState toClusterState() {
-    switch (this) {
-      case 'CREATE_IN_PROGRESS':
-        return ClusterState.createInProgress;
-      case 'UNINITIALIZED':
-        return ClusterState.uninitialized;
-      case 'INITIALIZE_IN_PROGRESS':
-        return ClusterState.initializeInProgress;
-      case 'INITIALIZED':
-        return ClusterState.initialized;
-      case 'ACTIVE':
-        return ClusterState.active;
-      case 'UPDATE_IN_PROGRESS':
-        return ClusterState.updateInProgress;
-      case 'DELETE_IN_PROGRESS':
-        return ClusterState.deleteInProgress;
-      case 'DELETED':
-        return ClusterState.deleted;
-      case 'DEGRADED':
-        return ClusterState.degraded;
-    }
-    throw Exception('$this is not known in enum ClusterState');
-  }
+  const ClusterState(this.value);
+
+  static ClusterState fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ClusterState'));
 }
 
 class CopyBackupToRegionResponse {
@@ -1288,6 +1455,27 @@ class DeleteHsmResponse {
   }
 }
 
+class DeleteResourcePolicyResponse {
+  /// The policy previously attached to the resource.
+  final String? policy;
+
+  /// Amazon Resource Name (ARN) of the resource from which the policy was
+  /// deleted.
+  final String? resourceArn;
+
+  DeleteResourcePolicyResponse({
+    this.policy,
+    this.resourceArn,
+  });
+
+  factory DeleteResourcePolicyResponse.fromJson(Map<String, dynamic> json) {
+    return DeleteResourcePolicyResponse(
+      policy: json['Policy'] as String?,
+      resourceArn: json['ResourceArn'] as String?,
+    );
+  }
+}
+
 class DescribeBackupsResponse {
   /// A list of backups.
   final List<Backup>? backups;
@@ -1305,7 +1493,7 @@ class DescribeBackupsResponse {
   factory DescribeBackupsResponse.fromJson(Map<String, dynamic> json) {
     return DescribeBackupsResponse(
       backups: (json['Backups'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Backup.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -1330,7 +1518,7 @@ class DescribeClustersResponse {
   factory DescribeClustersResponse.fromJson(Map<String, dynamic> json) {
     return DescribeClustersResponse(
       clusters: (json['Clusters'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Cluster.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -1373,8 +1561,23 @@ class DestinationBackup {
   }
 }
 
-/// Contains information about a hardware security module (HSM) in an AWS
-/// CloudHSM cluster.
+class GetResourcePolicyResponse {
+  /// The policy attached to a resource.
+  final String? policy;
+
+  GetResourcePolicyResponse({
+    this.policy,
+  });
+
+  factory GetResourcePolicyResponse.fromJson(Map<String, dynamic> json) {
+    return GetResourcePolicyResponse(
+      policy: json['Policy'] as String?,
+    );
+  }
+}
+
+/// Contains information about a hardware security module (HSM) in an CloudHSM
+/// cluster.
 class Hsm {
   /// The HSM's identifier (ID).
   final String hsmId;
@@ -1418,7 +1621,7 @@ class Hsm {
       clusterId: json['ClusterId'] as String?,
       eniId: json['EniId'] as String?,
       eniIp: json['EniIp'] as String?,
-      state: (json['State'] as String?)?.toHsmState(),
+      state: (json['State'] as String?)?.let(HsmState.fromString),
       stateMessage: json['StateMessage'] as String?,
       subnetId: json['SubnetId'] as String?,
     );
@@ -1426,46 +1629,20 @@ class Hsm {
 }
 
 enum HsmState {
-  createInProgress,
-  active,
-  degraded,
-  deleteInProgress,
-  deleted,
-}
+  createInProgress('CREATE_IN_PROGRESS'),
+  active('ACTIVE'),
+  degraded('DEGRADED'),
+  deleteInProgress('DELETE_IN_PROGRESS'),
+  deleted('DELETED'),
+  ;
 
-extension HsmStateValueExtension on HsmState {
-  String toValue() {
-    switch (this) {
-      case HsmState.createInProgress:
-        return 'CREATE_IN_PROGRESS';
-      case HsmState.active:
-        return 'ACTIVE';
-      case HsmState.degraded:
-        return 'DEGRADED';
-      case HsmState.deleteInProgress:
-        return 'DELETE_IN_PROGRESS';
-      case HsmState.deleted:
-        return 'DELETED';
-    }
-  }
-}
+  final String value;
 
-extension HsmStateFromString on String {
-  HsmState toHsmState() {
-    switch (this) {
-      case 'CREATE_IN_PROGRESS':
-        return HsmState.createInProgress;
-      case 'ACTIVE':
-        return HsmState.active;
-      case 'DEGRADED':
-        return HsmState.degraded;
-      case 'DELETE_IN_PROGRESS':
-        return HsmState.deleteInProgress;
-      case 'DELETED':
-        return HsmState.deleted;
-    }
-    throw Exception('$this is not known in enum HsmState');
-  }
+  const HsmState(this.value);
+
+  static HsmState fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum HsmState'));
 }
 
 class InitializeClusterResponse {
@@ -1482,7 +1659,7 @@ class InitializeClusterResponse {
 
   factory InitializeClusterResponse.fromJson(Map<String, dynamic> json) {
     return InitializeClusterResponse(
-      state: (json['State'] as String?)?.toClusterState(),
+      state: (json['State'] as String?)?.let(ClusterState.fromString),
       stateMessage: json['StateMessage'] as String?,
     );
   }
@@ -1505,7 +1682,7 @@ class ListTagsResponse {
   factory ListTagsResponse.fromJson(Map<String, dynamic> json) {
     return ListTagsResponse(
       tagList: (json['TagList'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -1541,6 +1718,26 @@ class ModifyClusterResponse {
       cluster: json['Cluster'] != null
           ? Cluster.fromJson(json['Cluster'] as Map<String, dynamic>)
           : null,
+    );
+  }
+}
+
+class PutResourcePolicyResponse {
+  /// The policy attached to a resource.
+  final String? policy;
+
+  /// Amazon Resource Name (ARN) of the resource to which a policy is attached.
+  final String? resourceArn;
+
+  PutResourcePolicyResponse({
+    this.policy,
+    this.resourceArn,
+  });
+
+  factory PutResourcePolicyResponse.fromJson(Map<String, dynamic> json) {
+    return PutResourcePolicyResponse(
+      policy: json['Policy'] as String?,
+      resourceArn: json['ResourceArn'] as String?,
     );
   }
 }

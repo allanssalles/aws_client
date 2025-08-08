@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.7.1
+
+- Fix a missing enum value in LambdaUpdateStatusReasonCode
+
+## 0.7.0
+
+- Generate all the APIs with version v2.1692.0 of the AWS SDK
+- Add `ChecksumAlgorithm.crc64nvme` in `package:aws_client/s3_2006_03_01.dart`
+
+## 0.6.1
+
+- Allow `package:intl` version 0.20.x
+
+## 0.6.0
+
+- Expose `package:aws_client/credential_providers.dart` for advanced options to resolve the `AwsClientCredentials`
+- Remove double-encode of request URI when generating signature for S3
+- Internal refactoring of the query protocol
+- Internal refactor of enums serialization
+
+## 0.5.0
+
+- Generate all the APIs with version v2.1635.0 of the AWS SDK
+
+## 0.4.3
+
+- Updated `pubspec.yaml`.
+
 ## 0.4.2
 
 - Upgrade dependencies

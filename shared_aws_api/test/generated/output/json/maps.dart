@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -75,8 +76,7 @@ class OutputShape {
   factory OutputShape.fromJson(Map<String, dynamic> json) {
     return OutputShape(
       mapMember: (json['MapMember'] as Map<String, dynamic>?)?.map((k, e) =>
-          MapEntry(
-              k, (e as List).whereNotNull().map((e) => e as int).toList())),
+          MapEntry(k, (e as List).nonNulls.map((e) => e as int).toList())),
     );
   }
 }

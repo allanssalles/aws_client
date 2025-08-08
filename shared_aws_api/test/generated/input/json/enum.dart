@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -63,9 +64,9 @@ class Enum {
       // TODO queryParams
       headers: headers,
       payload: {
-        if (fooEnum != null) 'FooEnum': fooEnum.toValue(),
+        if (fooEnum != null) 'FooEnum': fooEnum.value,
         if (listEnums != null)
-          'ListEnums': listEnums.map((e) => e.toValue()).toList(),
+          'ListEnums': listEnums.map((e) => e.value).toList(),
       },
     );
   }
@@ -85,40 +86,26 @@ class Enum {
       // TODO queryParams
       headers: headers,
       payload: {
-        if (fooEnum != null) 'FooEnum': fooEnum.toValue(),
+        if (fooEnum != null) 'FooEnum': fooEnum.value,
         if (listEnums != null)
-          'ListEnums': listEnums.map((e) => e.toValue()).toList(),
+          'ListEnums': listEnums.map((e) => e.value).toList(),
       },
     );
   }
 }
 
 enum EnumType {
-  foo,
-  bar,
-}
+  foo('foo'),
+  bar('bar'),
+  ;
 
-extension EnumTypeValueExtension on EnumType {
-  String toValue() {
-    switch (this) {
-      case EnumType.foo:
-        return 'foo';
-      case EnumType.bar:
-        return 'bar';
-    }
-  }
-}
+  final String value;
 
-extension EnumTypeFromString on String {
-  EnumType toEnumType() {
-    switch (this) {
-      case 'foo':
-        return EnumType.foo;
-      case 'bar':
-        return EnumType.bar;
-    }
-    throw Exception('$this is not known in enum EnumType');
-  }
+  const EnumType(this.value);
+
+  static EnumType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum EnumType'));
 }
 
 final _exceptionFns = <String, _s.AwsExceptionFn>{};

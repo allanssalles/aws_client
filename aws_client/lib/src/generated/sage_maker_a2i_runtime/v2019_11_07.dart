@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -188,7 +189,7 @@ class AugmentedAIRuntime {
         'CreationTimeBefore': [_s.iso8601ToJson(creationTimeBefore).toString()],
       if (maxResults != null) 'MaxResults': [maxResults.toString()],
       if (nextToken != null) 'NextToken': [nextToken],
-      if (sortOrder != null) 'SortOrder': [sortOrder.toValue()],
+      if (sortOrder != null) 'SortOrder': [sortOrder.value],
     };
     final response = await _protocol.send(
       payload: null,
@@ -269,31 +270,19 @@ class AugmentedAIRuntime {
 }
 
 enum ContentClassifier {
-  freeOfPersonallyIdentifiableInformation,
-  freeOfAdultContent,
-}
+  freeOfPersonallyIdentifiableInformation(
+      'FreeOfPersonallyIdentifiableInformation'),
+  freeOfAdultContent('FreeOfAdultContent'),
+  ;
 
-extension ContentClassifierValueExtension on ContentClassifier {
-  String toValue() {
-    switch (this) {
-      case ContentClassifier.freeOfPersonallyIdentifiableInformation:
-        return 'FreeOfPersonallyIdentifiableInformation';
-      case ContentClassifier.freeOfAdultContent:
-        return 'FreeOfAdultContent';
-    }
-  }
-}
+  final String value;
 
-extension ContentClassifierFromString on String {
-  ContentClassifier toContentClassifier() {
-    switch (this) {
-      case 'FreeOfPersonallyIdentifiableInformation':
-        return ContentClassifier.freeOfPersonallyIdentifiableInformation;
-      case 'FreeOfAdultContent':
-        return ContentClassifier.freeOfAdultContent;
-    }
-    throw Exception('$this is not known in enum ContentClassifier');
-  }
+  const ContentClassifier(this.value);
+
+  static ContentClassifier fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ContentClassifier'));
 }
 
 class DeleteHumanLoopResponse {
@@ -357,7 +346,8 @@ class DescribeHumanLoopResponse {
       flowDefinitionArn: json['FlowDefinitionArn'] as String,
       humanLoopArn: json['HumanLoopArn'] as String,
       humanLoopName: json['HumanLoopName'] as String,
-      humanLoopStatus: (json['HumanLoopStatus'] as String).toHumanLoopStatus(),
+      humanLoopStatus:
+          HumanLoopStatus.fromString((json['HumanLoopStatus'] as String)),
       failureCode: json['FailureCode'] as String?,
       failureReason: json['FailureReason'] as String?,
       humanLoopOutput: json['HumanLoopOutput'] != null
@@ -381,7 +371,7 @@ class DescribeHumanLoopResponse {
       'FlowDefinitionArn': flowDefinitionArn,
       'HumanLoopArn': humanLoopArn,
       'HumanLoopName': humanLoopName,
-      'HumanLoopStatus': humanLoopStatus.toValue(),
+      'HumanLoopStatus': humanLoopStatus.value,
       if (failureCode != null) 'FailureCode': failureCode,
       if (failureReason != null) 'FailureReason': failureReason,
       if (humanLoopOutput != null) 'HumanLoopOutput': humanLoopOutput,
@@ -406,7 +396,7 @@ class HumanLoopDataAttributes {
   Map<String, dynamic> toJson() {
     final contentClassifiers = this.contentClassifiers;
     return {
-      'ContentClassifiers': contentClassifiers.map((e) => e.toValue()).toList(),
+      'ContentClassifiers': contentClassifiers.map((e) => e.value).toList(),
     };
   }
 }
@@ -454,46 +444,21 @@ class HumanLoopOutput {
 }
 
 enum HumanLoopStatus {
-  inProgress,
-  failed,
-  completed,
-  stopped,
-  stopping,
-}
+  inProgress('InProgress'),
+  failed('Failed'),
+  completed('Completed'),
+  stopped('Stopped'),
+  stopping('Stopping'),
+  ;
 
-extension HumanLoopStatusValueExtension on HumanLoopStatus {
-  String toValue() {
-    switch (this) {
-      case HumanLoopStatus.inProgress:
-        return 'InProgress';
-      case HumanLoopStatus.failed:
-        return 'Failed';
-      case HumanLoopStatus.completed:
-        return 'Completed';
-      case HumanLoopStatus.stopped:
-        return 'Stopped';
-      case HumanLoopStatus.stopping:
-        return 'Stopping';
-    }
-  }
-}
+  final String value;
 
-extension HumanLoopStatusFromString on String {
-  HumanLoopStatus toHumanLoopStatus() {
-    switch (this) {
-      case 'InProgress':
-        return HumanLoopStatus.inProgress;
-      case 'Failed':
-        return HumanLoopStatus.failed;
-      case 'Completed':
-        return HumanLoopStatus.completed;
-      case 'Stopped':
-        return HumanLoopStatus.stopped;
-      case 'Stopping':
-        return HumanLoopStatus.stopping;
-    }
-    throw Exception('$this is not known in enum HumanLoopStatus');
-  }
+  const HumanLoopStatus(this.value);
+
+  static HumanLoopStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum HumanLoopStatus'));
 }
 
 /// Summary information about the human loop.
@@ -530,7 +495,7 @@ class HumanLoopSummary {
       flowDefinitionArn: json['FlowDefinitionArn'] as String?,
       humanLoopName: json['HumanLoopName'] as String?,
       humanLoopStatus:
-          (json['HumanLoopStatus'] as String?)?.toHumanLoopStatus(),
+          (json['HumanLoopStatus'] as String?)?.let(HumanLoopStatus.fromString),
     );
   }
 
@@ -545,7 +510,7 @@ class HumanLoopSummary {
       if (failureReason != null) 'FailureReason': failureReason,
       if (flowDefinitionArn != null) 'FlowDefinitionArn': flowDefinitionArn,
       if (humanLoopName != null) 'HumanLoopName': humanLoopName,
-      if (humanLoopStatus != null) 'HumanLoopStatus': humanLoopStatus.toValue(),
+      if (humanLoopStatus != null) 'HumanLoopStatus': humanLoopStatus.value,
     };
   }
 }
@@ -565,7 +530,7 @@ class ListHumanLoopsResponse {
   factory ListHumanLoopsResponse.fromJson(Map<String, dynamic> json) {
     return ListHumanLoopsResponse(
       humanLoopSummaries: (json['HumanLoopSummaries'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => HumanLoopSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['NextToken'] as String?,
@@ -583,31 +548,17 @@ class ListHumanLoopsResponse {
 }
 
 enum SortOrder {
-  ascending,
-  descending,
-}
+  ascending('Ascending'),
+  descending('Descending'),
+  ;
 
-extension SortOrderValueExtension on SortOrder {
-  String toValue() {
-    switch (this) {
-      case SortOrder.ascending:
-        return 'Ascending';
-      case SortOrder.descending:
-        return 'Descending';
-    }
-  }
-}
+  final String value;
 
-extension SortOrderFromString on String {
-  SortOrder toSortOrder() {
-    switch (this) {
-      case 'Ascending':
-        return SortOrder.ascending;
-      case 'Descending':
-        return SortOrder.descending;
-    }
-    throw Exception('$this is not known in enum SortOrder');
-  }
+  const SortOrder(this.value);
+
+  static SortOrder fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum SortOrder'));
 }
 
 class StartHumanLoopResponse {

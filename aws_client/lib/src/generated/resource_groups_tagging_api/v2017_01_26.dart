@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -186,8 +187,7 @@ class ResourceGroupsTaggingApi {
       // TODO queryParams
       headers: headers,
       payload: {
-        if (groupBy != null)
-          'GroupBy': groupBy.map((e) => e.toValue()).toList(),
+        if (groupBy != null) 'GroupBy': groupBy.map((e) => e.value).toList(),
         if (maxResults != null) 'MaxResults': maxResults,
         if (paginationToken != null) 'PaginationToken': paginationToken,
         if (regionFilters != null) 'RegionFilters': regionFilters,
@@ -735,11 +735,11 @@ class ComplianceDetails {
     return ComplianceDetails(
       complianceStatus: json['ComplianceStatus'] as bool?,
       keysWithNoncompliantValues: (json['KeysWithNoncompliantValues'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       noncompliantKeys: (json['NoncompliantKeys'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -815,31 +815,17 @@ class DescribeReportCreationOutput {
 }
 
 enum ErrorCode {
-  internalServiceException,
-  invalidParameterException,
-}
+  internalServiceException('InternalServiceException'),
+  invalidParameterException('InvalidParameterException'),
+  ;
 
-extension ErrorCodeValueExtension on ErrorCode {
-  String toValue() {
-    switch (this) {
-      case ErrorCode.internalServiceException:
-        return 'InternalServiceException';
-      case ErrorCode.invalidParameterException:
-        return 'InvalidParameterException';
-    }
-  }
-}
+  final String value;
 
-extension ErrorCodeFromString on String {
-  ErrorCode toErrorCode() {
-    switch (this) {
-      case 'InternalServiceException':
-        return ErrorCode.internalServiceException;
-      case 'InvalidParameterException':
-        return ErrorCode.invalidParameterException;
-    }
-    throw Exception('$this is not known in enum ErrorCode');
-  }
+  const ErrorCode(this.value);
+
+  static ErrorCode fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum ErrorCode'));
 }
 
 /// Information about the errors that are returned for each failed resource.
@@ -896,7 +882,7 @@ class FailureInfo {
 
   factory FailureInfo.fromJson(Map<String, dynamic> json) {
     return FailureInfo(
-      errorCode: (json['ErrorCode'] as String?)?.toErrorCode(),
+      errorCode: (json['ErrorCode'] as String?)?.let(ErrorCode.fromString),
       errorMessage: json['ErrorMessage'] as String?,
       statusCode: json['StatusCode'] as int?,
     );
@@ -907,7 +893,7 @@ class FailureInfo {
     final errorMessage = this.errorMessage;
     final statusCode = this.statusCode;
     return {
-      if (errorCode != null) 'ErrorCode': errorCode.toValue(),
+      if (errorCode != null) 'ErrorCode': errorCode.value,
       if (errorMessage != null) 'ErrorMessage': errorMessage,
       if (statusCode != null) 'StatusCode': statusCode,
     };
@@ -933,7 +919,7 @@ class GetComplianceSummaryOutput {
     return GetComplianceSummaryOutput(
       paginationToken: json['PaginationToken'] as String?,
       summaryList: (json['SummaryList'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Summary.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -968,7 +954,7 @@ class GetResourcesOutput {
     return GetResourcesOutput(
       paginationToken: json['PaginationToken'] as String?,
       resourceTagMappingList: (json['ResourceTagMappingList'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ResourceTagMapping.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -1003,10 +989,8 @@ class GetTagKeysOutput {
   factory GetTagKeysOutput.fromJson(Map<String, dynamic> json) {
     return GetTagKeysOutput(
       paginationToken: json['PaginationToken'] as String?,
-      tagKeys: (json['TagKeys'] as List?)
-          ?.whereNotNull()
-          .map((e) => e as String)
-          .toList(),
+      tagKeys:
+          (json['TagKeys'] as List?)?.nonNulls.map((e) => e as String).toList(),
     );
   }
 
@@ -1040,7 +1024,7 @@ class GetTagValuesOutput {
     return GetTagValuesOutput(
       paginationToken: json['PaginationToken'] as String?,
       tagValues: (json['TagValues'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -1057,36 +1041,19 @@ class GetTagValuesOutput {
 }
 
 enum GroupByAttribute {
-  targetId,
-  region,
-  resourceType,
-}
+  targetId('TARGET_ID'),
+  region('REGION'),
+  resourceType('RESOURCE_TYPE'),
+  ;
 
-extension GroupByAttributeValueExtension on GroupByAttribute {
-  String toValue() {
-    switch (this) {
-      case GroupByAttribute.targetId:
-        return 'TARGET_ID';
-      case GroupByAttribute.region:
-        return 'REGION';
-      case GroupByAttribute.resourceType:
-        return 'RESOURCE_TYPE';
-    }
-  }
-}
+  final String value;
 
-extension GroupByAttributeFromString on String {
-  GroupByAttribute toGroupByAttribute() {
-    switch (this) {
-      case 'TARGET_ID':
-        return GroupByAttribute.targetId;
-      case 'REGION':
-        return GroupByAttribute.region;
-      case 'RESOURCE_TYPE':
-        return GroupByAttribute.resourceType;
-    }
-    throw Exception('$this is not known in enum GroupByAttribute');
-  }
+  const GroupByAttribute(this.value);
+
+  static GroupByAttribute fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum GroupByAttribute'));
 }
 
 /// A list of resource ARNs and the tags (keys and values) that are associated
@@ -1117,7 +1084,7 @@ class ResourceTagMapping {
           : null,
       resourceARN: json['ResourceARN'] as String?,
       tags: (json['Tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -1186,7 +1153,8 @@ class Summary {
       region: json['Region'] as String?,
       resourceType: json['ResourceType'] as String?,
       targetId: json['TargetId'] as String?,
-      targetIdType: (json['TargetIdType'] as String?)?.toTargetIdType(),
+      targetIdType:
+          (json['TargetIdType'] as String?)?.let(TargetIdType.fromString),
     );
   }
 
@@ -1204,7 +1172,7 @@ class Summary {
       if (region != null) 'Region': region,
       if (resourceType != null) 'ResourceType': resourceType,
       if (targetId != null) 'TargetId': targetId,
-      if (targetIdType != null) 'TargetIdType': targetIdType.toValue(),
+      if (targetIdType != null) 'TargetIdType': targetIdType.value,
     };
   }
 }
@@ -1301,36 +1269,19 @@ class TagResourcesOutput {
 }
 
 enum TargetIdType {
-  account,
-  ou,
-  root,
-}
+  account('ACCOUNT'),
+  ou('OU'),
+  root('ROOT'),
+  ;
 
-extension TargetIdTypeValueExtension on TargetIdType {
-  String toValue() {
-    switch (this) {
-      case TargetIdType.account:
-        return 'ACCOUNT';
-      case TargetIdType.ou:
-        return 'OU';
-      case TargetIdType.root:
-        return 'ROOT';
-    }
-  }
-}
+  final String value;
 
-extension TargetIdTypeFromString on String {
-  TargetIdType toTargetIdType() {
-    switch (this) {
-      case 'ACCOUNT':
-        return TargetIdType.account;
-      case 'OU':
-        return TargetIdType.ou;
-      case 'ROOT':
-        return TargetIdType.root;
-    }
-    throw Exception('$this is not known in enum TargetIdType');
-  }
+  const TargetIdType(this.value);
+
+  static TargetIdType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum TargetIdType'));
 }
 
 class UntagResourcesOutput {

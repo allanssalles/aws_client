@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -168,6 +169,8 @@ class Ecr {
   /// May throw [ServerException].
   /// May throw [InvalidParameterException].
   /// May throw [RepositoryNotFoundException].
+  /// May throw [LimitExceededException].
+  /// May throw [UnableToGetUpstreamImageException].
   ///
   /// Parameter [imageIds] :
   /// A list of image ID references that correspond to images to describe. The
@@ -315,8 +318,11 @@ class Ecr {
   }
 
   /// Creates a pull through cache rule. A pull through cache rule provides a
-  /// way to cache images from an external public registry in your Amazon ECR
-  /// private registry.
+  /// way to cache images from an upstream registry source in your Amazon ECR
+  /// private registry. For more information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/pull-through-cache.html">Using
+  /// pull through cache rules</a> in the <i>Amazon Elastic Container Registry
+  /// User Guide</i>.
   ///
   /// May throw [ServerException].
   /// May throw [InvalidParameterException].
@@ -324,6 +330,9 @@ class Ecr {
   /// May throw [PullThroughCacheRuleAlreadyExistsException].
   /// May throw [UnsupportedUpstreamRegistryException].
   /// May throw [LimitExceededException].
+  /// May throw [UnableToAccessSecretException].
+  /// May throw [SecretNotFoundException].
+  /// May throw [UnableToDecryptSecretValueException].
   ///
   /// Parameter [ecrRepositoryPrefix] :
   /// The repository name prefix to use when caching images from the source
@@ -331,16 +340,50 @@ class Ecr {
   ///
   /// Parameter [upstreamRegistryUrl] :
   /// The registry URL of the upstream public registry to use as the source for
-  /// the pull through cache rule.
+  /// the pull through cache rule. The following is the syntax to use for each
+  /// supported upstream registry.
+  ///
+  /// <ul>
+  /// <li>
+  /// Amazon ECR Public (<code>ecr-public</code>) - <code>public.ecr.aws</code>
+  /// </li>
+  /// <li>
+  /// Docker Hub (<code>docker-hub</code>) - <code>registry-1.docker.io</code>
+  /// </li>
+  /// <li>
+  /// Quay (<code>quay</code>) - <code>quay.io</code>
+  /// </li>
+  /// <li>
+  /// Kubernetes (<code>k8s</code>) - <code>registry.k8s.io</code>
+  /// </li>
+  /// <li>
+  /// GitHub Container Registry (<code>github-container-registry</code>) -
+  /// <code>ghcr.io</code>
+  /// </li>
+  /// <li>
+  /// Microsoft Azure Container Registry (<code>azure-container-registry</code>)
+  /// - <code>&lt;custom&gt;.azurecr.io</code>
+  /// </li>
+  /// </ul>
+  ///
+  /// Parameter [credentialArn] :
+  /// The Amazon Resource Name (ARN) of the Amazon Web Services Secrets Manager
+  /// secret that identifies the credentials to authenticate to the upstream
+  /// registry.
   ///
   /// Parameter [registryId] :
   /// The Amazon Web Services account ID associated with the registry to create
   /// the pull through cache rule for. If you do not specify a registry, the
   /// default registry is assumed.
+  ///
+  /// Parameter [upstreamRegistry] :
+  /// The name of the upstream registry.
   Future<CreatePullThroughCacheRuleResponse> createPullThroughCacheRule({
     required String ecrRepositoryPrefix,
     required String upstreamRegistryUrl,
+    String? credentialArn,
     String? registryId,
+    UpstreamRegistry? upstreamRegistry,
   }) async {
     final headers = <String, String>{
       'Content-Type': 'application/x-amz-json-1.1',
@@ -356,7 +399,10 @@ class Ecr {
       payload: {
         'ecrRepositoryPrefix': ecrRepositoryPrefix,
         'upstreamRegistryUrl': upstreamRegistryUrl,
+        if (credentialArn != null) 'credentialArn': credentialArn,
         if (registryId != null) 'registryId': registryId,
+        if (upstreamRegistry != null)
+          'upstreamRegistry': upstreamRegistry.value,
       },
     );
 
@@ -381,6 +427,9 @@ class Ecr {
   /// on its own (such as <code>nginx-web-app</code>) or it can be prepended
   /// with a namespace to group the repository into a category (such as
   /// <code>project-a/nginx-web-app</code>).
+  ///
+  /// The repository name must start with a letter and can only contain
+  /// lowercase letters, numbers, hyphens, underscores, and forward slashes.
   ///
   /// Parameter [encryptionConfiguration] :
   /// The encryption configuration for the repository. This determines how the
@@ -433,7 +482,7 @@ class Ecr {
         if (imageScanningConfiguration != null)
           'imageScanningConfiguration': imageScanningConfiguration,
         if (imageTagMutability != null)
-          'imageTagMutability': imageTagMutability.toValue(),
+          'imageTagMutability': imageTagMutability.value,
         if (registryId != null) 'registryId': registryId,
         if (tags != null) 'tags': tags,
       },
@@ -442,12 +491,128 @@ class Ecr {
     return CreateRepositoryResponse.fromJson(jsonResponse.body);
   }
 
+  /// Creates a repository creation template. This template is used to define
+  /// the settings for repositories created by Amazon ECR on your behalf. For
+  /// example, repositories created through pull through cache actions. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/repository-creation-templates.html">Private
+  /// repository creation templates</a> in the <i>Amazon Elastic Container
+  /// Registry User Guide</i>.
+  ///
+  /// May throw [ServerException].
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterException].
+  /// May throw [LimitExceededException].
+  /// May throw [TemplateAlreadyExistsException].
+  ///
+  /// Parameter [appliedFor] :
+  /// A list of enumerable strings representing the Amazon ECR repository
+  /// creation scenarios that this template will apply towards. The two
+  /// supported scenarios are <code>PULL_THROUGH_CACHE</code> and
+  /// <code>REPLICATION</code>
+  ///
+  /// Parameter [prefix] :
+  /// The repository namespace prefix to associate with the template. All
+  /// repositories created using this namespace prefix will have the settings
+  /// defined in this template applied. For example, a prefix of
+  /// <code>prod</code> would apply to all repositories beginning with
+  /// <code>prod/</code>. Similarly, a prefix of <code>prod/team</code> would
+  /// apply to all repositories beginning with <code>prod/team/</code>.
+  ///
+  /// To apply a template to all repositories in your registry that don't have
+  /// an associated creation template, you can use <code>ROOT</code> as the
+  /// prefix.
+  /// <important>
+  /// There is always an assumed <code>/</code> applied to the end of the
+  /// prefix. If you specify <code>ecr-public</code> as the prefix, Amazon ECR
+  /// treats that as <code>ecr-public/</code>. When using a pull through cache
+  /// rule, the repository prefix you specify during rule creation is what you
+  /// should specify as your repository creation template prefix as well.
+  /// </important>
+  ///
+  /// Parameter [customRoleArn] :
+  /// The ARN of the role to be assumed by Amazon ECR. This role must be in the
+  /// same account as the registry that you are configuring. Amazon ECR will
+  /// assume your supplied role when the customRoleArn is specified. When this
+  /// field isn't specified, Amazon ECR will use the service-linked role for the
+  /// repository creation template.
+  ///
+  /// Parameter [description] :
+  /// A description for the repository creation template.
+  ///
+  /// Parameter [encryptionConfiguration] :
+  /// The encryption configuration to use for repositories created using the
+  /// template.
+  ///
+  /// Parameter [imageTagMutability] :
+  /// The tag mutability setting for the repository. If this parameter is
+  /// omitted, the default setting of <code>MUTABLE</code> will be used which
+  /// will allow image tags to be overwritten. If <code>IMMUTABLE</code> is
+  /// specified, all image tags within the repository will be immutable which
+  /// will prevent them from being overwritten.
+  ///
+  /// Parameter [lifecyclePolicy] :
+  /// The lifecycle policy to use for repositories created using the template.
+  ///
+  /// Parameter [repositoryPolicy] :
+  /// The repository policy to apply to repositories created using the template.
+  /// A repository policy is a permissions policy associated with a repository
+  /// to control access permissions.
+  ///
+  /// Parameter [resourceTags] :
+  /// The metadata to apply to the repository to help you categorize and
+  /// organize. Each tag consists of a key and an optional value, both of which
+  /// you define. Tag keys can have a maximum character length of 128
+  /// characters, and tag values can have a maximum length of 256 characters.
+  Future<CreateRepositoryCreationTemplateResponse>
+      createRepositoryCreationTemplate({
+    required List<RCTAppliedFor> appliedFor,
+    required String prefix,
+    String? customRoleArn,
+    String? description,
+    EncryptionConfigurationForRepositoryCreationTemplate?
+        encryptionConfiguration,
+    ImageTagMutability? imageTagMutability,
+    String? lifecyclePolicy,
+    String? repositoryPolicy,
+    List<Tag>? resourceTags,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AmazonEC2ContainerRegistry_V20150921.CreateRepositoryCreationTemplate'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'appliedFor': appliedFor.map((e) => e.value).toList(),
+        'prefix': prefix,
+        if (customRoleArn != null) 'customRoleArn': customRoleArn,
+        if (description != null) 'description': description,
+        if (encryptionConfiguration != null)
+          'encryptionConfiguration': encryptionConfiguration,
+        if (imageTagMutability != null)
+          'imageTagMutability': imageTagMutability.value,
+        if (lifecyclePolicy != null) 'lifecyclePolicy': lifecyclePolicy,
+        if (repositoryPolicy != null) 'repositoryPolicy': repositoryPolicy,
+        if (resourceTags != null) 'resourceTags': resourceTags,
+      },
+    );
+
+    return CreateRepositoryCreationTemplateResponse.fromJson(jsonResponse.body);
+  }
+
   /// Deletes the lifecycle policy associated with the specified repository.
   ///
   /// May throw [ServerException].
   /// May throw [InvalidParameterException].
   /// May throw [RepositoryNotFoundException].
   /// May throw [LifecyclePolicyNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [repositoryName] :
   /// The name of the repository.
@@ -542,9 +707,10 @@ class Ecr {
     return DeleteRegistryPolicyResponse.fromJson(jsonResponse.body);
   }
 
-  /// Deletes a repository. If the repository contains images, you must either
-  /// delete all images in the repository or use the <code>force</code> option
-  /// to delete the repository.
+  /// Deletes a repository. If the repository isn't empty, you must either
+  /// delete the contents of the repository or use the <code>force</code> option
+  /// to delete the repository and have Amazon ECR delete all of its contents on
+  /// your behalf.
   ///
   /// May throw [ServerException].
   /// May throw [InvalidParameterException].
@@ -556,7 +722,9 @@ class Ecr {
   /// The name of the repository to delete.
   ///
   /// Parameter [force] :
-  /// If a repository contains images, forces the deletion.
+  /// If true, deleting the repository force deletes the contents of the
+  /// repository. If false, the repository must be empty before attempting to
+  /// delete it.
   ///
   /// Parameter [registryId] :
   /// The Amazon Web Services account ID associated with the registry that
@@ -585,6 +753,39 @@ class Ecr {
     );
 
     return DeleteRepositoryResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Deletes a repository creation template.
+  ///
+  /// May throw [ServerException].
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterException].
+  /// May throw [TemplateNotFoundException].
+  ///
+  /// Parameter [prefix] :
+  /// The repository namespace prefix associated with the repository creation
+  /// template.
+  Future<DeleteRepositoryCreationTemplateResponse>
+      deleteRepositoryCreationTemplate({
+    required String prefix,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AmazonEC2ContainerRegistry_V20150921.DeleteRepositoryCreationTemplate'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'prefix': prefix,
+      },
+    );
+
+    return DeleteRepositoryCreationTemplateResponse.fromJson(jsonResponse.body);
   }
 
   /// Deletes the repository policy associated with the specified repository.
@@ -997,6 +1198,107 @@ class Ecr {
     return DescribeRepositoriesResponse.fromJson(jsonResponse.body);
   }
 
+  /// Returns details about the repository creation templates in a registry. The
+  /// <code>prefixes</code> request parameter can be used to return the details
+  /// for a specific repository creation template.
+  ///
+  /// May throw [ServerException].
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterException].
+  ///
+  /// Parameter [maxResults] :
+  /// The maximum number of repository results returned by
+  /// <code>DescribeRepositoryCreationTemplatesRequest</code> in paginated
+  /// output. When this parameter is used,
+  /// <code>DescribeRepositoryCreationTemplatesRequest</code> only returns
+  /// <code>maxResults</code> results in a single page along with a
+  /// <code>nextToken</code> response element. The remaining results of the
+  /// initial request can be seen by sending another
+  /// <code>DescribeRepositoryCreationTemplatesRequest</code> request with the
+  /// returned <code>nextToken</code> value. This value can be between 1 and
+  /// 1000. If this parameter is not used, then
+  /// <code>DescribeRepositoryCreationTemplatesRequest</code> returns up to 100
+  /// results and a <code>nextToken</code> value, if applicable.
+  ///
+  /// Parameter [nextToken] :
+  /// The <code>nextToken</code> value returned from a previous paginated
+  /// <code>DescribeRepositoryCreationTemplates</code> request where
+  /// <code>maxResults</code> was used and the results exceeded the value of
+  /// that parameter. Pagination continues from the end of the previous results
+  /// that returned the <code>nextToken</code> value. This value is
+  /// <code>null</code> when there are no more results to return.
+  /// <note>
+  /// This token should be treated as an opaque identifier that is only used to
+  /// retrieve the next items in a list and not for other programmatic purposes.
+  /// </note>
+  ///
+  /// Parameter [prefixes] :
+  /// The repository namespace prefixes associated with the repository creation
+  /// templates to describe. If this value is not specified, all repository
+  /// creation templates are returned.
+  Future<DescribeRepositoryCreationTemplatesResponse>
+      describeRepositoryCreationTemplates({
+    int? maxResults,
+    String? nextToken,
+    List<String>? prefixes,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      1000,
+    );
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AmazonEC2ContainerRegistry_V20150921.DescribeRepositoryCreationTemplates'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        if (maxResults != null) 'maxResults': maxResults,
+        if (nextToken != null) 'nextToken': nextToken,
+        if (prefixes != null) 'prefixes': prefixes,
+      },
+    );
+
+    return DescribeRepositoryCreationTemplatesResponse.fromJson(
+        jsonResponse.body);
+  }
+
+  /// Retrieves the basic scan type version name.
+  ///
+  /// May throw [ServerException].
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterException].
+  ///
+  /// Parameter [name] :
+  /// Basic scan type version name.
+  Future<GetAccountSettingResponse> getAccountSetting({
+    required String name,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonEC2ContainerRegistry_V20150921.GetAccountSetting'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'name': name,
+      },
+    );
+
+    return GetAccountSettingResponse.fromJson(jsonResponse.body);
+  }
+
   /// Retrieves an authorization token. An authorization token represents your
   /// IAM authentication credentials and can be used to access any Amazon ECR
   /// registry that your IAM principal has access to. The authorization token is
@@ -1057,6 +1359,7 @@ class Ecr {
   /// May throw [LayersNotFoundException].
   /// May throw [LayerInaccessibleException].
   /// May throw [RepositoryNotFoundException].
+  /// May throw [UnableToGetUpstreamLayerException].
   ///
   /// Parameter [layerDigest] :
   /// The digest of the image layer to download.
@@ -1101,6 +1404,7 @@ class Ecr {
   /// May throw [InvalidParameterException].
   /// May throw [RepositoryNotFoundException].
   /// May throw [LifecyclePolicyNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [repositoryName] :
   /// The name of the repository.
@@ -1139,6 +1443,7 @@ class Ecr {
   /// May throw [InvalidParameterException].
   /// May throw [RepositoryNotFoundException].
   /// May throw [LifecyclePolicyPreviewNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [repositoryName] :
   /// The name of the repository.
@@ -1459,6 +1764,44 @@ class Ecr {
     return ListTagsForResourceResponse.fromJson(jsonResponse.body);
   }
 
+  /// Allows you to change the basic scan type version by setting the
+  /// <code>name</code> parameter to either <code>CLAIR</code> to
+  /// <code>AWS_NATIVE</code>.
+  ///
+  /// May throw [ServerException].
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterException].
+  /// May throw [LimitExceededException].
+  ///
+  /// Parameter [name] :
+  /// Basic scan type version name.
+  ///
+  /// Parameter [value] :
+  /// Setting value that determines what basic scan type is being used:
+  /// <code>AWS_NATIVE</code> or <code>CLAIR</code>.
+  Future<PutAccountSettingResponse> putAccountSetting({
+    required String name,
+    required String value,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target': 'AmazonEC2ContainerRegistry_V20150921.PutAccountSetting'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'name': name,
+        'value': value,
+      },
+    );
+
+    return PutAccountSettingResponse.fromJson(jsonResponse.body);
+  }
+
   /// Creates or updates the image manifest and tags associated with an image.
   ///
   /// When an image is pushed and all new image layers have been uploaded, the
@@ -1630,7 +1973,7 @@ class Ecr {
       // TODO queryParams
       headers: headers,
       payload: {
-        'imageTagMutability': imageTagMutability.toValue(),
+        'imageTagMutability': imageTagMutability.value,
         'repositoryName': repositoryName,
         if (registryId != null) 'registryId': registryId,
       },
@@ -1647,6 +1990,7 @@ class Ecr {
   /// May throw [ServerException].
   /// May throw [InvalidParameterException].
   /// May throw [RepositoryNotFoundException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [lifecyclePolicyText] :
   /// The JSON repository policy text to apply to the repository.
@@ -1766,7 +2110,7 @@ class Ecr {
       headers: headers,
       payload: {
         if (rules != null) 'rules': rules,
-        if (scanType != null) 'scanType': scanType.toValue(),
+        if (scanType != null) 'scanType': scanType.value,
       },
     );
 
@@ -1781,7 +2125,10 @@ class Ecr {
   /// see <a
   /// href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/using-service-linked-roles.html">Using
   /// service-linked roles for Amazon ECR</a> in the <i>Amazon Elastic Container
-  /// Registry User Guide</i>.
+  /// Registry User Guide</i>. For more information on the custom role for
+  /// replication, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/replication-creation-templates.html#roles-creatingrole-user-console">Creating
+  /// an IAM role for replication</a>.
   /// <note>
   /// When configuring cross-account replication, the destination account must
   /// grant the source account permission to replicate. This permission is
@@ -1929,6 +2276,7 @@ class Ecr {
   /// May throw [RepositoryNotFoundException].
   /// May throw [LifecyclePolicyNotFoundException].
   /// May throw [LifecyclePolicyPreviewInProgressException].
+  /// May throw [ValidationException].
   ///
   /// Parameter [repositoryName] :
   /// The name of the repository to be evaluated.
@@ -2042,6 +2390,155 @@ class Ecr {
     );
   }
 
+  /// Updates an existing pull through cache rule.
+  ///
+  /// May throw [ServerException].
+  /// May throw [InvalidParameterException].
+  /// May throw [ValidationException].
+  /// May throw [UnableToAccessSecretException].
+  /// May throw [PullThroughCacheRuleNotFoundException].
+  /// May throw [SecretNotFoundException].
+  /// May throw [UnableToDecryptSecretValueException].
+  ///
+  /// Parameter [credentialArn] :
+  /// The Amazon Resource Name (ARN) of the Amazon Web Services Secrets Manager
+  /// secret that identifies the credentials to authenticate to the upstream
+  /// registry.
+  ///
+  /// Parameter [ecrRepositoryPrefix] :
+  /// The repository name prefix to use when caching images from the source
+  /// registry.
+  ///
+  /// Parameter [registryId] :
+  /// The Amazon Web Services account ID associated with the registry associated
+  /// with the pull through cache rule. If you do not specify a registry, the
+  /// default registry is assumed.
+  Future<UpdatePullThroughCacheRuleResponse> updatePullThroughCacheRule({
+    required String credentialArn,
+    required String ecrRepositoryPrefix,
+    String? registryId,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AmazonEC2ContainerRegistry_V20150921.UpdatePullThroughCacheRule'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'credentialArn': credentialArn,
+        'ecrRepositoryPrefix': ecrRepositoryPrefix,
+        if (registryId != null) 'registryId': registryId,
+      },
+    );
+
+    return UpdatePullThroughCacheRuleResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Updates an existing repository creation template.
+  ///
+  /// May throw [ServerException].
+  /// May throw [ValidationException].
+  /// May throw [InvalidParameterException].
+  /// May throw [TemplateNotFoundException].
+  ///
+  /// Parameter [prefix] :
+  /// The repository namespace prefix that matches an existing repository
+  /// creation template in the registry. All repositories created using this
+  /// namespace prefix will have the settings defined in this template applied.
+  /// For example, a prefix of <code>prod</code> would apply to all repositories
+  /// beginning with <code>prod/</code>. This includes a repository named
+  /// <code>prod/team1</code> as well as a repository named
+  /// <code>prod/repository1</code>.
+  ///
+  /// To apply a template to all repositories in your registry that don't have
+  /// an associated creation template, you can use <code>ROOT</code> as the
+  /// prefix.
+  ///
+  /// Parameter [appliedFor] :
+  /// Updates the list of enumerable strings representing the Amazon ECR
+  /// repository creation scenarios that this template will apply towards. The
+  /// two supported scenarios are <code>PULL_THROUGH_CACHE</code> and
+  /// <code>REPLICATION</code>
+  ///
+  /// Parameter [customRoleArn] :
+  /// The ARN of the role to be assumed by Amazon ECR. This role must be in the
+  /// same account as the registry that you are configuring. Amazon ECR will
+  /// assume your supplied role when the customRoleArn is specified. When this
+  /// field isn't specified, Amazon ECR will use the service-linked role for the
+  /// repository creation template.
+  ///
+  /// Parameter [description] :
+  /// A description for the repository creation template.
+  ///
+  /// Parameter [imageTagMutability] :
+  /// Updates the tag mutability setting for the repository. If this parameter
+  /// is omitted, the default setting of <code>MUTABLE</code> will be used which
+  /// will allow image tags to be overwritten. If <code>IMMUTABLE</code> is
+  /// specified, all image tags within the repository will be immutable which
+  /// will prevent them from being overwritten.
+  ///
+  /// Parameter [lifecyclePolicy] :
+  /// Updates the lifecycle policy associated with the specified repository
+  /// creation template.
+  ///
+  /// Parameter [repositoryPolicy] :
+  /// Updates the repository policy created using the template. A repository
+  /// policy is a permissions policy associated with a repository to control
+  /// access permissions.
+  ///
+  /// Parameter [resourceTags] :
+  /// The metadata to apply to the repository to help you categorize and
+  /// organize. Each tag consists of a key and an optional value, both of which
+  /// you define. Tag keys can have a maximum character length of 128
+  /// characters, and tag values can have a maximum length of 256 characters.
+  Future<UpdateRepositoryCreationTemplateResponse>
+      updateRepositoryCreationTemplate({
+    required String prefix,
+    List<RCTAppliedFor>? appliedFor,
+    String? customRoleArn,
+    String? description,
+    EncryptionConfigurationForRepositoryCreationTemplate?
+        encryptionConfiguration,
+    ImageTagMutability? imageTagMutability,
+    String? lifecyclePolicy,
+    String? repositoryPolicy,
+    List<Tag>? resourceTags,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AmazonEC2ContainerRegistry_V20150921.UpdateRepositoryCreationTemplate'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'prefix': prefix,
+        if (appliedFor != null)
+          'appliedFor': appliedFor.map((e) => e.value).toList(),
+        if (customRoleArn != null) 'customRoleArn': customRoleArn,
+        if (description != null) 'description': description,
+        if (encryptionConfiguration != null)
+          'encryptionConfiguration': encryptionConfiguration,
+        if (imageTagMutability != null)
+          'imageTagMutability': imageTagMutability.value,
+        if (lifecyclePolicy != null) 'lifecyclePolicy': lifecyclePolicy,
+        if (repositoryPolicy != null) 'repositoryPolicy': repositoryPolicy,
+        if (resourceTags != null) 'resourceTags': resourceTags,
+      },
+    );
+
+    return UpdateRepositoryCreationTemplateResponse.fromJson(jsonResponse.body);
+  }
+
   /// Uploads an image layer part to Amazon ECR.
   ///
   /// When an image is pushed, each new image layer is uploaded in parts. The
@@ -2127,6 +2624,46 @@ class Ecr {
     );
 
     return UploadLayerPartResponse.fromJson(jsonResponse.body);
+  }
+
+  /// Validates an existing pull through cache rule for an upstream registry
+  /// that requires authentication. This will retrieve the contents of the
+  /// Amazon Web Services Secrets Manager secret, verify the syntax, and then
+  /// validate that authentication to the upstream registry is successful.
+  ///
+  /// May throw [ServerException].
+  /// May throw [InvalidParameterException].
+  /// May throw [ValidationException].
+  /// May throw [PullThroughCacheRuleNotFoundException].
+  ///
+  /// Parameter [ecrRepositoryPrefix] :
+  /// The repository name prefix associated with the pull through cache rule.
+  ///
+  /// Parameter [registryId] :
+  /// The registry ID associated with the pull through cache rule. If you do not
+  /// specify a registry, the default registry is assumed.
+  Future<ValidatePullThroughCacheRuleResponse> validatePullThroughCacheRule({
+    required String ecrRepositoryPrefix,
+    String? registryId,
+  }) async {
+    final headers = <String, String>{
+      'Content-Type': 'application/x-amz-json-1.1',
+      'X-Amz-Target':
+          'AmazonEC2ContainerRegistry_V20150921.ValidatePullThroughCacheRule'
+    };
+    final jsonResponse = await _protocol.send(
+      method: 'POST',
+      requestUri: '/',
+      exceptionFnMap: _exceptionFns,
+      // TODO queryParams
+      headers: headers,
+      payload: {
+        'ecrRepositoryPrefix': ecrRepositoryPrefix,
+        if (registryId != null) 'registryId': registryId,
+      },
+    );
+
+    return ValidatePullThroughCacheRuleResponse.fromJson(jsonResponse.body);
   }
 }
 
@@ -2247,7 +2784,7 @@ class AwsEcrContainerImageDetails {
       author: json['author'] as String?,
       imageHash: json['imageHash'] as String?,
       imageTags: (json['imageTags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       platform: json['platform'] as String?,
@@ -2296,11 +2833,11 @@ class BatchCheckLayerAvailabilityResponse {
       Map<String, dynamic> json) {
     return BatchCheckLayerAvailabilityResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => LayerFailure.fromJson(e as Map<String, dynamic>))
           .toList(),
       layers: (json['layers'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Layer.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -2331,11 +2868,11 @@ class BatchDeleteImageResponse {
   factory BatchDeleteImageResponse.fromJson(Map<String, dynamic> json) {
     return BatchDeleteImageResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ImageFailure.fromJson(e as Map<String, dynamic>))
           .toList(),
       imageIds: (json['imageIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ImageIdentifier.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -2367,11 +2904,11 @@ class BatchGetImageResponse {
   factory BatchGetImageResponse.fromJson(Map<String, dynamic> json) {
     return BatchGetImageResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ImageFailure.fromJson(e as Map<String, dynamic>))
           .toList(),
       images: (json['images'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Image.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -2403,12 +2940,12 @@ class BatchGetRepositoryScanningConfigurationResponse {
       Map<String, dynamic> json) {
     return BatchGetRepositoryScanningConfigurationResponse(
       failures: (json['failures'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => RepositoryScanningConfigurationFailure.fromJson(
               e as Map<String, dynamic>))
           .toList(),
       scanningConfigurations: (json['scanningConfigurations'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => RepositoryScanningConfiguration.fromJson(
               e as Map<String, dynamic>))
           .toList(),
@@ -2474,6 +3011,10 @@ class CreatePullThroughCacheRuleResponse {
   /// rule was created.
   final DateTime? createdAt;
 
+  /// The Amazon Resource Name (ARN) of the Amazon Web Services Secrets Manager
+  /// secret associated with the pull through cache rule.
+  final String? credentialArn;
+
   /// The Amazon ECR repository prefix associated with the pull through cache
   /// rule.
   final String? ecrRepositoryPrefix;
@@ -2481,13 +3022,19 @@ class CreatePullThroughCacheRuleResponse {
   /// The registry ID associated with the request.
   final String? registryId;
 
+  /// The name of the upstream registry associated with the pull through cache
+  /// rule.
+  final UpstreamRegistry? upstreamRegistry;
+
   /// The upstream registry URL associated with the pull through cache rule.
   final String? upstreamRegistryUrl;
 
   CreatePullThroughCacheRuleResponse({
     this.createdAt,
+    this.credentialArn,
     this.ecrRepositoryPrefix,
     this.registryId,
+    this.upstreamRegistry,
     this.upstreamRegistryUrl,
   });
 
@@ -2495,24 +3042,65 @@ class CreatePullThroughCacheRuleResponse {
       Map<String, dynamic> json) {
     return CreatePullThroughCacheRuleResponse(
       createdAt: timeStampFromJson(json['createdAt']),
+      credentialArn: json['credentialArn'] as String?,
       ecrRepositoryPrefix: json['ecrRepositoryPrefix'] as String?,
       registryId: json['registryId'] as String?,
+      upstreamRegistry: (json['upstreamRegistry'] as String?)
+          ?.let(UpstreamRegistry.fromString),
       upstreamRegistryUrl: json['upstreamRegistryUrl'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final createdAt = this.createdAt;
+    final credentialArn = this.credentialArn;
     final ecrRepositoryPrefix = this.ecrRepositoryPrefix;
     final registryId = this.registryId;
+    final upstreamRegistry = this.upstreamRegistry;
     final upstreamRegistryUrl = this.upstreamRegistryUrl;
     return {
       if (createdAt != null) 'createdAt': unixTimestampToJson(createdAt),
+      if (credentialArn != null) 'credentialArn': credentialArn,
       if (ecrRepositoryPrefix != null)
         'ecrRepositoryPrefix': ecrRepositoryPrefix,
       if (registryId != null) 'registryId': registryId,
+      if (upstreamRegistry != null) 'upstreamRegistry': upstreamRegistry.value,
       if (upstreamRegistryUrl != null)
         'upstreamRegistryUrl': upstreamRegistryUrl,
+    };
+  }
+}
+
+class CreateRepositoryCreationTemplateResponse {
+  /// The registry ID associated with the request.
+  final String? registryId;
+
+  /// The details of the repository creation template associated with the request.
+  final RepositoryCreationTemplate? repositoryCreationTemplate;
+
+  CreateRepositoryCreationTemplateResponse({
+    this.registryId,
+    this.repositoryCreationTemplate,
+  });
+
+  factory CreateRepositoryCreationTemplateResponse.fromJson(
+      Map<String, dynamic> json) {
+    return CreateRepositoryCreationTemplateResponse(
+      registryId: json['registryId'] as String?,
+      repositoryCreationTemplate: json['repositoryCreationTemplate'] != null
+          ? RepositoryCreationTemplate.fromJson(
+              json['repositoryCreationTemplate'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final registryId = this.registryId;
+    final repositoryCreationTemplate = this.repositoryCreationTemplate;
+    return {
+      if (registryId != null) 'registryId': registryId,
+      if (repositoryCreationTemplate != null)
+        'repositoryCreationTemplate': repositoryCreationTemplate,
     };
   }
 }
@@ -2645,7 +3233,7 @@ class CvssScoreDetails {
   factory CvssScoreDetails.fromJson(Map<String, dynamic> json) {
     return CvssScoreDetails(
       adjustments: (json['adjustments'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => CvssScoreAdjustment.fromJson(e as Map<String, dynamic>))
           .toList(),
       score: json['score'] as double?,
@@ -2720,6 +3308,10 @@ class DeletePullThroughCacheRuleResponse {
   /// The timestamp associated with the pull through cache rule.
   final DateTime? createdAt;
 
+  /// The Amazon Resource Name (ARN) of the Amazon Web Services Secrets Manager
+  /// secret associated with the pull through cache rule.
+  final String? credentialArn;
+
   /// The Amazon ECR repository prefix associated with the request.
   final String? ecrRepositoryPrefix;
 
@@ -2731,6 +3323,7 @@ class DeletePullThroughCacheRuleResponse {
 
   DeletePullThroughCacheRuleResponse({
     this.createdAt,
+    this.credentialArn,
     this.ecrRepositoryPrefix,
     this.registryId,
     this.upstreamRegistryUrl,
@@ -2740,6 +3333,7 @@ class DeletePullThroughCacheRuleResponse {
       Map<String, dynamic> json) {
     return DeletePullThroughCacheRuleResponse(
       createdAt: timeStampFromJson(json['createdAt']),
+      credentialArn: json['credentialArn'] as String?,
       ecrRepositoryPrefix: json['ecrRepositoryPrefix'] as String?,
       registryId: json['registryId'] as String?,
       upstreamRegistryUrl: json['upstreamRegistryUrl'] as String?,
@@ -2748,11 +3342,13 @@ class DeletePullThroughCacheRuleResponse {
 
   Map<String, dynamic> toJson() {
     final createdAt = this.createdAt;
+    final credentialArn = this.credentialArn;
     final ecrRepositoryPrefix = this.ecrRepositoryPrefix;
     final registryId = this.registryId;
     final upstreamRegistryUrl = this.upstreamRegistryUrl;
     return {
       if (createdAt != null) 'createdAt': unixTimestampToJson(createdAt),
+      if (credentialArn != null) 'credentialArn': credentialArn,
       if (ecrRepositoryPrefix != null)
         'ecrRepositoryPrefix': ecrRepositoryPrefix,
       if (registryId != null) 'registryId': registryId,
@@ -2787,6 +3383,40 @@ class DeleteRegistryPolicyResponse {
     return {
       if (policyText != null) 'policyText': policyText,
       if (registryId != null) 'registryId': registryId,
+    };
+  }
+}
+
+class DeleteRepositoryCreationTemplateResponse {
+  /// The registry ID associated with the request.
+  final String? registryId;
+
+  /// The details of the repository creation template that was deleted.
+  final RepositoryCreationTemplate? repositoryCreationTemplate;
+
+  DeleteRepositoryCreationTemplateResponse({
+    this.registryId,
+    this.repositoryCreationTemplate,
+  });
+
+  factory DeleteRepositoryCreationTemplateResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DeleteRepositoryCreationTemplateResponse(
+      registryId: json['registryId'] as String?,
+      repositoryCreationTemplate: json['repositoryCreationTemplate'] != null
+          ? RepositoryCreationTemplate.fromJson(
+              json['repositoryCreationTemplate'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final registryId = this.registryId;
+    final repositoryCreationTemplate = this.repositoryCreationTemplate;
+    return {
+      if (registryId != null) 'registryId': registryId,
+      if (repositoryCreationTemplate != null)
+        'repositoryCreationTemplate': repositoryCreationTemplate,
     };
   }
 }
@@ -2873,7 +3503,7 @@ class DescribeImageReplicationStatusResponse {
           ? ImageIdentifier.fromJson(json['imageId'] as Map<String, dynamic>)
           : null,
       replicationStatuses: (json['replicationStatuses'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map(
               (e) => ImageReplicationStatus.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -2977,7 +3607,7 @@ class DescribeImagesFilter {
   Map<String, dynamic> toJson() {
     final tagStatus = this.tagStatus;
     return {
-      if (tagStatus != null) 'tagStatus': tagStatus.toValue(),
+      if (tagStatus != null) 'tagStatus': tagStatus.value,
     };
   }
 }
@@ -3001,7 +3631,7 @@ class DescribeImagesResponse {
   factory DescribeImagesResponse.fromJson(Map<String, dynamic> json) {
     return DescribeImagesResponse(
       imageDetails: (json['imageDetails'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ImageDetail.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -3039,7 +3669,7 @@ class DescribePullThroughCacheRulesResponse {
     return DescribePullThroughCacheRulesResponse(
       nextToken: json['nextToken'] as String?,
       pullThroughCacheRules: (json['pullThroughCacheRules'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => PullThroughCacheRule.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -3057,7 +3687,7 @@ class DescribePullThroughCacheRulesResponse {
 }
 
 class DescribeRegistryResponse {
-  /// The ID of the registry.
+  /// The registry ID associated with the request.
   final String? registryId;
 
   /// The replication configuration for the registry.
@@ -3109,7 +3739,7 @@ class DescribeRepositoriesResponse {
     return DescribeRepositoriesResponse(
       nextToken: json['nextToken'] as String?,
       repositories: (json['repositories'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Repository.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -3125,13 +3755,61 @@ class DescribeRepositoriesResponse {
   }
 }
 
+class DescribeRepositoryCreationTemplatesResponse {
+  /// The <code>nextToken</code> value to include in a future
+  /// <code>DescribeRepositoryCreationTemplates</code> request. When the results
+  /// of a <code>DescribeRepositoryCreationTemplates</code> request exceed
+  /// <code>maxResults</code>, this value can be used to retrieve the next page of
+  /// results. This value is <code>null</code> when there are no more results to
+  /// return.
+  final String? nextToken;
+
+  /// The registry ID associated with the request.
+  final String? registryId;
+
+  /// The details of the repository creation templates.
+  final List<RepositoryCreationTemplate>? repositoryCreationTemplates;
+
+  DescribeRepositoryCreationTemplatesResponse({
+    this.nextToken,
+    this.registryId,
+    this.repositoryCreationTemplates,
+  });
+
+  factory DescribeRepositoryCreationTemplatesResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DescribeRepositoryCreationTemplatesResponse(
+      nextToken: json['nextToken'] as String?,
+      registryId: json['registryId'] as String?,
+      repositoryCreationTemplates: (json['repositoryCreationTemplates']
+              as List?)
+          ?.nonNulls
+          .map((e) =>
+              RepositoryCreationTemplate.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final nextToken = this.nextToken;
+    final registryId = this.registryId;
+    final repositoryCreationTemplates = this.repositoryCreationTemplates;
+    return {
+      if (nextToken != null) 'nextToken': nextToken,
+      if (registryId != null) 'registryId': registryId,
+      if (repositoryCreationTemplates != null)
+        'repositoryCreationTemplates': repositoryCreationTemplates,
+    };
+  }
+}
+
 /// The encryption configuration for the repository. This determines how the
 /// contents of your repository are encrypted at rest.
 ///
 /// By default, when no encryption configuration is set or the
 /// <code>AES256</code> encryption type is used, Amazon ECR uses server-side
 /// encryption with Amazon S3-managed encryption keys which encrypts your data
-/// at rest using an AES-256 encryption algorithm. This does not require any
+/// at rest using an AES256 encryption algorithm. This does not require any
 /// action on your part.
 ///
 /// For more control over the encryption of the contents of your repository, you
@@ -3157,7 +3835,7 @@ class EncryptionConfiguration {
   ///
   /// If you use the <code>AES256</code> encryption type, Amazon ECR uses
   /// server-side encryption with Amazon S3-managed encryption keys which encrypts
-  /// the images in the repository using an AES-256 encryption algorithm. For more
+  /// the images in the repository using an AES256 encryption algorithm. For more
   /// information, see <a
   /// href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html">Protecting
   /// data using server-side encryption with Amazon S3-managed encryption keys
@@ -3179,7 +3857,8 @@ class EncryptionConfiguration {
 
   factory EncryptionConfiguration.fromJson(Map<String, dynamic> json) {
     return EncryptionConfiguration(
-      encryptionType: (json['encryptionType'] as String).toEncryptionType(),
+      encryptionType:
+          EncryptionType.fromString((json['encryptionType'] as String)),
       kmsKey: json['kmsKey'] as String?,
     );
   }
@@ -3188,38 +3867,81 @@ class EncryptionConfiguration {
     final encryptionType = this.encryptionType;
     final kmsKey = this.kmsKey;
     return {
-      'encryptionType': encryptionType.toValue(),
+      'encryptionType': encryptionType.value,
+      if (kmsKey != null) 'kmsKey': kmsKey,
+    };
+  }
+}
+
+/// The encryption configuration to associate with the repository creation
+/// template.
+class EncryptionConfigurationForRepositoryCreationTemplate {
+  /// The encryption type to use.
+  ///
+  /// If you use the <code>KMS</code> encryption type, the contents of the
+  /// repository will be encrypted using server-side encryption with Key
+  /// Management Service key stored in KMS. When you use KMS to encrypt your data,
+  /// you can either use the default Amazon Web Services managed KMS key for
+  /// Amazon ECR, or specify your own KMS key, which you already created. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingKMSEncryption.html">Protecting
+  /// data using server-side encryption with an KMS key stored in Key Management
+  /// Service (SSE-KMS)</a> in the <i>Amazon Simple Storage Service Console
+  /// Developer Guide</i>.
+  ///
+  /// If you use the <code>AES256</code> encryption type, Amazon ECR uses
+  /// server-side encryption with Amazon S3-managed encryption keys which encrypts
+  /// the images in the repository using an AES256 encryption algorithm. For more
+  /// information, see <a
+  /// href="https://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html">Protecting
+  /// data using server-side encryption with Amazon S3-managed encryption keys
+  /// (SSE-S3)</a> in the <i>Amazon Simple Storage Service Console Developer
+  /// Guide</i>.
+  final EncryptionType encryptionType;
+
+  /// If you use the <code>KMS</code> encryption type, specify the KMS key to use
+  /// for encryption. The full ARN of the KMS key must be specified. The key must
+  /// exist in the same Region as the repository. If no key is specified, the
+  /// default Amazon Web Services managed KMS key for Amazon ECR will be used.
+  final String? kmsKey;
+
+  EncryptionConfigurationForRepositoryCreationTemplate({
+    required this.encryptionType,
+    this.kmsKey,
+  });
+
+  factory EncryptionConfigurationForRepositoryCreationTemplate.fromJson(
+      Map<String, dynamic> json) {
+    return EncryptionConfigurationForRepositoryCreationTemplate(
+      encryptionType:
+          EncryptionType.fromString((json['encryptionType'] as String)),
+      kmsKey: json['kmsKey'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final encryptionType = this.encryptionType;
+    final kmsKey = this.kmsKey;
+    return {
+      'encryptionType': encryptionType.value,
       if (kmsKey != null) 'kmsKey': kmsKey,
     };
   }
 }
 
 enum EncryptionType {
-  aes256,
-  kms,
-}
+  aes256('AES256'),
+  kms('KMS'),
+  ;
 
-extension EncryptionTypeValueExtension on EncryptionType {
-  String toValue() {
-    switch (this) {
-      case EncryptionType.aes256:
-        return 'AES256';
-      case EncryptionType.kms:
-        return 'KMS';
-    }
-  }
-}
+  final String value;
 
-extension EncryptionTypeFromString on String {
-  EncryptionType toEncryptionType() {
-    switch (this) {
-      case 'AES256':
-        return EncryptionType.aes256;
-      case 'KMS':
-        return EncryptionType.kms;
-    }
-    throw Exception('$this is not known in enum EncryptionType');
-  }
+  const EncryptionType(this.value);
+
+  static EncryptionType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum EncryptionType'));
 }
 
 /// The details of an enhanced image scan. This is returned when enhanced
@@ -3303,7 +4025,7 @@ class EnhancedImageScanFinding {
           ? Remediation.fromJson(json['remediation'] as Map<String, dynamic>)
           : null,
       resources: (json['resources'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Resource.fromJson(e as Map<String, dynamic>))
           .toList(),
       score: json['score'] as double?,
@@ -3358,50 +4080,51 @@ class EnhancedImageScanFinding {
 }
 
 enum FindingSeverity {
-  informational,
-  low,
-  medium,
-  high,
-  critical,
-  undefined,
+  informational('INFORMATIONAL'),
+  low('LOW'),
+  medium('MEDIUM'),
+  high('HIGH'),
+  critical('CRITICAL'),
+  undefined('UNDEFINED'),
+  ;
+
+  final String value;
+
+  const FindingSeverity(this.value);
+
+  static FindingSeverity fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum FindingSeverity'));
 }
 
-extension FindingSeverityValueExtension on FindingSeverity {
-  String toValue() {
-    switch (this) {
-      case FindingSeverity.informational:
-        return 'INFORMATIONAL';
-      case FindingSeverity.low:
-        return 'LOW';
-      case FindingSeverity.medium:
-        return 'MEDIUM';
-      case FindingSeverity.high:
-        return 'HIGH';
-      case FindingSeverity.critical:
-        return 'CRITICAL';
-      case FindingSeverity.undefined:
-        return 'UNDEFINED';
-    }
+class GetAccountSettingResponse {
+  /// Retrieves the basic scan type version name.
+  final String? name;
+
+  /// Retrieves the value that specifies what basic scan type is being used:
+  /// <code>AWS_NATIVE</code> or <code>CLAIR</code>.
+  final String? value;
+
+  GetAccountSettingResponse({
+    this.name,
+    this.value,
+  });
+
+  factory GetAccountSettingResponse.fromJson(Map<String, dynamic> json) {
+    return GetAccountSettingResponse(
+      name: json['name'] as String?,
+      value: json['value'] as String?,
+    );
   }
-}
 
-extension FindingSeverityFromString on String {
-  FindingSeverity toFindingSeverity() {
-    switch (this) {
-      case 'INFORMATIONAL':
-        return FindingSeverity.informational;
-      case 'LOW':
-        return FindingSeverity.low;
-      case 'MEDIUM':
-        return FindingSeverity.medium;
-      case 'HIGH':
-        return FindingSeverity.high;
-      case 'CRITICAL':
-        return FindingSeverity.critical;
-      case 'UNDEFINED':
-        return FindingSeverity.undefined;
-    }
-    throw Exception('$this is not known in enum FindingSeverity');
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final value = this.value;
+    return {
+      if (name != null) 'name': name,
+      if (value != null) 'value': value,
+    };
   }
 }
 
@@ -3417,7 +4140,7 @@ class GetAuthorizationTokenResponse {
   factory GetAuthorizationTokenResponse.fromJson(Map<String, dynamic> json) {
     return GetAuthorizationTokenResponse(
       authorizationData: (json['authorizationData'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => AuthorizationData.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -3503,13 +4226,14 @@ class GetLifecyclePolicyPreviewResponse {
       lifecyclePolicyText: json['lifecyclePolicyText'] as String?,
       nextToken: json['nextToken'] as String?,
       previewResults: (json['previewResults'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               LifecyclePolicyPreviewResult.fromJson(e as Map<String, dynamic>))
           .toList(),
       registryId: json['registryId'] as String?,
       repositoryName: json['repositoryName'] as String?,
-      status: (json['status'] as String?)?.toLifecyclePolicyPreviewStatus(),
+      status: (json['status'] as String?)
+          ?.let(LifecyclePolicyPreviewStatus.fromString),
       summary: json['summary'] != null
           ? LifecyclePolicyPreviewSummary.fromJson(
               json['summary'] as Map<String, dynamic>)
@@ -3532,7 +4256,7 @@ class GetLifecyclePolicyPreviewResponse {
       if (previewResults != null) 'previewResults': previewResults,
       if (registryId != null) 'registryId': registryId,
       if (repositoryName != null) 'repositoryName': repositoryName,
-      if (status != null) 'status': status.toValue(),
+      if (status != null) 'status': status.value,
       if (summary != null) 'summary': summary,
     };
   }
@@ -3587,7 +4311,7 @@ class GetRegistryPolicyResponse {
   /// The JSON text of the permissions policy for a registry.
   final String? policyText;
 
-  /// The ID of the registry.
+  /// The registry ID associated with the request.
   final String? registryId;
 
   GetRegistryPolicyResponse({
@@ -3613,7 +4337,7 @@ class GetRegistryPolicyResponse {
 }
 
 class GetRegistryScanningConfigurationResponse {
-  /// The ID of the registry.
+  /// The registry ID associated with the request.
   final String? registryId;
 
   /// The scanning configuration for the registry.
@@ -3739,26 +4463,17 @@ class Image {
 }
 
 enum ImageActionType {
-  expire,
-}
+  expire('EXPIRE'),
+  ;
 
-extension ImageActionTypeValueExtension on ImageActionType {
-  String toValue() {
-    switch (this) {
-      case ImageActionType.expire:
-        return 'EXPIRE';
-    }
-  }
-}
+  final String value;
 
-extension ImageActionTypeFromString on String {
-  ImageActionType toImageActionType() {
-    switch (this) {
-      case 'EXPIRE':
-        return ImageActionType.expire;
-    }
-    throw Exception('$this is not known in enum ImageActionType');
-  }
+  const ImageActionType(this.value);
+
+  static ImageActionType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ImageActionType'));
 }
 
 /// An object that describes an image returned by a <a>DescribeImages</a>
@@ -3848,7 +4563,7 @@ class ImageDetail {
           : null,
       imageSizeInBytes: json['imageSizeInBytes'] as int?,
       imageTags: (json['imageTags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       lastRecordedPullTime: timeStampFromJson(json['lastRecordedPullTime']),
@@ -3908,7 +4623,8 @@ class ImageFailure {
 
   factory ImageFailure.fromJson(Map<String, dynamic> json) {
     return ImageFailure(
-      failureCode: (json['failureCode'] as String?)?.toImageFailureCode(),
+      failureCode:
+          (json['failureCode'] as String?)?.let(ImageFailureCode.fromString),
       failureReason: json['failureReason'] as String?,
       imageId: json['imageId'] != null
           ? ImageIdentifier.fromJson(json['imageId'] as Map<String, dynamic>)
@@ -3921,7 +4637,7 @@ class ImageFailure {
     final failureReason = this.failureReason;
     final imageId = this.imageId;
     return {
-      if (failureCode != null) 'failureCode': failureCode.toValue(),
+      if (failureCode != null) 'failureCode': failureCode.value,
       if (failureReason != null) 'failureReason': failureReason,
       if (imageId != null) 'imageId': imageId,
     };
@@ -3929,56 +4645,26 @@ class ImageFailure {
 }
 
 enum ImageFailureCode {
-  invalidImageDigest,
-  invalidImageTag,
-  imageTagDoesNotMatchDigest,
-  imageNotFound,
-  missingDigestAndTag,
-  imageReferencedByManifestList,
-  kmsError,
-}
+  invalidImageDigest('InvalidImageDigest'),
+  invalidImageTag('InvalidImageTag'),
+  imageTagDoesNotMatchDigest('ImageTagDoesNotMatchDigest'),
+  imageNotFound('ImageNotFound'),
+  missingDigestAndTag('MissingDigestAndTag'),
+  imageReferencedByManifestList('ImageReferencedByManifestList'),
+  kmsError('KmsError'),
+  upstreamAccessDenied('UpstreamAccessDenied'),
+  upstreamTooManyRequests('UpstreamTooManyRequests'),
+  upstreamUnavailable('UpstreamUnavailable'),
+  ;
 
-extension ImageFailureCodeValueExtension on ImageFailureCode {
-  String toValue() {
-    switch (this) {
-      case ImageFailureCode.invalidImageDigest:
-        return 'InvalidImageDigest';
-      case ImageFailureCode.invalidImageTag:
-        return 'InvalidImageTag';
-      case ImageFailureCode.imageTagDoesNotMatchDigest:
-        return 'ImageTagDoesNotMatchDigest';
-      case ImageFailureCode.imageNotFound:
-        return 'ImageNotFound';
-      case ImageFailureCode.missingDigestAndTag:
-        return 'MissingDigestAndTag';
-      case ImageFailureCode.imageReferencedByManifestList:
-        return 'ImageReferencedByManifestList';
-      case ImageFailureCode.kmsError:
-        return 'KmsError';
-    }
-  }
-}
+  final String value;
 
-extension ImageFailureCodeFromString on String {
-  ImageFailureCode toImageFailureCode() {
-    switch (this) {
-      case 'InvalidImageDigest':
-        return ImageFailureCode.invalidImageDigest;
-      case 'InvalidImageTag':
-        return ImageFailureCode.invalidImageTag;
-      case 'ImageTagDoesNotMatchDigest':
-        return ImageFailureCode.imageTagDoesNotMatchDigest;
-      case 'ImageNotFound':
-        return ImageFailureCode.imageNotFound;
-      case 'MissingDigestAndTag':
-        return ImageFailureCode.missingDigestAndTag;
-      case 'ImageReferencedByManifestList':
-        return ImageFailureCode.imageReferencedByManifestList;
-      case 'KmsError':
-        return ImageFailureCode.kmsError;
-    }
-    throw Exception('$this is not known in enum ImageFailureCode');
-  }
+  const ImageFailureCode(this.value);
+
+  static ImageFailureCode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ImageFailureCode'));
 }
 
 /// An object with identifying information for an image in an Amazon ECR
@@ -4039,7 +4725,7 @@ class ImageReplicationStatus {
       failureCode: json['failureCode'] as String?,
       region: json['region'] as String?,
       registryId: json['registryId'] as String?,
-      status: (json['status'] as String?)?.toReplicationStatus(),
+      status: (json['status'] as String?)?.let(ReplicationStatus.fromString),
     );
   }
 
@@ -4052,7 +4738,7 @@ class ImageReplicationStatus {
       if (failureCode != null) 'failureCode': failureCode,
       if (region != null) 'region': region,
       if (registryId != null) 'registryId': registryId,
-      if (status != null) 'status': status.toValue(),
+      if (status != null) 'status': status.value,
     };
   }
 }
@@ -4085,12 +4771,12 @@ class ImageScanFinding {
   factory ImageScanFinding.fromJson(Map<String, dynamic> json) {
     return ImageScanFinding(
       attributes: (json['attributes'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Attribute.fromJson(e as Map<String, dynamic>))
           .toList(),
       description: json['description'] as String?,
       name: json['name'] as String?,
-      severity: (json['severity'] as String?)?.toFindingSeverity(),
+      severity: (json['severity'] as String?)?.let(FindingSeverity.fromString),
       uri: json['uri'] as String?,
     );
   }
@@ -4105,7 +4791,7 @@ class ImageScanFinding {
       if (attributes != null) 'attributes': attributes,
       if (description != null) 'description': description,
       if (name != null) 'name': name,
-      if (severity != null) 'severity': severity.toValue(),
+      if (severity != null) 'severity': severity.value,
       if (uri != null) 'uri': uri,
     };
   }
@@ -4139,15 +4825,15 @@ class ImageScanFindings {
   factory ImageScanFindings.fromJson(Map<String, dynamic> json) {
     return ImageScanFindings(
       enhancedFindings: (json['enhancedFindings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               EnhancedImageScanFinding.fromJson(e as Map<String, dynamic>))
           .toList(),
-      findingSeverityCounts:
-          (json['findingSeverityCounts'] as Map<String, dynamic>?)
-              ?.map((k, e) => MapEntry(k.toFindingSeverity(), e as int)),
+      findingSeverityCounts: (json['findingSeverityCounts']
+              as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(FindingSeverity.fromString(k), e as int)),
       findings: (json['findings'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ImageScanFinding.fromJson(e as Map<String, dynamic>))
           .toList(),
       imageScanCompletedAt: timeStampFromJson(json['imageScanCompletedAt']),
@@ -4166,7 +4852,7 @@ class ImageScanFindings {
       if (enhancedFindings != null) 'enhancedFindings': enhancedFindings,
       if (findingSeverityCounts != null)
         'findingSeverityCounts':
-            findingSeverityCounts.map((k, e) => MapEntry(k.toValue(), e)),
+            findingSeverityCounts.map((k, e) => MapEntry(k.value, e)),
       if (findings != null) 'findings': findings,
       if (imageScanCompletedAt != null)
         'imageScanCompletedAt': unixTimestampToJson(imageScanCompletedAt),
@@ -4196,9 +4882,9 @@ class ImageScanFindingsSummary {
 
   factory ImageScanFindingsSummary.fromJson(Map<String, dynamic> json) {
     return ImageScanFindingsSummary(
-      findingSeverityCounts:
-          (json['findingSeverityCounts'] as Map<String, dynamic>?)
-              ?.map((k, e) => MapEntry(k.toFindingSeverity(), e as int)),
+      findingSeverityCounts: (json['findingSeverityCounts']
+              as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(FindingSeverity.fromString(k), e as int)),
       imageScanCompletedAt: timeStampFromJson(json['imageScanCompletedAt']),
       vulnerabilitySourceUpdatedAt:
           timeStampFromJson(json['vulnerabilitySourceUpdatedAt']),
@@ -4212,7 +4898,7 @@ class ImageScanFindingsSummary {
     return {
       if (findingSeverityCounts != null)
         'findingSeverityCounts':
-            findingSeverityCounts.map((k, e) => MapEntry(k.toValue(), e)),
+            findingSeverityCounts.map((k, e) => MapEntry(k.value, e)),
       if (imageScanCompletedAt != null)
         'imageScanCompletedAt': unixTimestampToJson(imageScanCompletedAt),
       if (vulnerabilitySourceUpdatedAt != null)
@@ -4238,7 +4924,7 @@ class ImageScanStatus {
   factory ImageScanStatus.fromJson(Map<String, dynamic> json) {
     return ImageScanStatus(
       description: json['description'] as String?,
-      status: (json['status'] as String?)?.toScanStatus(),
+      status: (json['status'] as String?)?.let(ScanStatus.fromString),
     );
   }
 
@@ -4247,7 +4933,7 @@ class ImageScanStatus {
     final status = this.status;
     return {
       if (description != null) 'description': description,
-      if (status != null) 'status': status.toValue(),
+      if (status != null) 'status': status.value,
     };
   }
 }
@@ -4282,31 +4968,18 @@ class ImageScanningConfiguration {
 }
 
 enum ImageTagMutability {
-  mutable,
-  immutable,
-}
+  mutable('MUTABLE'),
+  immutable('IMMUTABLE'),
+  ;
 
-extension ImageTagMutabilityValueExtension on ImageTagMutability {
-  String toValue() {
-    switch (this) {
-      case ImageTagMutability.mutable:
-        return 'MUTABLE';
-      case ImageTagMutability.immutable:
-        return 'IMMUTABLE';
-    }
-  }
-}
+  final String value;
 
-extension ImageTagMutabilityFromString on String {
-  ImageTagMutability toImageTagMutability() {
-    switch (this) {
-      case 'MUTABLE':
-        return ImageTagMutability.mutable;
-      case 'IMMUTABLE':
-        return ImageTagMutability.immutable;
-    }
-    throw Exception('$this is not known in enum ImageTagMutability');
-  }
+  const ImageTagMutability(this.value);
+
+  static ImageTagMutability fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ImageTagMutability'));
 }
 
 class InitiateLayerUploadResponse {
@@ -4364,8 +5037,8 @@ class Layer {
 
   factory Layer.fromJson(Map<String, dynamic> json) {
     return Layer(
-      layerAvailability:
-          (json['layerAvailability'] as String?)?.toLayerAvailability(),
+      layerAvailability: (json['layerAvailability'] as String?)
+          ?.let(LayerAvailability.fromString),
       layerDigest: json['layerDigest'] as String?,
       layerSize: json['layerSize'] as int?,
       mediaType: json['mediaType'] as String?,
@@ -4379,7 +5052,7 @@ class Layer {
     final mediaType = this.mediaType;
     return {
       if (layerAvailability != null)
-        'layerAvailability': layerAvailability.toValue(),
+        'layerAvailability': layerAvailability.value,
       if (layerDigest != null) 'layerDigest': layerDigest,
       if (layerSize != null) 'layerSize': layerSize,
       if (mediaType != null) 'mediaType': mediaType,
@@ -4388,31 +5061,18 @@ class Layer {
 }
 
 enum LayerAvailability {
-  available,
-  unavailable,
-}
+  available('AVAILABLE'),
+  unavailable('UNAVAILABLE'),
+  ;
 
-extension LayerAvailabilityValueExtension on LayerAvailability {
-  String toValue() {
-    switch (this) {
-      case LayerAvailability.available:
-        return 'AVAILABLE';
-      case LayerAvailability.unavailable:
-        return 'UNAVAILABLE';
-    }
-  }
-}
+  final String value;
 
-extension LayerAvailabilityFromString on String {
-  LayerAvailability toLayerAvailability() {
-    switch (this) {
-      case 'AVAILABLE':
-        return LayerAvailability.available;
-      case 'UNAVAILABLE':
-        return LayerAvailability.unavailable;
-    }
-    throw Exception('$this is not known in enum LayerAvailability');
-  }
+  const LayerAvailability(this.value);
+
+  static LayerAvailability fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum LayerAvailability'));
 }
 
 /// An object representing an Amazon ECR image layer failure.
@@ -4434,7 +5094,8 @@ class LayerFailure {
 
   factory LayerFailure.fromJson(Map<String, dynamic> json) {
     return LayerFailure(
-      failureCode: (json['failureCode'] as String?)?.toLayerFailureCode(),
+      failureCode:
+          (json['failureCode'] as String?)?.let(LayerFailureCode.fromString),
       failureReason: json['failureReason'] as String?,
       layerDigest: json['layerDigest'] as String?,
     );
@@ -4445,7 +5106,7 @@ class LayerFailure {
     final failureReason = this.failureReason;
     final layerDigest = this.layerDigest;
     return {
-      if (failureCode != null) 'failureCode': failureCode.toValue(),
+      if (failureCode != null) 'failureCode': failureCode.value,
       if (failureReason != null) 'failureReason': failureReason,
       if (layerDigest != null) 'layerDigest': layerDigest,
     };
@@ -4453,31 +5114,18 @@ class LayerFailure {
 }
 
 enum LayerFailureCode {
-  invalidLayerDigest,
-  missingLayerDigest,
-}
+  invalidLayerDigest('InvalidLayerDigest'),
+  missingLayerDigest('MissingLayerDigest'),
+  ;
 
-extension LayerFailureCodeValueExtension on LayerFailureCode {
-  String toValue() {
-    switch (this) {
-      case LayerFailureCode.invalidLayerDigest:
-        return 'InvalidLayerDigest';
-      case LayerFailureCode.missingLayerDigest:
-        return 'MissingLayerDigest';
-    }
-  }
-}
+  final String value;
 
-extension LayerFailureCodeFromString on String {
-  LayerFailureCode toLayerFailureCode() {
-    switch (this) {
-      case 'InvalidLayerDigest':
-        return LayerFailureCode.invalidLayerDigest;
-      case 'MissingLayerDigest':
-        return LayerFailureCode.missingLayerDigest;
-    }
-    throw Exception('$this is not known in enum LayerFailureCode');
-  }
+  const LayerFailureCode(this.value);
+
+  static LayerFailureCode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum LayerFailureCode'));
 }
 
 /// The filter for the lifecycle policy preview.
@@ -4492,7 +5140,7 @@ class LifecyclePolicyPreviewFilter {
   Map<String, dynamic> toJson() {
     final tagStatus = this.tagStatus;
     return {
-      if (tagStatus != null) 'tagStatus': tagStatus.toValue(),
+      if (tagStatus != null) 'tagStatus': tagStatus.value,
     };
   }
 }
@@ -4533,7 +5181,7 @@ class LifecyclePolicyPreviewResult {
       imageDigest: json['imageDigest'] as String?,
       imagePushedAt: timeStampFromJson(json['imagePushedAt']),
       imageTags: (json['imageTags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
     );
@@ -4558,42 +5206,20 @@ class LifecyclePolicyPreviewResult {
 }
 
 enum LifecyclePolicyPreviewStatus {
-  inProgress,
-  complete,
-  expired,
-  failed,
-}
+  inProgress('IN_PROGRESS'),
+  complete('COMPLETE'),
+  expired('EXPIRED'),
+  failed('FAILED'),
+  ;
 
-extension LifecyclePolicyPreviewStatusValueExtension
-    on LifecyclePolicyPreviewStatus {
-  String toValue() {
-    switch (this) {
-      case LifecyclePolicyPreviewStatus.inProgress:
-        return 'IN_PROGRESS';
-      case LifecyclePolicyPreviewStatus.complete:
-        return 'COMPLETE';
-      case LifecyclePolicyPreviewStatus.expired:
-        return 'EXPIRED';
-      case LifecyclePolicyPreviewStatus.failed:
-        return 'FAILED';
-    }
-  }
-}
+  final String value;
 
-extension LifecyclePolicyPreviewStatusFromString on String {
-  LifecyclePolicyPreviewStatus toLifecyclePolicyPreviewStatus() {
-    switch (this) {
-      case 'IN_PROGRESS':
-        return LifecyclePolicyPreviewStatus.inProgress;
-      case 'COMPLETE':
-        return LifecyclePolicyPreviewStatus.complete;
-      case 'EXPIRED':
-        return LifecyclePolicyPreviewStatus.expired;
-      case 'FAILED':
-        return LifecyclePolicyPreviewStatus.failed;
-    }
-    throw Exception('$this is not known in enum LifecyclePolicyPreviewStatus');
-  }
+  const LifecyclePolicyPreviewStatus(this.value);
+
+  static LifecyclePolicyPreviewStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum LifecyclePolicyPreviewStatus'));
 }
 
 /// The summary of the lifecycle policy preview request.
@@ -4631,14 +5257,14 @@ class LifecyclePolicyRuleAction {
 
   factory LifecyclePolicyRuleAction.fromJson(Map<String, dynamic> json) {
     return LifecyclePolicyRuleAction(
-      type: (json['type'] as String?)?.toImageActionType(),
+      type: (json['type'] as String?)?.let(ImageActionType.fromString),
     );
   }
 
   Map<String, dynamic> toJson() {
     final type = this.type;
     return {
-      if (type != null) 'type': type.toValue(),
+      if (type != null) 'type': type.value,
     };
   }
 }
@@ -4657,7 +5283,7 @@ class ListImagesFilter {
   Map<String, dynamic> toJson() {
     final tagStatus = this.tagStatus;
     return {
-      if (tagStatus != null) 'tagStatus': tagStatus.toValue(),
+      if (tagStatus != null) 'tagStatus': tagStatus.value,
     };
   }
 }
@@ -4681,7 +5307,7 @@ class ListImagesResponse {
   factory ListImagesResponse.fromJson(Map<String, dynamic> json) {
     return ListImagesResponse(
       imageIds: (json['imageIds'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ImageIdentifier.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -4709,7 +5335,7 @@ class ListTagsForResourceResponse {
   factory ListTagsForResourceResponse.fromJson(Map<String, dynamic> json) {
     return ListTagsForResourceResponse(
       tags: (json['tags'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => Tag.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -4773,15 +5399,15 @@ class PackageVulnerabilityDetails {
   factory PackageVulnerabilityDetails.fromJson(Map<String, dynamic> json) {
     return PackageVulnerabilityDetails(
       cvss: (json['cvss'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => CvssScore.fromJson(e as Map<String, dynamic>))
           .toList(),
       referenceUrls: (json['referenceUrls'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       relatedVulnerabilities: (json['relatedVulnerabilities'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => e as String)
           .toList(),
       source: json['source'] as String?,
@@ -4791,7 +5417,7 @@ class PackageVulnerabilityDetails {
       vendorUpdatedAt: timeStampFromJson(json['vendorUpdatedAt']),
       vulnerabilityId: json['vulnerabilityId'] as String?,
       vulnerablePackages: (json['vulnerablePackages'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => VulnerablePackage.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -4831,6 +5457,10 @@ class PullThroughCacheRule {
   /// The date and time the pull through cache was created.
   final DateTime? createdAt;
 
+  /// The ARN of the Secrets Manager secret associated with the pull through cache
+  /// rule.
+  final String? credentialArn;
+
   /// The Amazon ECR repository prefix associated with the pull through cache
   /// rule.
   final String? ecrRepositoryPrefix;
@@ -4839,37 +5469,88 @@ class PullThroughCacheRule {
   /// through cache rule is associated with.
   final String? registryId;
 
+  /// The date and time, in JavaScript date format, when the pull through cache
+  /// rule was last updated.
+  final DateTime? updatedAt;
+
+  /// The name of the upstream source registry associated with the pull through
+  /// cache rule.
+  final UpstreamRegistry? upstreamRegistry;
+
   /// The upstream registry URL associated with the pull through cache rule.
   final String? upstreamRegistryUrl;
 
   PullThroughCacheRule({
     this.createdAt,
+    this.credentialArn,
     this.ecrRepositoryPrefix,
     this.registryId,
+    this.updatedAt,
+    this.upstreamRegistry,
     this.upstreamRegistryUrl,
   });
 
   factory PullThroughCacheRule.fromJson(Map<String, dynamic> json) {
     return PullThroughCacheRule(
       createdAt: timeStampFromJson(json['createdAt']),
+      credentialArn: json['credentialArn'] as String?,
       ecrRepositoryPrefix: json['ecrRepositoryPrefix'] as String?,
       registryId: json['registryId'] as String?,
+      updatedAt: timeStampFromJson(json['updatedAt']),
+      upstreamRegistry: (json['upstreamRegistry'] as String?)
+          ?.let(UpstreamRegistry.fromString),
       upstreamRegistryUrl: json['upstreamRegistryUrl'] as String?,
     );
   }
 
   Map<String, dynamic> toJson() {
     final createdAt = this.createdAt;
+    final credentialArn = this.credentialArn;
     final ecrRepositoryPrefix = this.ecrRepositoryPrefix;
     final registryId = this.registryId;
+    final updatedAt = this.updatedAt;
+    final upstreamRegistry = this.upstreamRegistry;
     final upstreamRegistryUrl = this.upstreamRegistryUrl;
     return {
       if (createdAt != null) 'createdAt': unixTimestampToJson(createdAt),
+      if (credentialArn != null) 'credentialArn': credentialArn,
       if (ecrRepositoryPrefix != null)
         'ecrRepositoryPrefix': ecrRepositoryPrefix,
       if (registryId != null) 'registryId': registryId,
+      if (updatedAt != null) 'updatedAt': unixTimestampToJson(updatedAt),
+      if (upstreamRegistry != null) 'upstreamRegistry': upstreamRegistry.value,
       if (upstreamRegistryUrl != null)
         'upstreamRegistryUrl': upstreamRegistryUrl,
+    };
+  }
+}
+
+class PutAccountSettingResponse {
+  /// Retrieves the the basic scan type version name.
+  final String? name;
+
+  /// Retrieves the basic scan type value, either <code>AWS_NATIVE</code> or
+  /// <code>-</code>.
+  final String? value;
+
+  PutAccountSettingResponse({
+    this.name,
+    this.value,
+  });
+
+  factory PutAccountSettingResponse.fromJson(Map<String, dynamic> json) {
+    return PutAccountSettingResponse(
+      name: json['name'] as String?,
+      value: json['value'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final name = this.name;
+    final value = this.value;
+    return {
+      if (name != null) 'name': name,
+      if (value != null) 'value': value,
     };
   }
 }
@@ -4957,8 +5638,8 @@ class PutImageTagMutabilityResponse {
 
   factory PutImageTagMutabilityResponse.fromJson(Map<String, dynamic> json) {
     return PutImageTagMutabilityResponse(
-      imageTagMutability:
-          (json['imageTagMutability'] as String?)?.toImageTagMutability(),
+      imageTagMutability: (json['imageTagMutability'] as String?)
+          ?.let(ImageTagMutability.fromString),
       registryId: json['registryId'] as String?,
       repositoryName: json['repositoryName'] as String?,
     );
@@ -4970,7 +5651,7 @@ class PutImageTagMutabilityResponse {
     final repositoryName = this.repositoryName;
     return {
       if (imageTagMutability != null)
-        'imageTagMutability': imageTagMutability.toValue(),
+        'imageTagMutability': imageTagMutability.value,
       if (registryId != null) 'registryId': registryId,
       if (repositoryName != null) 'repositoryName': repositoryName,
     };
@@ -5018,7 +5699,7 @@ class PutRegistryPolicyResponse {
   /// The JSON policy text for your registry.
   final String? policyText;
 
-  /// The registry ID.
+  /// The registry ID associated with the request.
   final String? registryId;
 
   PutRegistryPolicyResponse({
@@ -5098,6 +5779,21 @@ class PutReplicationConfigurationResponse {
   }
 }
 
+enum RCTAppliedFor {
+  replication('REPLICATION'),
+  pullThroughCache('PULL_THROUGH_CACHE'),
+  ;
+
+  final String value;
+
+  const RCTAppliedFor(this.value);
+
+  static RCTAppliedFor fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum RCTAppliedFor'));
+}
+
 /// Details about the recommended course of action to remediate the finding.
 class Recommendation {
   /// The recommended course of action to remediate the finding.
@@ -5144,10 +5840,10 @@ class RegistryScanningConfiguration {
   factory RegistryScanningConfiguration.fromJson(Map<String, dynamic> json) {
     return RegistryScanningConfiguration(
       rules: (json['rules'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => RegistryScanningRule.fromJson(e as Map<String, dynamic>))
           .toList(),
-      scanType: (json['scanType'] as String?)?.toScanType(),
+      scanType: (json['scanType'] as String?)?.let(ScanType.fromString),
     );
   }
 
@@ -5156,7 +5852,7 @@ class RegistryScanningConfiguration {
     final scanType = this.scanType;
     return {
       if (rules != null) 'rules': rules,
-      if (scanType != null) 'scanType': scanType.toValue(),
+      if (scanType != null) 'scanType': scanType.value,
     };
   }
 }
@@ -5170,8 +5866,9 @@ class RegistryScanningRule {
   /// The frequency that scans are performed at for a private registry. When the
   /// <code>ENHANCED</code> scan type is specified, the supported scan frequencies
   /// are <code>CONTINUOUS_SCAN</code> and <code>SCAN_ON_PUSH</code>. When the
-  /// <code>BASIC</code> scan type is specified, the <code>SCAN_ON_PUSH</code> and
-  /// <code>MANUAL</code> scan frequencies are supported.
+  /// <code>BASIC</code> scan type is specified, the <code>SCAN_ON_PUSH</code>
+  /// scan frequency is supported. If scan on push is not specified, then the
+  /// <code>MANUAL</code> scan frequency is set by default.
   final ScanFrequency scanFrequency;
 
   RegistryScanningRule({
@@ -5182,11 +5879,12 @@ class RegistryScanningRule {
   factory RegistryScanningRule.fromJson(Map<String, dynamic> json) {
     return RegistryScanningRule(
       repositoryFilters: (json['repositoryFilters'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) =>
               ScanningRepositoryFilter.fromJson(e as Map<String, dynamic>))
           .toList(),
-      scanFrequency: (json['scanFrequency'] as String).toScanFrequency(),
+      scanFrequency:
+          ScanFrequency.fromString((json['scanFrequency'] as String)),
     );
   }
 
@@ -5195,7 +5893,7 @@ class RegistryScanningRule {
     final scanFrequency = this.scanFrequency;
     return {
       'repositoryFilters': repositoryFilters,
-      'scanFrequency': scanFrequency.toValue(),
+      'scanFrequency': scanFrequency.value,
     };
   }
 }
@@ -5240,7 +5938,7 @@ class ReplicationConfiguration {
   factory ReplicationConfiguration.fromJson(Map<String, dynamic> json) {
     return ReplicationConfiguration(
       rules: (json['rules'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ReplicationRule.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -5305,12 +6003,12 @@ class ReplicationRule {
   factory ReplicationRule.fromJson(Map<String, dynamic> json) {
     return ReplicationRule(
       destinations: (json['destinations'] as List)
-          .whereNotNull()
+          .nonNulls
           .map(
               (e) => ReplicationDestination.fromJson(e as Map<String, dynamic>))
           .toList(),
       repositoryFilters: (json['repositoryFilters'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => RepositoryFilter.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
@@ -5327,36 +6025,19 @@ class ReplicationRule {
 }
 
 enum ReplicationStatus {
-  inProgress,
-  complete,
-  failed,
-}
+  inProgress('IN_PROGRESS'),
+  complete('COMPLETE'),
+  failed('FAILED'),
+  ;
 
-extension ReplicationStatusValueExtension on ReplicationStatus {
-  String toValue() {
-    switch (this) {
-      case ReplicationStatus.inProgress:
-        return 'IN_PROGRESS';
-      case ReplicationStatus.complete:
-        return 'COMPLETE';
-      case ReplicationStatus.failed:
-        return 'FAILED';
-    }
-  }
-}
+  final String value;
 
-extension ReplicationStatusFromString on String {
-  ReplicationStatus toReplicationStatus() {
-    switch (this) {
-      case 'IN_PROGRESS':
-        return ReplicationStatus.inProgress;
-      case 'COMPLETE':
-        return ReplicationStatus.complete;
-      case 'FAILED':
-        return ReplicationStatus.failed;
-    }
-    throw Exception('$this is not known in enum ReplicationStatus');
-  }
+  const ReplicationStatus(this.value);
+
+  static ReplicationStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ReplicationStatus'));
 }
 
 /// An object representing a repository.
@@ -5381,7 +6062,7 @@ class Repository {
   /// contains the <code>arn:aws:ecr</code> namespace, followed by the region of
   /// the repository, Amazon Web Services account ID of the repository owner,
   /// repository namespace, and repository name. For example,
-  /// <code>arn:aws:ecr:region:012345678910:repository/test</code>.
+  /// <code>arn:aws:ecr:region:012345678910:repository-namespace/repository-name</code>.
   final String? repositoryArn;
 
   /// The name of the repository.
@@ -5413,8 +6094,8 @@ class Repository {
           ? ImageScanningConfiguration.fromJson(
               json['imageScanningConfiguration'] as Map<String, dynamic>)
           : null,
-      imageTagMutability:
-          (json['imageTagMutability'] as String?)?.toImageTagMutability(),
+      imageTagMutability: (json['imageTagMutability'] as String?)
+          ?.let(ImageTagMutability.fromString),
       registryId: json['registryId'] as String?,
       repositoryArn: json['repositoryArn'] as String?,
       repositoryName: json['repositoryName'] as String?,
@@ -5438,7 +6119,7 @@ class Repository {
       if (imageScanningConfiguration != null)
         'imageScanningConfiguration': imageScanningConfiguration,
       if (imageTagMutability != null)
-        'imageTagMutability': imageTagMutability.toValue(),
+        'imageTagMutability': imageTagMutability.value,
       if (registryId != null) 'registryId': registryId,
       if (repositoryArn != null) 'repositoryArn': repositoryArn,
       if (repositoryName != null) 'repositoryName': repositoryName,
@@ -5447,10 +6128,134 @@ class Repository {
   }
 }
 
+/// The details of the repository creation template associated with the request.
+class RepositoryCreationTemplate {
+  /// A list of enumerable Strings representing the repository creation scenarios
+  /// that this template will apply towards. The two supported scenarios are
+  /// PULL_THROUGH_CACHE and REPLICATION
+  final List<RCTAppliedFor>? appliedFor;
+
+  /// The date and time, in JavaScript date format, when the repository creation
+  /// template was created.
+  final DateTime? createdAt;
+
+  /// The ARN of the role to be assumed by Amazon ECR. Amazon ECR will assume your
+  /// supplied role when the customRoleArn is specified. When this field isn't
+  /// specified, Amazon ECR will use the service-linked role for the repository
+  /// creation template.
+  final String? customRoleArn;
+
+  /// The description associated with the repository creation template.
+  final String? description;
+
+  /// The encryption configuration associated with the repository creation
+  /// template.
+  final EncryptionConfigurationForRepositoryCreationTemplate?
+      encryptionConfiguration;
+
+  /// The tag mutability setting for the repository. If this parameter is omitted,
+  /// the default setting of MUTABLE will be used which will allow image tags to
+  /// be overwritten. If IMMUTABLE is specified, all image tags within the
+  /// repository will be immutable which will prevent them from being overwritten.
+  final ImageTagMutability? imageTagMutability;
+
+  /// The lifecycle policy to use for repositories created using the template.
+  final String? lifecyclePolicy;
+
+  /// The repository namespace prefix associated with the repository creation
+  /// template.
+  final String? prefix;
+
+  /// he repository policy to apply to repositories created using the template. A
+  /// repository policy is a permissions policy associated with a repository to
+  /// control access permissions.
+  final String? repositoryPolicy;
+
+  /// The metadata to apply to the repository to help you categorize and organize.
+  /// Each tag consists of a key and an optional value, both of which you define.
+  /// Tag keys can have a maximum character length of 128 characters, and tag
+  /// values can have a maximum length of 256 characters.
+  final List<Tag>? resourceTags;
+
+  /// The date and time, in JavaScript date format, when the repository creation
+  /// template was last updated.
+  final DateTime? updatedAt;
+
+  RepositoryCreationTemplate({
+    this.appliedFor,
+    this.createdAt,
+    this.customRoleArn,
+    this.description,
+    this.encryptionConfiguration,
+    this.imageTagMutability,
+    this.lifecyclePolicy,
+    this.prefix,
+    this.repositoryPolicy,
+    this.resourceTags,
+    this.updatedAt,
+  });
+
+  factory RepositoryCreationTemplate.fromJson(Map<String, dynamic> json) {
+    return RepositoryCreationTemplate(
+      appliedFor: (json['appliedFor'] as List?)
+          ?.nonNulls
+          .map((e) => RCTAppliedFor.fromString((e as String)))
+          .toList(),
+      createdAt: timeStampFromJson(json['createdAt']),
+      customRoleArn: json['customRoleArn'] as String?,
+      description: json['description'] as String?,
+      encryptionConfiguration: json['encryptionConfiguration'] != null
+          ? EncryptionConfigurationForRepositoryCreationTemplate.fromJson(
+              json['encryptionConfiguration'] as Map<String, dynamic>)
+          : null,
+      imageTagMutability: (json['imageTagMutability'] as String?)
+          ?.let(ImageTagMutability.fromString),
+      lifecyclePolicy: json['lifecyclePolicy'] as String?,
+      prefix: json['prefix'] as String?,
+      repositoryPolicy: json['repositoryPolicy'] as String?,
+      resourceTags: (json['resourceTags'] as List?)
+          ?.nonNulls
+          .map((e) => Tag.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      updatedAt: timeStampFromJson(json['updatedAt']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final appliedFor = this.appliedFor;
+    final createdAt = this.createdAt;
+    final customRoleArn = this.customRoleArn;
+    final description = this.description;
+    final encryptionConfiguration = this.encryptionConfiguration;
+    final imageTagMutability = this.imageTagMutability;
+    final lifecyclePolicy = this.lifecyclePolicy;
+    final prefix = this.prefix;
+    final repositoryPolicy = this.repositoryPolicy;
+    final resourceTags = this.resourceTags;
+    final updatedAt = this.updatedAt;
+    return {
+      if (appliedFor != null)
+        'appliedFor': appliedFor.map((e) => e.value).toList(),
+      if (createdAt != null) 'createdAt': unixTimestampToJson(createdAt),
+      if (customRoleArn != null) 'customRoleArn': customRoleArn,
+      if (description != null) 'description': description,
+      if (encryptionConfiguration != null)
+        'encryptionConfiguration': encryptionConfiguration,
+      if (imageTagMutability != null)
+        'imageTagMutability': imageTagMutability.value,
+      if (lifecyclePolicy != null) 'lifecyclePolicy': lifecyclePolicy,
+      if (prefix != null) 'prefix': prefix,
+      if (repositoryPolicy != null) 'repositoryPolicy': repositoryPolicy,
+      if (resourceTags != null) 'resourceTags': resourceTags,
+      if (updatedAt != null) 'updatedAt': unixTimestampToJson(updatedAt),
+    };
+  }
+}
+
 /// The filter settings used with image replication. Specifying a repository
 /// filter to a replication rule provides a method for controlling which
-/// repositories in a private registry are replicated. If no repository filter
-/// is specified, all images in the repository are replicated.
+/// repositories in a private registry are replicated. If no filters are added,
+/// the contents of all repositories are replicated.
 class RepositoryFilter {
   /// The repository filter details. When the <code>PREFIX_MATCH</code> filter
   /// type is specified, this value is required and should be the repository name
@@ -5470,7 +6275,8 @@ class RepositoryFilter {
   factory RepositoryFilter.fromJson(Map<String, dynamic> json) {
     return RepositoryFilter(
       filter: json['filter'] as String,
-      filterType: (json['filterType'] as String).toRepositoryFilterType(),
+      filterType:
+          RepositoryFilterType.fromString((json['filterType'] as String)),
     );
   }
 
@@ -5479,32 +6285,23 @@ class RepositoryFilter {
     final filterType = this.filterType;
     return {
       'filter': filter,
-      'filterType': filterType.toValue(),
+      'filterType': filterType.value,
     };
   }
 }
 
 enum RepositoryFilterType {
-  prefixMatch,
-}
+  prefixMatch('PREFIX_MATCH'),
+  ;
 
-extension RepositoryFilterTypeValueExtension on RepositoryFilterType {
-  String toValue() {
-    switch (this) {
-      case RepositoryFilterType.prefixMatch:
-        return 'PREFIX_MATCH';
-    }
-  }
-}
+  final String value;
 
-extension RepositoryFilterTypeFromString on String {
-  RepositoryFilterType toRepositoryFilterType() {
-    switch (this) {
-      case 'PREFIX_MATCH':
-        return RepositoryFilterType.prefixMatch;
-    }
-    throw Exception('$this is not known in enum RepositoryFilterType');
-  }
+  const RepositoryFilterType(this.value);
+
+  static RepositoryFilterType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum RepositoryFilterType'));
 }
 
 /// The details of the scanning configuration for a repository.
@@ -5535,13 +6332,14 @@ class RepositoryScanningConfiguration {
   factory RepositoryScanningConfiguration.fromJson(Map<String, dynamic> json) {
     return RepositoryScanningConfiguration(
       appliedScanFilters: (json['appliedScanFilters'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) =>
               ScanningRepositoryFilter.fromJson(e as Map<String, dynamic>))
           .toList(),
       repositoryArn: json['repositoryArn'] as String?,
       repositoryName: json['repositoryName'] as String?,
-      scanFrequency: (json['scanFrequency'] as String?)?.toScanFrequency(),
+      scanFrequency:
+          (json['scanFrequency'] as String?)?.let(ScanFrequency.fromString),
       scanOnPush: json['scanOnPush'] as bool?,
     );
   }
@@ -5556,7 +6354,7 @@ class RepositoryScanningConfiguration {
       if (appliedScanFilters != null) 'appliedScanFilters': appliedScanFilters,
       if (repositoryArn != null) 'repositoryArn': repositoryArn,
       if (repositoryName != null) 'repositoryName': repositoryName,
-      if (scanFrequency != null) 'scanFrequency': scanFrequency.toValue(),
+      if (scanFrequency != null) 'scanFrequency': scanFrequency.value,
       if (scanOnPush != null) 'scanOnPush': scanOnPush,
     };
   }
@@ -5584,7 +6382,7 @@ class RepositoryScanningConfigurationFailure {
       Map<String, dynamic> json) {
     return RepositoryScanningConfigurationFailure(
       failureCode: (json['failureCode'] as String?)
-          ?.toScanningConfigurationFailureCode(),
+          ?.let(ScanningConfigurationFailureCode.fromString),
       failureReason: json['failureReason'] as String?,
       repositoryName: json['repositoryName'] as String?,
     );
@@ -5595,7 +6393,7 @@ class RepositoryScanningConfigurationFailure {
     final failureReason = this.failureReason;
     final repositoryName = this.repositoryName;
     return {
-      if (failureCode != null) 'failureCode': failureCode.toValue(),
+      if (failureCode != null) 'failureCode': failureCode.value,
       if (failureReason != null) 'failureReason': failureReason,
       if (repositoryName != null) 'repositoryName': repositoryName,
     };
@@ -5678,147 +6476,67 @@ class ResourceDetails {
 }
 
 enum ScanFrequency {
-  scanOnPush,
-  continuousScan,
-  manual,
-}
+  scanOnPush('SCAN_ON_PUSH'),
+  continuousScan('CONTINUOUS_SCAN'),
+  manual('MANUAL'),
+  ;
 
-extension ScanFrequencyValueExtension on ScanFrequency {
-  String toValue() {
-    switch (this) {
-      case ScanFrequency.scanOnPush:
-        return 'SCAN_ON_PUSH';
-      case ScanFrequency.continuousScan:
-        return 'CONTINUOUS_SCAN';
-      case ScanFrequency.manual:
-        return 'MANUAL';
-    }
-  }
-}
+  final String value;
 
-extension ScanFrequencyFromString on String {
-  ScanFrequency toScanFrequency() {
-    switch (this) {
-      case 'SCAN_ON_PUSH':
-        return ScanFrequency.scanOnPush;
-      case 'CONTINUOUS_SCAN':
-        return ScanFrequency.continuousScan;
-      case 'MANUAL':
-        return ScanFrequency.manual;
-    }
-    throw Exception('$this is not known in enum ScanFrequency');
-  }
+  const ScanFrequency(this.value);
+
+  static ScanFrequency fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ScanFrequency'));
 }
 
 enum ScanStatus {
-  inProgress,
-  complete,
-  failed,
-  unsupportedImage,
-  active,
-  pending,
-  scanEligibilityExpired,
-  findingsUnavailable,
-}
+  inProgress('IN_PROGRESS'),
+  complete('COMPLETE'),
+  failed('FAILED'),
+  unsupportedImage('UNSUPPORTED_IMAGE'),
+  active('ACTIVE'),
+  pending('PENDING'),
+  scanEligibilityExpired('SCAN_ELIGIBILITY_EXPIRED'),
+  findingsUnavailable('FINDINGS_UNAVAILABLE'),
+  ;
 
-extension ScanStatusValueExtension on ScanStatus {
-  String toValue() {
-    switch (this) {
-      case ScanStatus.inProgress:
-        return 'IN_PROGRESS';
-      case ScanStatus.complete:
-        return 'COMPLETE';
-      case ScanStatus.failed:
-        return 'FAILED';
-      case ScanStatus.unsupportedImage:
-        return 'UNSUPPORTED_IMAGE';
-      case ScanStatus.active:
-        return 'ACTIVE';
-      case ScanStatus.pending:
-        return 'PENDING';
-      case ScanStatus.scanEligibilityExpired:
-        return 'SCAN_ELIGIBILITY_EXPIRED';
-      case ScanStatus.findingsUnavailable:
-        return 'FINDINGS_UNAVAILABLE';
-    }
-  }
-}
+  final String value;
 
-extension ScanStatusFromString on String {
-  ScanStatus toScanStatus() {
-    switch (this) {
-      case 'IN_PROGRESS':
-        return ScanStatus.inProgress;
-      case 'COMPLETE':
-        return ScanStatus.complete;
-      case 'FAILED':
-        return ScanStatus.failed;
-      case 'UNSUPPORTED_IMAGE':
-        return ScanStatus.unsupportedImage;
-      case 'ACTIVE':
-        return ScanStatus.active;
-      case 'PENDING':
-        return ScanStatus.pending;
-      case 'SCAN_ELIGIBILITY_EXPIRED':
-        return ScanStatus.scanEligibilityExpired;
-      case 'FINDINGS_UNAVAILABLE':
-        return ScanStatus.findingsUnavailable;
-    }
-    throw Exception('$this is not known in enum ScanStatus');
-  }
+  const ScanStatus(this.value);
+
+  static ScanStatus fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum ScanStatus'));
 }
 
 enum ScanType {
-  basic,
-  enhanced,
-}
+  basic('BASIC'),
+  enhanced('ENHANCED'),
+  ;
 
-extension ScanTypeValueExtension on ScanType {
-  String toValue() {
-    switch (this) {
-      case ScanType.basic:
-        return 'BASIC';
-      case ScanType.enhanced:
-        return 'ENHANCED';
-    }
-  }
-}
+  final String value;
 
-extension ScanTypeFromString on String {
-  ScanType toScanType() {
-    switch (this) {
-      case 'BASIC':
-        return ScanType.basic;
-      case 'ENHANCED':
-        return ScanType.enhanced;
-    }
-    throw Exception('$this is not known in enum ScanType');
-  }
+  const ScanType(this.value);
+
+  static ScanType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum ScanType'));
 }
 
 enum ScanningConfigurationFailureCode {
-  repositoryNotFound,
-}
+  repositoryNotFound('REPOSITORY_NOT_FOUND'),
+  ;
 
-extension ScanningConfigurationFailureCodeValueExtension
-    on ScanningConfigurationFailureCode {
-  String toValue() {
-    switch (this) {
-      case ScanningConfigurationFailureCode.repositoryNotFound:
-        return 'REPOSITORY_NOT_FOUND';
-    }
-  }
-}
+  final String value;
 
-extension ScanningConfigurationFailureCodeFromString on String {
-  ScanningConfigurationFailureCode toScanningConfigurationFailureCode() {
-    switch (this) {
-      case 'REPOSITORY_NOT_FOUND':
-        return ScanningConfigurationFailureCode.repositoryNotFound;
-    }
-    throw Exception(
-        '$this is not known in enum ScanningConfigurationFailureCode');
-  }
+  const ScanningConfigurationFailureCode(this.value);
+
+  static ScanningConfigurationFailureCode fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ScanningConfigurationFailureCode'));
 }
 
 /// The details of a scanning repository filter. For more information on how to
@@ -5840,8 +6558,8 @@ class ScanningRepositoryFilter {
   factory ScanningRepositoryFilter.fromJson(Map<String, dynamic> json) {
     return ScanningRepositoryFilter(
       filter: json['filter'] as String,
-      filterType:
-          (json['filterType'] as String).toScanningRepositoryFilterType(),
+      filterType: ScanningRepositoryFilterType.fromString(
+          (json['filterType'] as String)),
     );
   }
 
@@ -5850,33 +6568,23 @@ class ScanningRepositoryFilter {
     final filterType = this.filterType;
     return {
       'filter': filter,
-      'filterType': filterType.toValue(),
+      'filterType': filterType.value,
     };
   }
 }
 
 enum ScanningRepositoryFilterType {
-  wildcard,
-}
+  wildcard('WILDCARD'),
+  ;
 
-extension ScanningRepositoryFilterTypeValueExtension
-    on ScanningRepositoryFilterType {
-  String toValue() {
-    switch (this) {
-      case ScanningRepositoryFilterType.wildcard:
-        return 'WILDCARD';
-    }
-  }
-}
+  final String value;
 
-extension ScanningRepositoryFilterTypeFromString on String {
-  ScanningRepositoryFilterType toScanningRepositoryFilterType() {
-    switch (this) {
-      case 'WILDCARD':
-        return ScanningRepositoryFilterType.wildcard;
-    }
-    throw Exception('$this is not known in enum ScanningRepositoryFilterType');
-  }
+  const ScanningRepositoryFilterType(this.value);
+
+  static ScanningRepositoryFilterType fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum ScanningRepositoryFilterType'));
 }
 
 /// Information about the Amazon Inspector score given to a finding.
@@ -6013,7 +6721,8 @@ class StartLifecyclePolicyPreviewResponse {
       lifecyclePolicyText: json['lifecyclePolicyText'] as String?,
       registryId: json['registryId'] as String?,
       repositoryName: json['repositoryName'] as String?,
-      status: (json['status'] as String?)?.toLifecyclePolicyPreviewStatus(),
+      status: (json['status'] as String?)
+          ?.let(LifecyclePolicyPreviewStatus.fromString),
     );
   }
 
@@ -6027,7 +6736,7 @@ class StartLifecyclePolicyPreviewResponse {
         'lifecyclePolicyText': lifecyclePolicyText,
       if (registryId != null) 'registryId': registryId,
       if (repositoryName != null) 'repositoryName': repositoryName,
-      if (status != null) 'status': status.toValue(),
+      if (status != null) 'status': status.value,
     };
   }
 }
@@ -6039,20 +6748,20 @@ class StartLifecyclePolicyPreviewResponse {
 class Tag {
   /// One part of a key-value pair that make up a tag. A <code>key</code> is a
   /// general label that acts like a category for more specific tag values.
-  final String? key;
+  final String key;
 
   /// A <code>value</code> acts as a descriptor within a tag category (key).
-  final String? value;
+  final String value;
 
   Tag({
-    this.key,
-    this.value,
+    required this.key,
+    required this.value,
   });
 
   factory Tag.fromJson(Map<String, dynamic> json) {
     return Tag(
-      key: json['Key'] as String?,
-      value: json['Value'] as String?,
+      key: json['Key'] as String,
+      value: json['Value'] as String,
     );
   }
 
@@ -6060,8 +6769,8 @@ class Tag {
     final key = this.key;
     final value = this.value;
     return {
-      if (key != null) 'Key': key,
-      if (value != null) 'Value': value,
+      'Key': key,
+      'Value': value,
     };
   }
 }
@@ -6079,36 +6788,18 @@ class TagResourceResponse {
 }
 
 enum TagStatus {
-  tagged,
-  untagged,
-  any,
-}
+  tagged('TAGGED'),
+  untagged('UNTAGGED'),
+  any('ANY'),
+  ;
 
-extension TagStatusValueExtension on TagStatus {
-  String toValue() {
-    switch (this) {
-      case TagStatus.tagged:
-        return 'TAGGED';
-      case TagStatus.untagged:
-        return 'UNTAGGED';
-      case TagStatus.any:
-        return 'ANY';
-    }
-  }
-}
+  final String value;
 
-extension TagStatusFromString on String {
-  TagStatus toTagStatus() {
-    switch (this) {
-      case 'TAGGED':
-        return TagStatus.tagged;
-      case 'UNTAGGED':
-        return TagStatus.untagged;
-      case 'ANY':
-        return TagStatus.any;
-    }
-    throw Exception('$this is not known in enum TagStatus');
-  }
+  const TagStatus(this.value);
+
+  static TagStatus fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () => throw Exception('$value is not known in enum TagStatus'));
 }
 
 class UntagResourceResponse {
@@ -6120,6 +6811,88 @@ class UntagResourceResponse {
 
   Map<String, dynamic> toJson() {
     return {};
+  }
+}
+
+class UpdatePullThroughCacheRuleResponse {
+  /// The Amazon Resource Name (ARN) of the Amazon Web Services Secrets Manager
+  /// secret associated with the pull through cache rule.
+  final String? credentialArn;
+
+  /// The Amazon ECR repository prefix associated with the pull through cache
+  /// rule.
+  final String? ecrRepositoryPrefix;
+
+  /// The registry ID associated with the request.
+  final String? registryId;
+
+  /// The date and time, in JavaScript date format, when the pull through cache
+  /// rule was updated.
+  final DateTime? updatedAt;
+
+  UpdatePullThroughCacheRuleResponse({
+    this.credentialArn,
+    this.ecrRepositoryPrefix,
+    this.registryId,
+    this.updatedAt,
+  });
+
+  factory UpdatePullThroughCacheRuleResponse.fromJson(
+      Map<String, dynamic> json) {
+    return UpdatePullThroughCacheRuleResponse(
+      credentialArn: json['credentialArn'] as String?,
+      ecrRepositoryPrefix: json['ecrRepositoryPrefix'] as String?,
+      registryId: json['registryId'] as String?,
+      updatedAt: timeStampFromJson(json['updatedAt']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final credentialArn = this.credentialArn;
+    final ecrRepositoryPrefix = this.ecrRepositoryPrefix;
+    final registryId = this.registryId;
+    final updatedAt = this.updatedAt;
+    return {
+      if (credentialArn != null) 'credentialArn': credentialArn,
+      if (ecrRepositoryPrefix != null)
+        'ecrRepositoryPrefix': ecrRepositoryPrefix,
+      if (registryId != null) 'registryId': registryId,
+      if (updatedAt != null) 'updatedAt': unixTimestampToJson(updatedAt),
+    };
+  }
+}
+
+class UpdateRepositoryCreationTemplateResponse {
+  /// The registry ID associated with the request.
+  final String? registryId;
+
+  /// The details of the repository creation template associated with the request.
+  final RepositoryCreationTemplate? repositoryCreationTemplate;
+
+  UpdateRepositoryCreationTemplateResponse({
+    this.registryId,
+    this.repositoryCreationTemplate,
+  });
+
+  factory UpdateRepositoryCreationTemplateResponse.fromJson(
+      Map<String, dynamic> json) {
+    return UpdateRepositoryCreationTemplateResponse(
+      registryId: json['registryId'] as String?,
+      repositoryCreationTemplate: json['repositoryCreationTemplate'] != null
+          ? RepositoryCreationTemplate.fromJson(
+              json['repositoryCreationTemplate'] as Map<String, dynamic>)
+          : null,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final registryId = this.registryId;
+    final repositoryCreationTemplate = this.repositoryCreationTemplate;
+    return {
+      if (registryId != null) 'registryId': registryId,
+      if (repositoryCreationTemplate != null)
+        'repositoryCreationTemplate': repositoryCreationTemplate,
+    };
   }
 }
 
@@ -6162,6 +6935,95 @@ class UploadLayerPartResponse {
       if (registryId != null) 'registryId': registryId,
       if (repositoryName != null) 'repositoryName': repositoryName,
       if (uploadId != null) 'uploadId': uploadId,
+    };
+  }
+}
+
+enum UpstreamRegistry {
+  ecrPublic('ecr-public'),
+  quay('quay'),
+  k8s('k8s'),
+  dockerHub('docker-hub'),
+  githubContainerRegistry('github-container-registry'),
+  azureContainerRegistry('azure-container-registry'),
+  gitlabContainerRegistry('gitlab-container-registry'),
+  ;
+
+  final String value;
+
+  const UpstreamRegistry(this.value);
+
+  static UpstreamRegistry fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum UpstreamRegistry'));
+}
+
+class ValidatePullThroughCacheRuleResponse {
+  /// The Amazon Resource Name (ARN) of the Amazon Web Services Secrets Manager
+  /// secret associated with the pull through cache rule.
+  final String? credentialArn;
+
+  /// The Amazon ECR repository prefix associated with the pull through cache
+  /// rule.
+  final String? ecrRepositoryPrefix;
+
+  /// The reason the validation failed. For more details about possible causes and
+  /// how to address them, see <a
+  /// href="https://docs.aws.amazon.com/AmazonECR/latest/userguide/pull-through-cache.html">Using
+  /// pull through cache rules</a> in the <i>Amazon Elastic Container Registry
+  /// User Guide</i>.
+  final String? failure;
+
+  /// Whether or not the pull through cache rule was validated. If
+  /// <code>true</code>, Amazon ECR was able to reach the upstream registry and
+  /// authentication was successful. If <code>false</code>, there was an issue and
+  /// validation failed. The <code>failure</code> reason indicates the cause.
+  final bool? isValid;
+
+  /// The registry ID associated with the request.
+  final String? registryId;
+
+  /// The upstream registry URL associated with the pull through cache rule.
+  final String? upstreamRegistryUrl;
+
+  ValidatePullThroughCacheRuleResponse({
+    this.credentialArn,
+    this.ecrRepositoryPrefix,
+    this.failure,
+    this.isValid,
+    this.registryId,
+    this.upstreamRegistryUrl,
+  });
+
+  factory ValidatePullThroughCacheRuleResponse.fromJson(
+      Map<String, dynamic> json) {
+    return ValidatePullThroughCacheRuleResponse(
+      credentialArn: json['credentialArn'] as String?,
+      ecrRepositoryPrefix: json['ecrRepositoryPrefix'] as String?,
+      failure: json['failure'] as String?,
+      isValid: json['isValid'] as bool?,
+      registryId: json['registryId'] as String?,
+      upstreamRegistryUrl: json['upstreamRegistryUrl'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final credentialArn = this.credentialArn;
+    final ecrRepositoryPrefix = this.ecrRepositoryPrefix;
+    final failure = this.failure;
+    final isValid = this.isValid;
+    final registryId = this.registryId;
+    final upstreamRegistryUrl = this.upstreamRegistryUrl;
+    return {
+      if (credentialArn != null) 'credentialArn': credentialArn,
+      if (ecrRepositoryPrefix != null)
+        'ecrRepositoryPrefix': ecrRepositoryPrefix,
+      if (failure != null) 'failure': failure,
+      if (isValid != null) 'isValid': isValid,
+      if (registryId != null) 'registryId': registryId,
+      if (upstreamRegistryUrl != null)
+        'upstreamRegistryUrl': upstreamRegistryUrl,
     };
   }
 }
@@ -6412,14 +7274,64 @@ class ScanNotFoundException extends _s.GenericAwsException {
       : super(type: type, code: 'ScanNotFoundException', message: message);
 }
 
+class SecretNotFoundException extends _s.GenericAwsException {
+  SecretNotFoundException({String? type, String? message})
+      : super(type: type, code: 'SecretNotFoundException', message: message);
+}
+
 class ServerException extends _s.GenericAwsException {
   ServerException({String? type, String? message})
       : super(type: type, code: 'ServerException', message: message);
 }
 
+class TemplateAlreadyExistsException extends _s.GenericAwsException {
+  TemplateAlreadyExistsException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'TemplateAlreadyExistsException',
+            message: message);
+}
+
+class TemplateNotFoundException extends _s.GenericAwsException {
+  TemplateNotFoundException({String? type, String? message})
+      : super(type: type, code: 'TemplateNotFoundException', message: message);
+}
+
 class TooManyTagsException extends _s.GenericAwsException {
   TooManyTagsException({String? type, String? message})
       : super(type: type, code: 'TooManyTagsException', message: message);
+}
+
+class UnableToAccessSecretException extends _s.GenericAwsException {
+  UnableToAccessSecretException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'UnableToAccessSecretException',
+            message: message);
+}
+
+class UnableToDecryptSecretValueException extends _s.GenericAwsException {
+  UnableToDecryptSecretValueException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'UnableToDecryptSecretValueException',
+            message: message);
+}
+
+class UnableToGetUpstreamImageException extends _s.GenericAwsException {
+  UnableToGetUpstreamImageException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'UnableToGetUpstreamImageException',
+            message: message);
+}
+
+class UnableToGetUpstreamLayerException extends _s.GenericAwsException {
+  UnableToGetUpstreamLayerException({String? type, String? message})
+      : super(
+            type: type,
+            code: 'UnableToGetUpstreamLayerException',
+            message: message);
 }
 
 class UnsupportedImageTypeException extends _s.GenericAwsException {
@@ -6502,10 +7414,24 @@ final _exceptionFns = <String, _s.AwsExceptionFn>{
       RepositoryPolicyNotFoundException(type: type, message: message),
   'ScanNotFoundException': (type, message) =>
       ScanNotFoundException(type: type, message: message),
+  'SecretNotFoundException': (type, message) =>
+      SecretNotFoundException(type: type, message: message),
   'ServerException': (type, message) =>
       ServerException(type: type, message: message),
+  'TemplateAlreadyExistsException': (type, message) =>
+      TemplateAlreadyExistsException(type: type, message: message),
+  'TemplateNotFoundException': (type, message) =>
+      TemplateNotFoundException(type: type, message: message),
   'TooManyTagsException': (type, message) =>
       TooManyTagsException(type: type, message: message),
+  'UnableToAccessSecretException': (type, message) =>
+      UnableToAccessSecretException(type: type, message: message),
+  'UnableToDecryptSecretValueException': (type, message) =>
+      UnableToDecryptSecretValueException(type: type, message: message),
+  'UnableToGetUpstreamImageException': (type, message) =>
+      UnableToGetUpstreamImageException(type: type, message: message),
+  'UnableToGetUpstreamLayerException': (type, message) =>
+      UnableToGetUpstreamLayerException(type: type, message: message),
   'UnsupportedImageTypeException': (type, message) =>
       UnsupportedImageTypeException(type: type, message: message),
   'UnsupportedUpstreamRegistryException': (type, message) =>

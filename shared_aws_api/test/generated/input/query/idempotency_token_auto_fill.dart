@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -17,13 +18,11 @@ import 'package:shared_aws_api/shared.dart'
         nonNullableTimeStampFromJson,
         timeStampFromJson;
 
-import 'idempotency_token_auto_fill.meta.dart';
 export 'package:shared_aws_api/shared.dart' show AwsClientCredentials;
 
 /// Idempotency token auto fill
 class IdempotencyTokenAutoFill {
   final _s.QueryProtocol _protocol;
-  final Map<String, _s.Shape> shapes;
 
   IdempotencyTokenAutoFill({
     required String region,
@@ -31,7 +30,7 @@ class IdempotencyTokenAutoFill {
     _s.AwsClientCredentialsProvider? credentialsProvider,
     _s.Client? client,
     String? endpointUrl,
-  })  : _protocol = _s.QueryProtocol(
+  }) : _protocol = _s.QueryProtocol(
           client: client,
           service: _s.ServiceMetadata(
             endpointPrefix: 'IdempotencyTokenAutoFill',
@@ -40,9 +39,7 @@ class IdempotencyTokenAutoFill {
           credentials: credentials,
           credentialsProvider: credentialsProvider,
           endpointUrl: endpointUrl,
-        ),
-        shapes = shapesJson
-            .map((key, value) => MapEntry(key, _s.Shape.fromJson(value)));
+        );
 
   /// Closes the internal HTTP client if none was provided at creation.
   /// If a client was passed as a constructor argument, this becomes a noop.
@@ -56,8 +53,9 @@ class IdempotencyTokenAutoFill {
   Future<void> operationName0({
     String? token,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Token'] = token ?? _s.generateIdempotencyToken();
+    final $request = <String, String>{
+      'Token': token ?? _s.generateIdempotencyToken(),
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -65,16 +63,15 @@ class IdempotencyTokenAutoFill {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 
   Future<void> operationName1({
     String? token,
   }) async {
-    final $request = <String, dynamic>{};
-    $request['Token'] = token ?? _s.generateIdempotencyToken();
+    final $request = <String, String>{
+      'Token': token ?? _s.generateIdempotencyToken(),
+    };
     await _protocol.send(
       $request,
       action: 'OperationName',
@@ -82,8 +79,6 @@ class IdempotencyTokenAutoFill {
       method: 'POST',
       requestUri: '/',
       exceptionFnMap: _exceptionFns,
-      shape: shapes['InputShape'],
-      shapes: shapes,
     );
   }
 }

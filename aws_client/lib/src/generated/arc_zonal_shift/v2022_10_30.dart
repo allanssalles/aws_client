@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -19,33 +20,52 @@ import '../../shared/shared.dart'
 
 export '../../shared/shared.dart' show AwsClientCredentials;
 
-/// This is the API Reference Guide for the zonal shift feature of Amazon Route
-/// 53 Application Recovery Controller. This guide is for developers who need
-/// detailed information about zonal shift API actions, data types, and errors.
+/// Welcome to the API Reference Guide for zonal shift and zonal autoshift in
+/// Amazon Route 53 Application Recovery Controller (Route 53 ARC).
 ///
-/// Zonal shift is in preview release for Amazon Route 53 Application Recovery
-/// Controller and is subject to change.
+/// You can start a zonal shift to move traffic for a load balancer resource
+/// away from an Availability Zone to help your application recover quickly from
+/// an impairment in an Availability Zone. For example, you can recover your
+/// application from a developer's bad code deployment or from an Amazon Web
+/// Services infrastructure failure in a single Availability Zone.
 ///
-/// Zonal shift in Route 53 ARC enables you to move traffic for a load balancer
-/// resource away from an Availability Zone. Starting a zonal shift helps your
-/// application recover immediately, for example, from a developer's bad code
-/// deployment or from an AWS infrastructure failure in a single Availability
-/// Zone, reducing the impact and time lost from an issue in one zone.
+/// You can also configure zonal autoshift for supported load balancer
+/// resources. Zonal autoshift is a capability in Route 53 ARC where you
+/// authorize Amazon Web Services to shift away application resource traffic
+/// from an Availability Zone during events, on your behalf, to help reduce your
+/// time to recovery. Amazon Web Services starts an autoshift when internal
+/// telemetry indicates that there is an Availability Zone impairment that could
+/// potentially impact customers.
 ///
-/// Supported AWS resources are automatically registered with Route 53 ARC.
-/// Resources that are registered for zonal shifts in Route 53 ARC are managed
-/// resources in Route 53 ARC. You can start a zonal shift for any managed
-/// resource in your account in a Region. At this time, you can only start a
-/// zonal shift for Network Load Balancers and Application Load Balancers with
-/// cross-zone load balancing turned off.
+/// To help make sure that zonal autoshift is safe for your application, you
+/// must also configure practice runs when you enable zonal autoshift for a
+/// resource. Practice runs start weekly zonal shifts for a resource, to shift
+/// traffic for the resource away from an Availability Zone. Practice runs help
+/// you to make sure, on a regular basis, that you have enough capacity in all
+/// the Availability Zones in an Amazon Web Services Region for your application
+/// to continue to operate normally when traffic for a resource is shifted away
+/// from one Availability Zone.
+/// <important>
+/// Before you configure practice runs or enable zonal autoshift, we strongly
+/// recommend that you prescale your application resource capacity in all
+/// Availability Zones in the Region where your application resources are
+/// deployed. You should not rely on scaling on demand when an autoshift or
+/// practice run starts. Zonal autoshift, including practice runs, works
+/// independently, and does not wait for auto scaling actions to complete.
+/// Relying on auto scaling, instead of pre-scaling, can result in loss of
+/// availability.
 ///
-/// Zonal shifts are temporary. You must specify an expiration when you start a
-/// zonal shift, of up to three days initially. If you want to still keep
-/// traffic away from an Availability Zone, you can update the zonal shift and
-/// set a new expiration. You can also cancel a zonal shift, before it expires,
-/// for example, if you're ready to restore traffic to the Availability Zone.
+/// If you use auto scaling to handle regular cycles of traffic, we strongly
+/// recommend that you configure the minimum capacity of your auto scaling to
+/// continue operating normally with the loss of an Availability Zone.
+/// </important>
+/// Be aware that Route 53 ARC does not inspect the health of individual
+/// resources. Amazon Web Services only starts an autoshift when Amazon Web
+/// Services telemetry detects that there is an Availability Zone impairment
+/// that could potentially impact customers. In some cases, resources might be
+/// shifted away that are not experiencing impact.
 ///
-/// For more information about using zonal shift, see the <a
+/// For more information about using zonal shift and zonal autoshift, see the <a
 /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/what-is-route53-recovery.html">Amazon
 /// Route 53 Application Recovery Controller Developer Guide</a>.
 class ArcZonalShift {
@@ -77,8 +97,12 @@ class ArcZonalShift {
     _protocol.close();
   }
 
-  /// Cancel a zonal shift in Amazon Route 53 Application Recovery Controller
-  /// that you've started for a resource in your AWS account in an AWS Region.
+  /// Cancel a zonal shift in Amazon Route 53 Application Recovery Controller.
+  /// To cancel the zonal shift, specify the zonal shift ID.
+  ///
+  /// A zonal shift can be one that you've started for a resource in your Amazon
+  /// Web Services account in an Amazon Web Services Region, or it can be a
+  /// zonal shift started by a practice run with zonal autoshift.
   ///
   /// May throw [InternalServerException].
   /// May throw [ConflictException].
@@ -101,13 +125,174 @@ class ArcZonalShift {
     return ZonalShift.fromJson(response);
   }
 
-  /// Get information about a resource that's been registered for zonal shifts
-  /// with Amazon Route 53 Application Recovery Controller in this AWS Region.
-  /// Resources that are registered for zonal shifts are managed resources in
-  /// Route 53 ARC.
+  /// A practice run configuration for zonal autoshift is required when you
+  /// enable zonal autoshift. A practice run configuration includes
+  /// specifications for blocked dates and blocked time windows, and for Amazon
+  /// CloudWatch alarms that you create to use with practice runs. The alarms
+  /// that you specify are an <i>outcome alarm</i>, to monitor application
+  /// health during practice runs and, optionally, a <i>blocking alarm</i>, to
+  /// block practice runs from starting.
   ///
-  /// At this time, you can only start a zonal shift for Network Load Balancers
-  /// and Application Load Balancers with cross-zone load balancing turned off.
+  /// When a resource has a practice run configuration, Route 53 ARC starts
+  /// zonal shifts for the resource weekly, to shift traffic for practice runs.
+  /// Practice runs help you to ensure that shifting away traffic from an
+  /// Availability Zone during an autoshift is safe for your application.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.considerations.html">
+  /// Considerations when you configure zonal autoshift</a> in the Amazon Route
+  /// 53 Application Recovery Controller Developer Guide.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ConflictException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ThrottlingException].
+  /// May throw [ValidationException].
+  /// May throw [AccessDeniedException].
+  ///
+  /// Parameter [outcomeAlarms] :
+  /// The <i>outcome alarm</i> for practice runs is a required Amazon CloudWatch
+  /// alarm that you specify that ends a practice run when the alarm is in an
+  /// <code>ALARM</code> state.
+  ///
+  /// Configure the alarm to monitor the health of your application when traffic
+  /// is shifted away from an Availability Zone during each weekly practice run.
+  /// You should configure the alarm to go into an <code>ALARM</code> state if
+  /// your application is impacted by the zonal shift, and you want to stop the
+  /// zonal shift, to let traffic for the resource return to the Availability
+  /// Zone.
+  ///
+  /// Parameter [resourceIdentifier] :
+  /// The identifier of the resource that Amazon Web Services shifts traffic for
+  /// with a practice run zonal shift. The identifier is the Amazon Resource
+  /// Name (ARN) for the resource.
+  ///
+  /// At this time, supported resources are Network Load Balancers and
+  /// Application Load Balancers with cross-zone load balancing turned off.
+  ///
+  /// Parameter [blockedDates] :
+  /// Optionally, you can block Route 53 ARC from starting practice runs for a
+  /// resource on specific calendar dates.
+  ///
+  /// The format for blocked dates is: YYYY-MM-DD. Keep in mind, when you
+  /// specify dates, that dates and times for practice runs are in UTC. Separate
+  /// multiple blocked dates with spaces.
+  ///
+  /// For example, if you have an application update scheduled to launch on May
+  /// 1, 2024, and you don't want practice runs to shift traffic away at that
+  /// time, you could set a blocked date for <code>2024-05-01</code>.
+  ///
+  /// Parameter [blockedWindows] :
+  /// Optionally, you can block Route 53 ARC from starting practice runs for
+  /// specific windows of days and times.
+  ///
+  /// The format for blocked windows is: DAY:HH:SS-DAY:HH:SS. Keep in mind, when
+  /// you specify dates, that dates and times for practice runs are in UTC.
+  /// Also, be aware of potential time adjustments that might be required for
+  /// daylight saving time differences. Separate multiple blocked windows with
+  /// spaces.
+  ///
+  /// For example, say you run business report summaries three days a week. For
+  /// this scenario, you might set the following recurring days and times as
+  /// blocked windows, for example: <code>MON-20:30-21:30 WED-20:30-21:30
+  /// FRI-20:30-21:30</code>.
+  ///
+  /// Parameter [blockingAlarms] :
+  /// An Amazon CloudWatch alarm that you can specify for zonal autoshift
+  /// practice runs. This alarm blocks Route 53 ARC from starting practice run
+  /// zonal shifts, and ends a practice run that's in progress, when the alarm
+  /// is in an <code>ALARM</code> state.
+  Future<CreatePracticeRunConfigurationResponse>
+      createPracticeRunConfiguration({
+    required List<ControlCondition> outcomeAlarms,
+    required String resourceIdentifier,
+    List<String>? blockedDates,
+    List<String>? blockedWindows,
+    List<ControlCondition>? blockingAlarms,
+  }) async {
+    final $payload = <String, dynamic>{
+      'outcomeAlarms': outcomeAlarms,
+      'resourceIdentifier': resourceIdentifier,
+      if (blockedDates != null) 'blockedDates': blockedDates,
+      if (blockedWindows != null) 'blockedWindows': blockedWindows,
+      if (blockingAlarms != null) 'blockingAlarms': blockingAlarms,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'POST',
+      requestUri: '/configuration',
+      exceptionFnMap: _exceptionFns,
+    );
+    return CreatePracticeRunConfigurationResponse.fromJson(response);
+  }
+
+  /// Deletes the practice run configuration for a resource. Before you can
+  /// delete a practice run configuration for a resource., you must disable
+  /// zonal autoshift for the resource. Practice runs must be configured for
+  /// zonal autoshift to be enabled.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ConflictException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ThrottlingException].
+  /// May throw [ValidationException].
+  /// May throw [AccessDeniedException].
+  ///
+  /// Parameter [resourceIdentifier] :
+  /// The identifier for the resource that you want to delete the practice run
+  /// configuration for. The identifier is the Amazon Resource Name (ARN) for
+  /// the resource.
+  Future<DeletePracticeRunConfigurationResponse>
+      deletePracticeRunConfiguration({
+    required String resourceIdentifier,
+  }) async {
+    final response = await _protocol.send(
+      payload: null,
+      method: 'DELETE',
+      requestUri: '/configuration/${Uri.encodeComponent(resourceIdentifier)}',
+      exceptionFnMap: _exceptionFns,
+    );
+    return DeletePracticeRunConfigurationResponse.fromJson(response);
+  }
+
+  /// Returns the status of autoshift observer notification. Autoshift observer
+  /// notification enables you to be notified, through Amazon EventBridge, when
+  /// there is an autoshift event for zonal autoshift.
+  ///
+  /// If the status is <code>ENABLED</code>, Route 53 ARC includes all autoshift
+  /// events when you use the EventBridge pattern <code>Autoshift In
+  /// Progress</code>. When the status is <code>DISABLED</code>, Route 53 ARC
+  /// includes only autoshift events for autoshifts when one or more of your
+  /// resources is included in the autoshift.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.how-it-works.html#ZAShiftNotification">
+  /// Notifications for practice runs and autoshifts</a> in the Amazon Route 53
+  /// Application Recovery Controller Developer Guide.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ThrottlingException].
+  /// May throw [AccessDeniedException].
+  Future<GetAutoshiftObserverNotificationStatusResponse>
+      getAutoshiftObserverNotificationStatus() async {
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri: '/autoshift-observer-notification',
+      exceptionFnMap: _exceptionFns,
+    );
+    return GetAutoshiftObserverNotificationStatusResponse.fromJson(response);
+  }
+
+  /// Get information about a resource that's been registered for zonal shifts
+  /// with Amazon Route 53 Application Recovery Controller in this Amazon Web
+  /// Services Region. Resources that are registered for zonal shifts are
+  /// managed resources in Route 53 ARC. You can start zonal shifts and
+  /// configure zonal autoshift for managed resources.
+  ///
+  /// At this time, you can only start a zonal shift or configure zonal
+  /// autoshift for Network Load Balancers and Application Load Balancers with
+  /// cross-zone load balancing turned off.
   ///
   /// May throw [InternalServerException].
   /// May throw [ResourceNotFoundException].
@@ -116,11 +301,11 @@ class ArcZonalShift {
   /// May throw [AccessDeniedException].
   ///
   /// Parameter [resourceIdentifier] :
-  /// The identifier for the resource to include in a zonal shift. The
-  /// identifier is the Amazon Resource Name (ARN) for the resource.
+  /// The identifier for the resource that Amazon Web Services shifts traffic
+  /// for. The identifier is the Amazon Resource Name (ARN) for the resource.
   ///
-  /// At this time, you can only start a zonal shift for Network Load Balancers
-  /// and Application Load Balancers with cross-zone load balancing turned off.
+  /// At this time, supported resources are Network Load Balancers and
+  /// Application Load Balancers with cross-zone load balancing turned off.
   Future<GetManagedResourceResponse> getManagedResource({
     required String resourceIdentifier,
   }) async {
@@ -134,11 +319,60 @@ class ArcZonalShift {
     return GetManagedResourceResponse.fromJson(response);
   }
 
-  /// Lists all the resources in your AWS account in this AWS Region that are
-  /// managed for zonal shifts in Amazon Route 53 Application Recovery
-  /// Controller, and information about them. The information includes their
-  /// Amazon Resource Names (ARNs), the Availability Zones the resources are
-  /// deployed in, and the resource name.
+  /// Returns a list of autoshifts for an Amazon Web Services Region. By
+  /// default, the call returns only <code>ACTIVE</code> autoshifts. Optionally,
+  /// you can specify the <code>status</code> parameter to return
+  /// <code>COMPLETED</code> autoshifts.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ThrottlingException].
+  /// May throw [ValidationException].
+  /// May throw [AccessDeniedException].
+  ///
+  /// Parameter [maxResults] :
+  /// The number of objects that you want to return with this call.
+  ///
+  /// Parameter [nextToken] :
+  /// Specifies that you want to receive the next page of results. Valid only if
+  /// you received a <code>NextToken</code> response in the previous request. If
+  /// you did, it indicates that more output is available. Set this parameter to
+  /// the value provided by the previous call's <code>NextToken</code> response
+  /// to request the next page of results.
+  ///
+  /// Parameter [status] :
+  /// The status of the autoshift.
+  Future<ListAutoshiftsResponse> listAutoshifts({
+    int? maxResults,
+    String? nextToken,
+    AutoshiftExecutionStatus? status,
+  }) async {
+    _s.validateNumRange(
+      'maxResults',
+      maxResults,
+      1,
+      100,
+    );
+    final $query = <String, List<String>>{
+      if (maxResults != null) 'maxResults': [maxResults.toString()],
+      if (nextToken != null) 'nextToken': [nextToken],
+      if (status != null) 'status': [status.value],
+    };
+    final response = await _protocol.send(
+      payload: null,
+      method: 'GET',
+      requestUri: '/autoshifts',
+      queryParams: $query,
+      exceptionFnMap: _exceptionFns,
+    );
+    return ListAutoshiftsResponse.fromJson(response);
+  }
+
+  /// Lists all the resources in your Amazon Web Services account in this Amazon
+  /// Web Services Region that are managed for zonal shifts in Amazon Route 53
+  /// Application Recovery Controller, and information about them. The
+  /// information includes the zonal autoshift status for the resource, as well
+  /// as the Amazon Resource Name (ARN), the Availability Zones that each
+  /// resource is deployed in, and the resource name.
   ///
   /// May throw [InternalServerException].
   /// May throw [ThrottlingException].
@@ -178,8 +412,15 @@ class ArcZonalShift {
     return ListManagedResourcesResponse.fromJson(response);
   }
 
-  /// Lists all the active zonal shifts in Amazon Route 53 Application Recovery
-  /// Controller in your AWS account in this AWS Region.
+  /// Lists all active and completed zonal shifts in Amazon Route 53 Application
+  /// Recovery Controller in your Amazon Web Services account in this Amazon Web
+  /// Services Region. <code>ListZonalShifts</code> returns customer-initiated
+  /// zonal shifts, as well as practice run zonal shifts that Route 53 ARC
+  /// started on your behalf for zonal autoshift.
+  ///
+  /// The <code>ListZonalShifts</code> operation does not list autoshifts. For
+  /// more information about listing autoshifts, see <a
+  /// href="https://docs.aws.amazon.com/arc-zonal-shift/latest/api/API_ListAutoshifts.html">"&gt;ListAutoshifts</a>.
   ///
   /// May throw [InternalServerException].
   /// May throw [ThrottlingException].
@@ -196,6 +437,10 @@ class ArcZonalShift {
   /// the value provided by the previous call's <code>NextToken</code> response
   /// to request the next page of results.
   ///
+  /// Parameter [resourceIdentifier] :
+  /// The identifier for the resource that you want to list zonal shifts for.
+  /// The identifier is the Amazon Resource Name (ARN) for the resource.
+  ///
   /// Parameter [status] :
   /// A status for a zonal shift.
   ///
@@ -204,7 +449,7 @@ class ArcZonalShift {
   ///
   /// <ul>
   /// <li>
-  /// <b>ACTIVE</b>: The zonal shift is started and active.
+  /// <b>ACTIVE</b>: The zonal shift has been started and active.
   /// </li>
   /// <li>
   /// <b>EXPIRED</b>: The zonal shift has expired (the expiry time was
@@ -217,6 +462,7 @@ class ArcZonalShift {
   Future<ListZonalShiftsResponse> listZonalShifts({
     int? maxResults,
     String? nextToken,
+    String? resourceIdentifier,
     ZonalShiftStatus? status,
   }) async {
     _s.validateNumRange(
@@ -228,7 +474,9 @@ class ArcZonalShift {
     final $query = <String, List<String>>{
       if (maxResults != null) 'maxResults': [maxResults.toString()],
       if (nextToken != null) 'nextToken': [nextToken],
-      if (status != null) 'status': [status.toValue()],
+      if (resourceIdentifier != null)
+        'resourceIdentifier': [resourceIdentifier],
+      if (status != null) 'status': [status.value],
     };
     final response = await _protocol.send(
       payload: null,
@@ -241,12 +489,13 @@ class ArcZonalShift {
   }
 
   /// You start a zonal shift to temporarily move load balancer traffic away
-  /// from an Availability Zone in a AWS Region, to help your application
-  /// recover immediately, for example, from a developer's bad code deployment
-  /// or from an AWS infrastructure failure in a single Availability Zone. You
-  /// can start a zonal shift in Route 53 ARC only for managed resources in your
-  /// account in an AWS Region. Resources are automatically registered with
-  /// Route 53 ARC by AWS services.
+  /// from an Availability Zone in an Amazon Web Services Region, to help your
+  /// application recover immediately, for example, from a developer's bad code
+  /// deployment or from an Amazon Web Services infrastructure failure in a
+  /// single Availability Zone. You can start a zonal shift in Route 53 ARC only
+  /// for managed resources in your Amazon Web Services account in an Amazon Web
+  /// Services Region. Resources are automatically registered with Route 53 ARC
+  /// by Amazon Web Services services.
   ///
   /// At this time, you can only start a zonal shift for Network Load Balancers
   /// and Application Load Balancers with cross-zone load balancing turned off.
@@ -270,10 +519,10 @@ class ArcZonalShift {
   /// May throw [AccessDeniedException].
   ///
   /// Parameter [awayFrom] :
-  /// The Availability Zone that traffic is moved away from for a resource when
-  /// you start a zonal shift. Until the zonal shift expires or you cancel it,
-  /// traffic for the resource is instead moved to other Availability Zones in
-  /// the AWS Region.
+  /// The Availability Zone (for example, <code>use1-az1</code>) that traffic is
+  /// moved away from for a resource when you start a zonal shift. Until the
+  /// zonal shift expires or you cancel it, traffic for the resource is instead
+  /// moved to other Availability Zones in the Amazon Web Services Region.
   ///
   /// Parameter [comment] :
   /// A comment that you enter about the zonal shift. Only the latest comment is
@@ -293,20 +542,24 @@ class ArcZonalShift {
   ///
   /// To set a length of time for a zonal shift to be active, specify a whole
   /// number, and then one of the following, with no space:
-  /// <pre><code> &lt;ul&gt; &lt;li&gt; &lt;p&gt; &lt;b&gt;A lowercase letter
-  /// m:&lt;/b&gt; To specify that the value is in minutes.&lt;/p&gt;
-  /// &lt;/li&gt; &lt;li&gt; &lt;p&gt; &lt;b&gt;A lowercase letter h:&lt;/b&gt;
-  /// To specify that the value is in hours.&lt;/p&gt; &lt;/li&gt; &lt;/ul&gt;
-  /// &lt;p&gt;For example: &lt;code&gt;20h&lt;/code&gt; means the zonal shift
-  /// expires in 20 hours. &lt;code&gt;120m&lt;/code&gt; means the zonal shift
-  /// expires in 120 minutes (2 hours).&lt;/p&gt; </code></pre>
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>A lowercase letter m:</b> To specify that the value is in minutes.
+  /// </li>
+  /// <li>
+  /// <b>A lowercase letter h:</b> To specify that the value is in hours.
+  /// </li>
+  /// </ul>
+  /// For example: <code>20h</code> means the zonal shift expires in 20 hours.
+  /// <code>120m</code> means the zonal shift expires in 120 minutes (2 hours).
   ///
   /// Parameter [resourceIdentifier] :
-  /// The identifier for the resource to include in a zonal shift. The
-  /// identifier is the Amazon Resource Name (ARN) for the resource.
+  /// The identifier for the resource that Amazon Web Services shifts traffic
+  /// for. The identifier is the Amazon Resource Name (ARN) for the resource.
   ///
-  /// At this time, you can only start a zonal shift for Network Load Balancers
-  /// and Application Load Balancers with cross-zone load balancing turned off.
+  /// At this time, supported resources are Network Load Balancers and
+  /// Application Load Balancers with cross-zone load balancing turned off.
   Future<ZonalShift> startZonalShift({
     required String awayFrom,
     required String comment,
@@ -328,9 +581,179 @@ class ArcZonalShift {
     return ZonalShift.fromJson(response);
   }
 
+  /// Update the status of autoshift observer notification. Autoshift observer
+  /// notification enables you to be notified, through Amazon EventBridge, when
+  /// there is an autoshift event for zonal autoshift.
+  ///
+  /// If the status is <code>ENABLED</code>, Route 53 ARC includes all autoshift
+  /// events when you use the EventBridge pattern <code>Autoshift In
+  /// Progress</code>. When the status is <code>DISABLED</code>, Route 53 ARC
+  /// includes only autoshift events for autoshifts when one or more of your
+  /// resources is included in the autoshift.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.how-it-works.html#ZAShiftNotification">
+  /// Notifications for practice runs and autoshifts</a> in the Amazon Route 53
+  /// Application Recovery Controller Developer Guide.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ThrottlingException].
+  /// May throw [ValidationException].
+  /// May throw [AccessDeniedException].
+  ///
+  /// Parameter [status] :
+  /// The status to set for autoshift observer notification. If the status is
+  /// <code>ENABLED</code>, Route 53 ARC includes all autoshift events when you
+  /// use the Amazon EventBridge pattern <code>Autoshift In Progress</code>.
+  /// When the status is <code>DISABLED</code>, Route 53 ARC includes only
+  /// autoshift events for autoshifts when one or more of your resources is
+  /// included in the autoshift.
+  Future<UpdateAutoshiftObserverNotificationStatusResponse>
+      updateAutoshiftObserverNotificationStatus({
+    required AutoshiftObserverNotificationStatus status,
+  }) async {
+    final $payload = <String, dynamic>{
+      'status': status.value,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'PUT',
+      requestUri: '/autoshift-observer-notification',
+      exceptionFnMap: _exceptionFns,
+    );
+    return UpdateAutoshiftObserverNotificationStatusResponse.fromJson(response);
+  }
+
+  /// Update a practice run configuration to change one or more of the
+  /// following: add, change, or remove the blocking alarm; change the outcome
+  /// alarm; or add, change, or remove blocking dates or time windows.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ConflictException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ThrottlingException].
+  /// May throw [ValidationException].
+  /// May throw [AccessDeniedException].
+  ///
+  /// Parameter [resourceIdentifier] :
+  /// The identifier for the resource that you want to update the practice run
+  /// configuration for. The identifier is the Amazon Resource Name (ARN) for
+  /// the resource.
+  ///
+  /// Parameter [blockedDates] :
+  /// Add, change, or remove blocked dates for a practice run in zonal
+  /// autoshift.
+  ///
+  /// Optionally, you can block practice runs for specific calendar dates. The
+  /// format for blocked dates is: YYYY-MM-DD. Keep in mind, when you specify
+  /// dates, that dates and times for practice runs are in UTC. Separate
+  /// multiple blocked dates with spaces.
+  ///
+  /// For example, if you have an application update scheduled to launch on May
+  /// 1, 2024, and you don't want practice runs to shift traffic away at that
+  /// time, you could set a blocked date for <code>2024-05-01</code>.
+  ///
+  /// Parameter [blockedWindows] :
+  /// Add, change, or remove windows of days and times for when you can,
+  /// optionally, block Route 53 ARC from starting a practice run for a
+  /// resource.
+  ///
+  /// The format for blocked windows is: DAY:HH:SS-DAY:HH:SS. Keep in mind, when
+  /// you specify dates, that dates and times for practice runs are in UTC.
+  /// Also, be aware of potential time adjustments that might be required for
+  /// daylight saving time differences. Separate multiple blocked windows with
+  /// spaces.
+  ///
+  /// For example, say you run business report summaries three days a week. For
+  /// this scenario, you might set the following recurring days and times as
+  /// blocked windows, for example: <code>MON-20:30-21:30 WED-20:30-21:30
+  /// FRI-20:30-21:30</code>.
+  ///
+  /// Parameter [blockingAlarms] :
+  /// Add, change, or remove the Amazon CloudWatch alarm that you optionally
+  /// specify as the blocking alarm for practice runs.
+  ///
+  /// Parameter [outcomeAlarms] :
+  /// Specify a new the Amazon CloudWatch alarm as the outcome alarm for
+  /// practice runs.
+  Future<UpdatePracticeRunConfigurationResponse>
+      updatePracticeRunConfiguration({
+    required String resourceIdentifier,
+    List<String>? blockedDates,
+    List<String>? blockedWindows,
+    List<ControlCondition>? blockingAlarms,
+    List<ControlCondition>? outcomeAlarms,
+  }) async {
+    final $payload = <String, dynamic>{
+      if (blockedDates != null) 'blockedDates': blockedDates,
+      if (blockedWindows != null) 'blockedWindows': blockedWindows,
+      if (blockingAlarms != null) 'blockingAlarms': blockingAlarms,
+      if (outcomeAlarms != null) 'outcomeAlarms': outcomeAlarms,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'PATCH',
+      requestUri: '/configuration/${Uri.encodeComponent(resourceIdentifier)}',
+      exceptionFnMap: _exceptionFns,
+    );
+    return UpdatePracticeRunConfigurationResponse.fromJson(response);
+  }
+
+  /// The zonal autoshift configuration for a resource includes the practice run
+  /// configuration and the status for running autoshifts, zonal autoshift
+  /// status. When a resource has a practice run configuation, Route 53 ARC
+  /// starts weekly zonal shifts for the resource, to shift traffic away from an
+  /// Availability Zone. Weekly practice runs help you to make sure that your
+  /// application can continue to operate normally with the loss of one
+  /// Availability Zone.
+  ///
+  /// You can update the zonal autoshift autoshift status to enable or disable
+  /// zonal autoshift. When zonal autoshift is <code>ENABLED</code>, you
+  /// authorize Amazon Web Services to shift away resource traffic for an
+  /// application from an Availability Zone during events, on your behalf, to
+  /// help reduce time to recovery. Traffic is also shifted away for the
+  /// required weekly practice runs.
+  ///
+  /// May throw [InternalServerException].
+  /// May throw [ConflictException].
+  /// May throw [ResourceNotFoundException].
+  /// May throw [ThrottlingException].
+  /// May throw [ValidationException].
+  /// May throw [AccessDeniedException].
+  ///
+  /// Parameter [resourceIdentifier] :
+  /// The identifier for the resource that you want to update the zonal
+  /// autoshift configuration for. The identifier is the Amazon Resource Name
+  /// (ARN) for the resource.
+  ///
+  /// Parameter [zonalAutoshiftStatus] :
+  /// The zonal autoshift status for the resource that you want to update the
+  /// zonal autoshift configuration for. Choose <code>ENABLED</code> to
+  /// authorize Amazon Web Services to shift away resource traffic for an
+  /// application from an Availability Zone during events, on your behalf, to
+  /// help reduce time to recovery.
+  Future<UpdateZonalAutoshiftConfigurationResponse>
+      updateZonalAutoshiftConfiguration({
+    required String resourceIdentifier,
+    required ZonalAutoshiftStatus zonalAutoshiftStatus,
+  }) async {
+    final $payload = <String, dynamic>{
+      'zonalAutoshiftStatus': zonalAutoshiftStatus.value,
+    };
+    final response = await _protocol.send(
+      payload: $payload,
+      method: 'PUT',
+      requestUri:
+          '/managedresources/${Uri.encodeComponent(resourceIdentifier)}',
+      exceptionFnMap: _exceptionFns,
+    );
+    return UpdateZonalAutoshiftConfigurationResponse.fromJson(response);
+  }
+
   /// Update an active zonal shift in Amazon Route 53 Application Recovery
-  /// Controller in your AWS account. You can update a zonal shift to set a new
-  /// expiration, or edit or replace the comment for the zonal shift.
+  /// Controller in your Amazon Web Services account. You can update a zonal
+  /// shift to set a new expiration, or edit or replace the comment for the
+  /// zonal shift.
   ///
   /// May throw [InternalServerException].
   /// May throw [ConflictException].
@@ -391,30 +814,377 @@ class ArcZonalShift {
 }
 
 enum AppliedStatus {
-  applied,
-  notApplied,
+  applied('APPLIED'),
+  notApplied('NOT_APPLIED'),
+  ;
+
+  final String value;
+
+  const AppliedStatus(this.value);
+
+  static AppliedStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum AppliedStatus'));
 }
 
-extension AppliedStatusValueExtension on AppliedStatus {
-  String toValue() {
-    switch (this) {
-      case AppliedStatus.applied:
-        return 'APPLIED';
-      case AppliedStatus.notApplied:
-        return 'NOT_APPLIED';
-    }
+enum AutoshiftAppliedStatus {
+  applied('APPLIED'),
+  notApplied('NOT_APPLIED'),
+  ;
+
+  final String value;
+
+  const AutoshiftAppliedStatus(this.value);
+
+  static AutoshiftAppliedStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum AutoshiftAppliedStatus'));
+}
+
+enum AutoshiftExecutionStatus {
+  active('ACTIVE'),
+  completed('COMPLETED'),
+  ;
+
+  final String value;
+
+  const AutoshiftExecutionStatus(this.value);
+
+  static AutoshiftExecutionStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum AutoshiftExecutionStatus'));
+}
+
+/// A complex structure that lists an autoshift that is currently active for a
+/// managed resource and information about the autoshift.
+///
+/// For more information, see <a
+/// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.how-it-works.html">How
+/// zonal autoshift and practice runs work</a> in the Amazon Route 53
+/// Application Recovery Controller Developer Guide.
+class AutoshiftInResource {
+  /// The <code>appliedStatus</code> field specifies which application traffic
+  /// shift is in effect for a resource when there is more than one active traffic
+  /// shift. There can be more than one application traffic shift in progress at
+  /// the same time - that is, practice run zonal shifts, customer-initiated zonal
+  /// shifts, or an autoshift. The <code>appliedStatus</code> field for a shift
+  /// that is in progress for a resource can have one of two values:
+  /// <code>APPLIED</code> or <code>NOT_APPLIED</code>. The zonal shift or
+  /// autoshift that is currently in effect for the resource has an
+  /// <code>appliedStatus</code> set to <code>APPLIED</code>.
+  ///
+  /// The overall principle for precedence is that zonal shifts that you start as
+  /// a customer take precedence autoshifts, which take precedence over practice
+  /// runs. That is, customer-initiated zonal shifts &gt; autoshifts &gt; practice
+  /// run zonal shifts.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.how-it-works.html">How
+  /// zonal autoshift and practice runs work</a> in the Amazon Route 53
+  /// Application Recovery Controller Developer Guide.
+  final AutoshiftAppliedStatus appliedStatus;
+
+  /// The Availability Zone (for example, <code>use1-az1</code>) that traffic is
+  /// shifted away from for a resource, when Amazon Web Services starts an
+  /// autoshift. Until the autoshift ends, traffic for the resource is instead
+  /// directed to other Availability Zones in the Amazon Web Services Region. An
+  /// autoshift can end for a resource, for example, when Amazon Web Services ends
+  /// the autoshift for the Availability Zone or when you disable zonal autoshift
+  /// for the resource.
+  final String awayFrom;
+
+  /// The time (UTC) when the autoshift started.
+  final DateTime startTime;
+
+  AutoshiftInResource({
+    required this.appliedStatus,
+    required this.awayFrom,
+    required this.startTime,
+  });
+
+  factory AutoshiftInResource.fromJson(Map<String, dynamic> json) {
+    return AutoshiftInResource(
+      appliedStatus:
+          AutoshiftAppliedStatus.fromString((json['appliedStatus'] as String)),
+      awayFrom: json['awayFrom'] as String,
+      startTime: nonNullableTimeStampFromJson(json['startTime'] as Object),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final appliedStatus = this.appliedStatus;
+    final awayFrom = this.awayFrom;
+    final startTime = this.startTime;
+    return {
+      'appliedStatus': appliedStatus.value,
+      'awayFrom': awayFrom,
+      'startTime': unixTimestampToJson(startTime),
+    };
   }
 }
 
-extension AppliedStatusFromString on String {
-  AppliedStatus toAppliedStatus() {
-    switch (this) {
-      case 'APPLIED':
-        return AppliedStatus.applied;
-      case 'NOT_APPLIED':
-        return AppliedStatus.notApplied;
-    }
-    throw Exception('$this is not known in enum AppliedStatus');
+enum AutoshiftObserverNotificationStatus {
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
+
+  final String value;
+
+  const AutoshiftObserverNotificationStatus(this.value);
+
+  static AutoshiftObserverNotificationStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () => throw Exception(
+              '$value is not known in enum AutoshiftObserverNotificationStatus'));
+}
+
+/// Information about an autoshift. Amazon Web Services starts an autoshift to
+/// temporarily move traffic for a resource away from an Availability Zone in an
+/// Amazon Web Services Region when Amazon Web Services determines that there's
+/// an issue in the Availability Zone that could potentially affect customers.
+/// You can configure zonal autoshift in Route 53 ARC for managed resources in
+/// your Amazon Web Services account in a Region. Supported Amazon Web Services
+/// resources are automatically registered with Route 53 ARC.
+///
+/// Autoshifts are temporary. When the Availability Zone recovers, Amazon Web
+/// Services ends the autoshift, and traffic for the resource is no longer
+/// directed to the other Availability Zones in the Region.
+///
+/// You can stop an autoshift for a resource by disabling zonal autoshift.
+class AutoshiftSummary {
+  /// The Availability Zone (for example, <code>use1-az1</code>) that traffic is
+  /// shifted away from for a resource when Amazon Web Services starts an
+  /// autoshift. Until the autoshift ends, traffic for the resource is instead
+  /// directed to other Availability Zones in the Amazon Web Services Region. An
+  /// autoshift can end for a resource, for example, when Amazon Web Services ends
+  /// the autoshift for the Availability Zone or when you disable zonal autoshift
+  /// for the resource.
+  final String awayFrom;
+
+  /// The time (in UTC) when the autoshift ended.
+  final DateTime endTime;
+
+  /// The time (in UTC) when the autoshift started.
+  final DateTime startTime;
+
+  /// The status for an autoshift.
+  final AutoshiftExecutionStatus status;
+
+  AutoshiftSummary({
+    required this.awayFrom,
+    required this.endTime,
+    required this.startTime,
+    required this.status,
+  });
+
+  factory AutoshiftSummary.fromJson(Map<String, dynamic> json) {
+    return AutoshiftSummary(
+      awayFrom: json['awayFrom'] as String,
+      endTime: nonNullableTimeStampFromJson(json['endTime'] as Object),
+      startTime: nonNullableTimeStampFromJson(json['startTime'] as Object),
+      status: AutoshiftExecutionStatus.fromString((json['status'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final awayFrom = this.awayFrom;
+    final endTime = this.endTime;
+    final startTime = this.startTime;
+    final status = this.status;
+    return {
+      'awayFrom': awayFrom,
+      'endTime': unixTimestampToJson(endTime),
+      'startTime': unixTimestampToJson(startTime),
+      'status': status.value,
+    };
+  }
+}
+
+/// A control condition is an alarm that you specify for a practice run. When
+/// you configure practice runs with zonal autoshift for a resource, you specify
+/// Amazon CloudWatch alarms, which you create in CloudWatch to use with the
+/// practice run. The alarms that you specify are an <i>outcome alarm</i>, to
+/// monitor application health during practice runs and, optionally, a
+/// <i>blocking alarm</i>, to block practice runs from starting or to interrupt
+/// a practice run in progress.
+///
+/// Control condition alarms do not apply for autoshifts.
+///
+/// For more information, see <a
+/// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.considerations.html">
+/// Considerations when you configure zonal autoshift</a> in the Amazon Route 53
+/// Application Recovery Controller Developer Guide.
+class ControlCondition {
+  /// The Amazon Resource Name (ARN) for an Amazon CloudWatch alarm that you
+  /// specify as a control condition for a practice run.
+  final String alarmIdentifier;
+
+  /// The type of alarm specified for a practice run. You can only specify Amazon
+  /// CloudWatch alarms for practice runs, so the only valid value is
+  /// <code>CLOUDWATCH</code>.
+  final ControlConditionType type;
+
+  ControlCondition({
+    required this.alarmIdentifier,
+    required this.type,
+  });
+
+  factory ControlCondition.fromJson(Map<String, dynamic> json) {
+    return ControlCondition(
+      alarmIdentifier: json['alarmIdentifier'] as String,
+      type: ControlConditionType.fromString((json['type'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final alarmIdentifier = this.alarmIdentifier;
+    final type = this.type;
+    return {
+      'alarmIdentifier': alarmIdentifier,
+      'type': type.value,
+    };
+  }
+}
+
+enum ControlConditionType {
+  cloudwatch('CLOUDWATCH'),
+  ;
+
+  final String value;
+
+  const ControlConditionType(this.value);
+
+  static ControlConditionType fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ControlConditionType'));
+}
+
+class CreatePracticeRunConfigurationResponse {
+  /// The Amazon Resource Name (ARN) of the resource that you configured the
+  /// practice run for.
+  final String arn;
+
+  /// The name of the resource that you configured the practice run for.
+  final String name;
+
+  /// A practice run configuration for a resource. Configurations include the
+  /// outcome alarm that you specify for practice runs, and, optionally, a
+  /// blocking alarm and blocking dates and windows.
+  final PracticeRunConfiguration practiceRunConfiguration;
+
+  /// The status for zonal autoshift for a resource. When you specify
+  /// <code>ENABLED</code> for the autoshift status, Amazon Web Services shifts
+  /// traffic away from shifts away application resource traffic from an
+  /// Availability Zone, on your behalf, when internal telemetry indicates that
+  /// there is an Availability Zone impairment that could potentially impact
+  /// customers.
+  ///
+  /// When you enable zonal autoshift, you must also configure practice runs for
+  /// the resource.
+  final ZonalAutoshiftStatus zonalAutoshiftStatus;
+
+  CreatePracticeRunConfigurationResponse({
+    required this.arn,
+    required this.name,
+    required this.practiceRunConfiguration,
+    required this.zonalAutoshiftStatus,
+  });
+
+  factory CreatePracticeRunConfigurationResponse.fromJson(
+      Map<String, dynamic> json) {
+    return CreatePracticeRunConfigurationResponse(
+      arn: json['arn'] as String,
+      name: json['name'] as String,
+      practiceRunConfiguration: PracticeRunConfiguration.fromJson(
+          json['practiceRunConfiguration'] as Map<String, dynamic>),
+      zonalAutoshiftStatus: ZonalAutoshiftStatus.fromString(
+          (json['zonalAutoshiftStatus'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final arn = this.arn;
+    final name = this.name;
+    final practiceRunConfiguration = this.practiceRunConfiguration;
+    final zonalAutoshiftStatus = this.zonalAutoshiftStatus;
+    return {
+      'arn': arn,
+      'name': name,
+      'practiceRunConfiguration': practiceRunConfiguration,
+      'zonalAutoshiftStatus': zonalAutoshiftStatus.value,
+    };
+  }
+}
+
+class DeletePracticeRunConfigurationResponse {
+  /// The Amazon Resource Name (ARN) of the resource that you deleted the practice
+  /// run for.
+  final String arn;
+
+  /// The name of the resource that you deleted the practice run for.
+  final String name;
+
+  /// The status of zonal autoshift for the resource.
+  final ZonalAutoshiftStatus zonalAutoshiftStatus;
+
+  DeletePracticeRunConfigurationResponse({
+    required this.arn,
+    required this.name,
+    required this.zonalAutoshiftStatus,
+  });
+
+  factory DeletePracticeRunConfigurationResponse.fromJson(
+      Map<String, dynamic> json) {
+    return DeletePracticeRunConfigurationResponse(
+      arn: json['arn'] as String,
+      name: json['name'] as String,
+      zonalAutoshiftStatus: ZonalAutoshiftStatus.fromString(
+          (json['zonalAutoshiftStatus'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final arn = this.arn;
+    final name = this.name;
+    final zonalAutoshiftStatus = this.zonalAutoshiftStatus;
+    return {
+      'arn': arn,
+      'name': name,
+      'zonalAutoshiftStatus': zonalAutoshiftStatus.value,
+    };
+  }
+}
+
+class GetAutoshiftObserverNotificationStatusResponse {
+  /// The status of autoshift observer notification. If the status is
+  /// <code>ENABLED</code>, Route 53 ARC includes all autoshift events when you
+  /// use the Amazon EventBridge pattern <code>Autoshift In Progress</code>. When
+  /// the status is <code>DISABLED</code>, Route 53 ARC includes only autoshift
+  /// events for autoshifts when one or more of your resources is included in the
+  /// autoshift.
+  final AutoshiftObserverNotificationStatus status;
+
+  GetAutoshiftObserverNotificationStatusResponse({
+    required this.status,
+  });
+
+  factory GetAutoshiftObserverNotificationStatusResponse.fromJson(
+      Map<String, dynamic> json) {
+    return GetAutoshiftObserverNotificationStatusResponse(
+      status: AutoshiftObserverNotificationStatus.fromString(
+          (json['status'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final status = this.status;
+    return {
+      'status': status.value,
+    };
   }
 }
 
@@ -430,14 +1200,31 @@ class GetManagedResourceResponse {
   /// The Amazon Resource Name (ARN) for the resource.
   final String? arn;
 
+  /// An array of the autoshifts that are active for the resource.
+  final List<AutoshiftInResource>? autoshifts;
+
   /// The name of the resource.
   final String? name;
+
+  /// The practice run configuration for zonal autoshift that's associated with
+  /// the resource.
+  final PracticeRunConfiguration? practiceRunConfiguration;
+
+  /// The status for zonal autoshift for a resource. When the autoshift status is
+  /// <code>ENABLED</code>, Amazon Web Services shifts traffic for a resource away
+  /// from an Availability Zone, on your behalf, when Amazon Web Services
+  /// determines that there's an issue in the Availability Zone that could
+  /// potentially affect customers.
+  final ZonalAutoshiftStatus? zonalAutoshiftStatus;
 
   GetManagedResourceResponse({
     required this.appliedWeights,
     required this.zonalShifts,
     this.arn,
+    this.autoshifts,
     this.name,
+    this.practiceRunConfiguration,
+    this.zonalAutoshiftStatus,
   });
 
   factory GetManagedResourceResponse.fromJson(Map<String, dynamic> json) {
@@ -445,11 +1232,21 @@ class GetManagedResourceResponse {
       appliedWeights: (json['appliedWeights'] as Map<String, dynamic>)
           .map((k, e) => MapEntry(k, e as double)),
       zonalShifts: (json['zonalShifts'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ZonalShiftInResource.fromJson(e as Map<String, dynamic>))
           .toList(),
       arn: json['arn'] as String?,
+      autoshifts: (json['autoshifts'] as List?)
+          ?.nonNulls
+          .map((e) => AutoshiftInResource.fromJson(e as Map<String, dynamic>))
+          .toList(),
       name: json['name'] as String?,
+      practiceRunConfiguration: json['practiceRunConfiguration'] != null
+          ? PracticeRunConfiguration.fromJson(
+              json['practiceRunConfiguration'] as Map<String, dynamic>)
+          : null,
+      zonalAutoshiftStatus: (json['zonalAutoshiftStatus'] as String?)
+          ?.let(ZonalAutoshiftStatus.fromString),
     );
   }
 
@@ -457,12 +1254,56 @@ class GetManagedResourceResponse {
     final appliedWeights = this.appliedWeights;
     final zonalShifts = this.zonalShifts;
     final arn = this.arn;
+    final autoshifts = this.autoshifts;
     final name = this.name;
+    final practiceRunConfiguration = this.practiceRunConfiguration;
+    final zonalAutoshiftStatus = this.zonalAutoshiftStatus;
     return {
       'appliedWeights': appliedWeights,
       'zonalShifts': zonalShifts,
       if (arn != null) 'arn': arn,
+      if (autoshifts != null) 'autoshifts': autoshifts,
       if (name != null) 'name': name,
+      if (practiceRunConfiguration != null)
+        'practiceRunConfiguration': practiceRunConfiguration,
+      if (zonalAutoshiftStatus != null)
+        'zonalAutoshiftStatus': zonalAutoshiftStatus.value,
+    };
+  }
+}
+
+class ListAutoshiftsResponse {
+  /// The items in the response list.
+  final List<AutoshiftSummary>? items;
+
+  /// Specifies that you want to receive the next page of results. Valid only if
+  /// you received a <code>NextToken</code> response in the previous request. If
+  /// you did, it indicates that more output is available. Set this parameter to
+  /// the value provided by the previous call's <code>NextToken</code> response to
+  /// request the next page of results.
+  final String? nextToken;
+
+  ListAutoshiftsResponse({
+    this.items,
+    this.nextToken,
+  });
+
+  factory ListAutoshiftsResponse.fromJson(Map<String, dynamic> json) {
+    return ListAutoshiftsResponse(
+      items: (json['items'] as List?)
+          ?.nonNulls
+          .map((e) => AutoshiftSummary.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      nextToken: json['nextToken'] as String?,
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final items = this.items;
+    final nextToken = this.nextToken;
+    return {
+      if (items != null) 'items': items,
+      if (nextToken != null) 'nextToken': nextToken,
     };
   }
 }
@@ -486,7 +1327,7 @@ class ListManagedResourcesResponse {
   factory ListManagedResourcesResponse.fromJson(Map<String, dynamic> json) {
     return ListManagedResourcesResponse(
       items: (json['items'] as List)
-          .whereNotNull()
+          .nonNulls
           .map(
               (e) => ManagedResourceSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -523,7 +1364,7 @@ class ListZonalShiftsResponse {
   factory ListZonalShiftsResponse.fromJson(Map<String, dynamic> json) {
     return ListZonalShiftsResponse(
       items: (json['items'] as List?)
-          ?.whereNotNull()
+          ?.nonNulls
           .map((e) => ZonalShiftSummary.fromJson(e as Map<String, dynamic>))
           .toList(),
       nextToken: json['nextToken'] as String?,
@@ -540,61 +1381,339 @@ class ListZonalShiftsResponse {
   }
 }
 
-/// A complex structure for a managed resource in an account.
+/// A complex structure for a managed resource in an Amazon Web Services account
+/// with information about zonal shifts and autoshifts.
 ///
-/// A managed resource is a Network Load Balancer or Application Load Balancer
-/// that has been registered with Route 53 ARC by Elastic Load Balancing. You
-/// can start a zonal shift in Route 53 ARC for a managed resource to
-/// temporarily move traffic for the resource away from an Availability Zone in
-/// an AWS Region.
+/// A managed resource is a load balancer that has been registered with Route 53
+/// ARC by Elastic Load Balancing. You can start a zonal shift in Route 53 ARC
+/// for a managed resource to temporarily move traffic for the resource away
+/// from an Availability Zone in an Amazon Web Services Region. You can also
+/// configure zonal autoshift for a managed resource.
 /// <note>
-/// At this time, you can only start a zonal shift for Network Load Balancers
-/// and Application Load Balancers with cross-zone load balancing turned off.
+/// At this time, managed resources are Network Load Balancers and Application
+/// Load Balancers with cross-zone load balancing turned off.
 /// </note>
 class ManagedResourceSummary {
   /// The Availability Zones that a resource is deployed in.
   final List<String> availabilityZones;
 
+  /// A collection of key-value pairs that indicate whether resources are active
+  /// in Availability Zones or not. The key name is the Availability Zone where
+  /// the resource is deployed. The value is 1 or 0.
+  final Map<String, double>? appliedWeights;
+
   /// The Amazon Resource Name (ARN) for the managed resource.
   final String? arn;
+
+  /// An array of the autoshifts that have been completed for a resource.
+  final List<AutoshiftInResource>? autoshifts;
 
   /// The name of the managed resource.
   final String? name;
 
+  /// This status tracks whether a practice run configuration exists for a
+  /// resource. When you configure a practice run for a resource so that a
+  /// practice run configuration exists, Route 53 ARC sets this value to
+  /// <code>ENABLED</code>. If a you have not configured a practice run for the
+  /// resource, or delete a practice run configuration, Route 53 ARC sets the
+  /// value to <code>DISABLED</code>.
+  ///
+  /// Route 53 ARC updates this status; you can't set a practice run status to
+  /// <code>ENABLED</code> or <code>DISABLED</code>.
+  final ZonalAutoshiftStatus? practiceRunStatus;
+
+  /// The status of autoshift for a resource. When you configure zonal autoshift
+  /// for a resource, you can set the value of the status to <code>ENABLED</code>
+  /// or <code>DISABLED</code>.
+  final ZonalAutoshiftStatus? zonalAutoshiftStatus;
+
+  /// An array of the zonal shifts for a resource.
+  final List<ZonalShiftInResource>? zonalShifts;
+
   ManagedResourceSummary({
     required this.availabilityZones,
+    this.appliedWeights,
     this.arn,
+    this.autoshifts,
     this.name,
+    this.practiceRunStatus,
+    this.zonalAutoshiftStatus,
+    this.zonalShifts,
   });
 
   factory ManagedResourceSummary.fromJson(Map<String, dynamic> json) {
     return ManagedResourceSummary(
       availabilityZones: (json['availabilityZones'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => e as String)
           .toList(),
+      appliedWeights: (json['appliedWeights'] as Map<String, dynamic>?)
+          ?.map((k, e) => MapEntry(k, e as double)),
       arn: json['arn'] as String?,
+      autoshifts: (json['autoshifts'] as List?)
+          ?.nonNulls
+          .map((e) => AutoshiftInResource.fromJson(e as Map<String, dynamic>))
+          .toList(),
       name: json['name'] as String?,
+      practiceRunStatus: (json['practiceRunStatus'] as String?)
+          ?.let(ZonalAutoshiftStatus.fromString),
+      zonalAutoshiftStatus: (json['zonalAutoshiftStatus'] as String?)
+          ?.let(ZonalAutoshiftStatus.fromString),
+      zonalShifts: (json['zonalShifts'] as List?)
+          ?.nonNulls
+          .map((e) => ZonalShiftInResource.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 
   Map<String, dynamic> toJson() {
     final availabilityZones = this.availabilityZones;
+    final appliedWeights = this.appliedWeights;
     final arn = this.arn;
+    final autoshifts = this.autoshifts;
     final name = this.name;
+    final practiceRunStatus = this.practiceRunStatus;
+    final zonalAutoshiftStatus = this.zonalAutoshiftStatus;
+    final zonalShifts = this.zonalShifts;
     return {
       'availabilityZones': availabilityZones,
+      if (appliedWeights != null) 'appliedWeights': appliedWeights,
       if (arn != null) 'arn': arn,
+      if (autoshifts != null) 'autoshifts': autoshifts,
       if (name != null) 'name': name,
+      if (practiceRunStatus != null)
+        'practiceRunStatus': practiceRunStatus.value,
+      if (zonalAutoshiftStatus != null)
+        'zonalAutoshiftStatus': zonalAutoshiftStatus.value,
+      if (zonalShifts != null) 'zonalShifts': zonalShifts,
     };
   }
 }
 
+/// A practice run configuration for a resource includes the Amazon CloudWatch
+/// alarms that you've specified for a practice run, as well as any blocked
+/// dates or blocked windows for the practice run. When a resource has a
+/// practice run configuration, Route 53 ARC shifts traffic for the resource
+/// weekly for practice runs.
+///
+/// Practice runs are required for zonal autoshift. The zonal shifts that Route
+/// 53 ARC starts for practice runs help you to ensure that shifting away
+/// traffic from an Availability Zone during an autoshift is safe for your
+/// application.
+///
+/// You can update or delete a practice run configuration. Before you delete a
+/// practice run configuration, you must disable zonal autoshift for the
+/// resource. A practice run configuration is required when zonal autoshift is
+/// enabled.
+class PracticeRunConfiguration {
+  /// The <i>outcome alarm</i> for practice runs is an alarm that you specify that
+  /// ends a practice run when the alarm is in an <code>ALARM</code> state.
+  final List<ControlCondition> outcomeAlarms;
+
+  /// An array of one or more dates that you can specify when Amazon Web Services
+  /// does not start practice runs for a resource.
+  ///
+  /// Specify blocked dates, in UTC, in the format <code>YYYY-MM-DD</code>,
+  /// separated by spaces.
+  final List<String>? blockedDates;
+
+  /// An array of one or more windows of days and times that you can block Route
+  /// 53 ARC from starting practice runs for a resource.
+  ///
+  /// Specify the blocked windows in UTC, using the format
+  /// <code>DAY:HH:MM-DAY:HH:MM</code>, separated by spaces. For example,
+  /// <code>MON:18:30-MON:19:30 TUE:18:30-TUE:19:30</code>.
+  final List<String>? blockedWindows;
+
+  /// The <i>blocking alarm</i> for practice runs is an optional alarm that you
+  /// can specify that blocks practice runs when the alarm is in an
+  /// <code>ALARM</code> state.
+  final List<ControlCondition>? blockingAlarms;
+
+  PracticeRunConfiguration({
+    required this.outcomeAlarms,
+    this.blockedDates,
+    this.blockedWindows,
+    this.blockingAlarms,
+  });
+
+  factory PracticeRunConfiguration.fromJson(Map<String, dynamic> json) {
+    return PracticeRunConfiguration(
+      outcomeAlarms: (json['outcomeAlarms'] as List)
+          .nonNulls
+          .map((e) => ControlCondition.fromJson(e as Map<String, dynamic>))
+          .toList(),
+      blockedDates: (json['blockedDates'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
+      blockedWindows: (json['blockedWindows'] as List?)
+          ?.nonNulls
+          .map((e) => e as String)
+          .toList(),
+      blockingAlarms: (json['blockingAlarms'] as List?)
+          ?.nonNulls
+          .map((e) => ControlCondition.fromJson(e as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final outcomeAlarms = this.outcomeAlarms;
+    final blockedDates = this.blockedDates;
+    final blockedWindows = this.blockedWindows;
+    final blockingAlarms = this.blockingAlarms;
+    return {
+      'outcomeAlarms': outcomeAlarms,
+      if (blockedDates != null) 'blockedDates': blockedDates,
+      if (blockedWindows != null) 'blockedWindows': blockedWindows,
+      if (blockingAlarms != null) 'blockingAlarms': blockingAlarms,
+    };
+  }
+}
+
+enum PracticeRunOutcome {
+  failed('FAILED'),
+  interrupted('INTERRUPTED'),
+  pending('PENDING'),
+  succeeded('SUCCEEDED'),
+  ;
+
+  final String value;
+
+  const PracticeRunOutcome(this.value);
+
+  static PracticeRunOutcome fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum PracticeRunOutcome'));
+}
+
+class UpdateAutoshiftObserverNotificationStatusResponse {
+  /// The status for autoshift observer notification.
+  final AutoshiftObserverNotificationStatus status;
+
+  UpdateAutoshiftObserverNotificationStatusResponse({
+    required this.status,
+  });
+
+  factory UpdateAutoshiftObserverNotificationStatusResponse.fromJson(
+      Map<String, dynamic> json) {
+    return UpdateAutoshiftObserverNotificationStatusResponse(
+      status: AutoshiftObserverNotificationStatus.fromString(
+          (json['status'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final status = this.status;
+    return {
+      'status': status.value,
+    };
+  }
+}
+
+class UpdatePracticeRunConfigurationResponse {
+  /// The Amazon Resource Name (ARN) of the resource that you updated the practice
+  /// run for.
+  final String arn;
+
+  /// The name of the resource that you updated the practice run for.
+  final String name;
+
+  /// The practice run configuration that was updated.
+  final PracticeRunConfiguration practiceRunConfiguration;
+
+  /// The zonal autoshift status for the resource that you updated the practice
+  /// run for.
+  final ZonalAutoshiftStatus zonalAutoshiftStatus;
+
+  UpdatePracticeRunConfigurationResponse({
+    required this.arn,
+    required this.name,
+    required this.practiceRunConfiguration,
+    required this.zonalAutoshiftStatus,
+  });
+
+  factory UpdatePracticeRunConfigurationResponse.fromJson(
+      Map<String, dynamic> json) {
+    return UpdatePracticeRunConfigurationResponse(
+      arn: json['arn'] as String,
+      name: json['name'] as String,
+      practiceRunConfiguration: PracticeRunConfiguration.fromJson(
+          json['practiceRunConfiguration'] as Map<String, dynamic>),
+      zonalAutoshiftStatus: ZonalAutoshiftStatus.fromString(
+          (json['zonalAutoshiftStatus'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final arn = this.arn;
+    final name = this.name;
+    final practiceRunConfiguration = this.practiceRunConfiguration;
+    final zonalAutoshiftStatus = this.zonalAutoshiftStatus;
+    return {
+      'arn': arn,
+      'name': name,
+      'practiceRunConfiguration': practiceRunConfiguration,
+      'zonalAutoshiftStatus': zonalAutoshiftStatus.value,
+    };
+  }
+}
+
+class UpdateZonalAutoshiftConfigurationResponse {
+  /// The identifier for the resource that you updated the zonal autoshift
+  /// configuration for. The identifier is the Amazon Resource Name (ARN) for the
+  /// resource.
+  final String resourceIdentifier;
+
+  /// The updated zonal autoshift status for the resource.
+  final ZonalAutoshiftStatus zonalAutoshiftStatus;
+
+  UpdateZonalAutoshiftConfigurationResponse({
+    required this.resourceIdentifier,
+    required this.zonalAutoshiftStatus,
+  });
+
+  factory UpdateZonalAutoshiftConfigurationResponse.fromJson(
+      Map<String, dynamic> json) {
+    return UpdateZonalAutoshiftConfigurationResponse(
+      resourceIdentifier: json['resourceIdentifier'] as String,
+      zonalAutoshiftStatus: ZonalAutoshiftStatus.fromString(
+          (json['zonalAutoshiftStatus'] as String)),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    final resourceIdentifier = this.resourceIdentifier;
+    final zonalAutoshiftStatus = this.zonalAutoshiftStatus;
+    return {
+      'resourceIdentifier': resourceIdentifier,
+      'zonalAutoshiftStatus': zonalAutoshiftStatus.value,
+    };
+  }
+}
+
+enum ZonalAutoshiftStatus {
+  enabled('ENABLED'),
+  disabled('DISABLED'),
+  ;
+
+  final String value;
+
+  const ZonalAutoshiftStatus(this.value);
+
+  static ZonalAutoshiftStatus fromString(String value) => values.firstWhere(
+      (e) => e.value == value,
+      orElse: () =>
+          throw Exception('$value is not known in enum ZonalAutoshiftStatus'));
+}
+
 class ZonalShift {
-  /// The Availability Zone that traffic is moved away from for a resource when
-  /// you start a zonal shift. Until the zonal shift expires or you cancel it,
-  /// traffic for the resource is instead moved to other Availability Zones in the
-  /// AWS Region.
+  /// The Availability Zone (for example, <code>use1-az1</code>) that traffic is
+  /// moved away from for a resource when you start a zonal shift. Until the zonal
+  /// shift expires or you cancel it, traffic for the resource is instead moved to
+  /// other Availability Zones in the Amazon Web Services Region.
   final String awayFrom;
 
   /// A comment that you enter about the zonal shift. Only the latest comment is
@@ -602,26 +1721,27 @@ class ZonalShift {
   /// existing comment string.
   final String comment;
 
-  /// The expiry time (expiration time) for the zonal shift. A zonal shift is
-  /// temporary and must be set to expire when you start the zonal shift. You can
-  /// initially set a zonal shift to expire in a maximum of three days (72 hours).
-  /// However, you can update a zonal shift to set a new expiration at any time.
+  /// The expiry time (expiration time) for a customer-initiated zonal shift. A
+  /// zonal shift is temporary and must be set to expire when you start the zonal
+  /// shift. You can initially set a zonal shift to expire in a maximum of three
+  /// days (72 hours). However, you can update a zonal shift to set a new
+  /// expiration at any time.
   ///
   /// When you start a zonal shift, you specify how long you want it to be active,
   /// which Route 53 ARC converts to an expiry time (expiration time). You can
-  /// cancel a zonal shift, for example, if you're ready to restore traffic to the
-  /// Availability Zone. Or you can update the zonal shift to specify another
-  /// length of time to expire in.
+  /// cancel a zonal shift when you're ready to restore traffic to the
+  /// Availability Zone, or just wait for it to expire. Or you can update the
+  /// zonal shift to specify another length of time to expire in.
   final DateTime expiryTime;
 
-  /// The identifier for the resource to include in a zonal shift. The identifier
-  /// is the Amazon Resource Name (ARN) for the resource.
+  /// The identifier for the resource that Amazon Web Services shifts traffic for.
+  /// The identifier is the Amazon Resource Name (ARN) for the resource.
   ///
-  /// At this time, you can only start a zonal shift for Network Load Balancers
-  /// and Application Load Balancers with cross-zone load balancing turned off.
+  /// At this time, supported resources are Network Load Balancers and Application
+  /// Load Balancers with cross-zone load balancing turned off.
   final String resourceIdentifier;
 
-  /// The time (UTC) when the zonal shift is started.
+  /// The time (UTC) when the zonal shift starts.
   final DateTime startTime;
 
   /// A status for a zonal shift.
@@ -631,7 +1751,7 @@ class ZonalShift {
   ///
   /// <ul>
   /// <li>
-  /// <b>ACTIVE:</b> The zonal shift is started and active.
+  /// <b>ACTIVE:</b> The zonal shift has been started and active.
   /// </li>
   /// <li>
   /// <b>EXPIRED:</b> The zonal shift has expired (the expiry time was exceeded).
@@ -662,7 +1782,7 @@ class ZonalShift {
       expiryTime: nonNullableTimeStampFromJson(json['expiryTime'] as Object),
       resourceIdentifier: json['resourceIdentifier'] as String,
       startTime: nonNullableTimeStampFromJson(json['startTime'] as Object),
-      status: (json['status'] as String).toZonalShiftStatus(),
+      status: ZonalShiftStatus.fromString((json['status'] as String)),
       zonalShiftId: json['zonalShiftId'] as String,
     );
   }
@@ -681,7 +1801,7 @@ class ZonalShift {
       'expiryTime': unixTimestampToJson(expiryTime),
       'resourceIdentifier': resourceIdentifier,
       'startTime': unixTimestampToJson(startTime),
-      'status': status.toValue(),
+      'status': status.value,
       'zonalShiftId': zonalShiftId,
     };
   }
@@ -690,31 +1810,49 @@ class ZonalShift {
 /// A complex structure that lists the zonal shifts for a managed resource and
 /// their statuses for the resource.
 class ZonalShiftInResource {
-  /// An <code>appliedStatus</code> for a zonal shift for a resource can have one
-  /// of two values: <code>APPLIED</code> or <code>NOT_APPLIED</code>.
+  /// The <code>appliedStatus</code> field specifies which application traffic
+  /// shift is in effect for a resource when there is more than one active traffic
+  /// shift. There can be more than one application traffic shift in progress at
+  /// the same time - that is, practice run zonal shifts, customer-initiated zonal
+  /// shifts, or an autoshift. The <code>appliedStatus</code> field for a shift
+  /// that is in progress for a resource can have one of two values:
+  /// <code>APPLIED</code> or <code>NOT_APPLIED</code>. The zonal shift or
+  /// autoshift that is currently in effect for the resource has an
+  /// <code>appliedStatus</code> set to <code>APPLIED</code>.
+  ///
+  /// The overall principle for precedence is that zonal shifts that you start as
+  /// a customer take precedence autoshifts, which take precedence over practice
+  /// runs. That is, customer-initiated zonal shifts &gt; autoshifts &gt; practice
+  /// run zonal shifts.
+  ///
+  /// For more information, see <a
+  /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.how-it-works.html">How
+  /// zonal autoshift and practice runs work</a> in the Amazon Route 53
+  /// Application Recovery Controller Developer Guide.
   final AppliedStatus appliedStatus;
 
-  /// The Availability Zone that traffic is moved away from for a resource when
-  /// you start a zonal shift. Until the zonal shift expires or you cancel it,
-  /// traffic for the resource is instead moved to other Availability Zones in the
-  /// AWS Region.
+  /// The Availability Zone (for example, <code>use1-az1</code>) that traffic is
+  /// moved away from for a resource when you start a zonal shift. Until the zonal
+  /// shift expires or you cancel it, traffic for the resource is instead moved to
+  /// other Availability Zones in the Amazon Web Services Region.
   final String awayFrom;
 
-  /// A comment that you enter about the zonal shift. Only the latest comment is
-  /// retained; no comment history is maintained. That is, a new comment
-  /// overwrites any existing comment string.
+  /// A comment that you enter for a customer-initiated zonal shift. Only the
+  /// latest comment is retained; no comment history is maintained. That is, a new
+  /// comment overwrites any existing comment string.
   final String comment;
 
-  /// The expiry time (expiration time) for the zonal shift. A zonal shift is
-  /// temporary and must be set to expire when you start the zonal shift. You can
-  /// initially set a zonal shift to expire in a maximum of three days (72 hours).
-  /// However, you can update a zonal shift to set a new expiration at any time.
+  /// The expiry time (expiration time) for a customer-initiated zonal shift. A
+  /// zonal shift is temporary and must be set to expire when you start the zonal
+  /// shift. You can initially set a zonal shift to expire in a maximum of three
+  /// days (72 hours). However, you can update a zonal shift to set a new
+  /// expiration at any time.
   ///
   /// When you start a zonal shift, you specify how long you want it to be active,
   /// which Route 53 ARC converts to an expiry time (expiration time). You can
-  /// cancel a zonal shift, for example, if you're ready to restore traffic to the
-  /// Availability Zone. Or you can update the zonal shift to specify another
-  /// length of time to expire in.
+  /// cancel a zonal shift when you're ready to restore traffic to the
+  /// Availability Zone, or just wait for it to expire. Or you can update the
+  /// zonal shift to specify another length of time to expire in.
   final DateTime expiryTime;
 
   /// The identifier for the resource to include in a zonal shift. The identifier
@@ -724,11 +1862,41 @@ class ZonalShiftInResource {
   /// and Application Load Balancers with cross-zone load balancing turned off.
   final String resourceIdentifier;
 
-  /// The time (UTC) when the zonal shift is started.
+  /// The time (UTC) when the zonal shift starts.
   final DateTime startTime;
 
   /// The identifier of a zonal shift.
   final String zonalShiftId;
+
+  /// The outcome, or end state, returned for a practice run. The following values
+  /// can be returned:
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>PENDING:</b> Outcome value when a practice run is in progress.
+  /// </li>
+  /// <li>
+  /// <b>SUCCEEDED:</b> Outcome value when the outcome alarm specified for the
+  /// practice run configuration does not go into an <code>ALARM</code> state
+  /// during the practice run, and the practice run was not interrupted before it
+  /// completed the expected 30 minute zonal shift.
+  /// </li>
+  /// <li>
+  /// <b>INTERRUPTED:</b> Outcome value when the practice run was stopped before
+  /// the expected 30 minute zonal shift duration, or there was another problem
+  /// with the practice run that created an inconclusive outcome.
+  /// </li>
+  /// <li>
+  /// <b>FAILED:</b> Outcome value when the outcome alarm specified for the
+  /// practice run configuration goes into an <code>ALARM</code> state during the
+  /// practice run, and the practice run was not interrupted before it completed.
+  /// </li>
+  /// </ul>
+  /// For more information about practice run outcomes, see <a
+  /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.configure.html">
+  /// Considerations when you configure zonal autoshift</a> in the Amazon Route 53
+  /// Application Recovery Controller Developer Guide.
+  final PracticeRunOutcome? practiceRunOutcome;
 
   ZonalShiftInResource({
     required this.appliedStatus,
@@ -738,17 +1906,21 @@ class ZonalShiftInResource {
     required this.resourceIdentifier,
     required this.startTime,
     required this.zonalShiftId,
+    this.practiceRunOutcome,
   });
 
   factory ZonalShiftInResource.fromJson(Map<String, dynamic> json) {
     return ZonalShiftInResource(
-      appliedStatus: (json['appliedStatus'] as String).toAppliedStatus(),
+      appliedStatus:
+          AppliedStatus.fromString((json['appliedStatus'] as String)),
       awayFrom: json['awayFrom'] as String,
       comment: json['comment'] as String,
       expiryTime: nonNullableTimeStampFromJson(json['expiryTime'] as Object),
       resourceIdentifier: json['resourceIdentifier'] as String,
       startTime: nonNullableTimeStampFromJson(json['startTime'] as Object),
       zonalShiftId: json['zonalShiftId'] as String,
+      practiceRunOutcome: (json['practiceRunOutcome'] as String?)
+          ?.let(PracticeRunOutcome.fromString),
     );
   }
 
@@ -760,72 +1932,52 @@ class ZonalShiftInResource {
     final resourceIdentifier = this.resourceIdentifier;
     final startTime = this.startTime;
     final zonalShiftId = this.zonalShiftId;
+    final practiceRunOutcome = this.practiceRunOutcome;
     return {
-      'appliedStatus': appliedStatus.toValue(),
+      'appliedStatus': appliedStatus.value,
       'awayFrom': awayFrom,
       'comment': comment,
       'expiryTime': unixTimestampToJson(expiryTime),
       'resourceIdentifier': resourceIdentifier,
       'startTime': unixTimestampToJson(startTime),
       'zonalShiftId': zonalShiftId,
+      if (practiceRunOutcome != null)
+        'practiceRunOutcome': practiceRunOutcome.value,
     };
   }
 }
 
 enum ZonalShiftStatus {
-  active,
-  expired,
-  canceled,
+  active('ACTIVE'),
+  expired('EXPIRED'),
+  canceled('CANCELED'),
+  ;
+
+  final String value;
+
+  const ZonalShiftStatus(this.value);
+
+  static ZonalShiftStatus fromString(String value) =>
+      values.firstWhere((e) => e.value == value,
+          orElse: () =>
+              throw Exception('$value is not known in enum ZonalShiftStatus'));
 }
 
-extension ZonalShiftStatusValueExtension on ZonalShiftStatus {
-  String toValue() {
-    switch (this) {
-      case ZonalShiftStatus.active:
-        return 'ACTIVE';
-      case ZonalShiftStatus.expired:
-        return 'EXPIRED';
-      case ZonalShiftStatus.canceled:
-        return 'CANCELED';
-    }
-  }
-}
-
-extension ZonalShiftStatusFromString on String {
-  ZonalShiftStatus toZonalShiftStatus() {
-    switch (this) {
-      case 'ACTIVE':
-        return ZonalShiftStatus.active;
-      case 'EXPIRED':
-        return ZonalShiftStatus.expired;
-      case 'CANCELED':
-        return ZonalShiftStatus.canceled;
-    }
-    throw Exception('$this is not known in enum ZonalShiftStatus');
-  }
-}
-
-/// You start a zonal shift to temporarily move load balancer traffic away from
-/// an Availability Zone in a AWS Region. A zonal shift helps your application
-/// recover immediately, for example, from a developer's bad code deployment or
-/// from an AWS infrastructure failure in a single Availability Zone. You can
-/// start a zonal shift in Route 53 ARC only for managed resources in your
-/// account in an AWS Region. Supported AWS resources are automatically
-/// registered with Route 53 ARC.
+/// Lists information about zonal shifts in Amazon Route 53 Application Recovery
+/// Controller, including zonal shifts that you start yourself and zonal shifts
+/// that Route 53 ARC starts on your behalf for practice runs with zonal
+/// autoshift.
 ///
-/// Zonal shifts are temporary. A zonal shift can be active for up to three days
-/// (72 hours).
-///
-/// When you start a zonal shift, you specify how long you want it to be active,
-/// which Amazon Route 53 Application Recovery Controller converts to an expiry
-/// time (expiration time). You can cancel a zonal shift, for example, if you're
-/// ready to restore traffic to the Availability Zone. Or you can extend the
-/// zonal shift by updating the expiration so the zonal shift is active longer.
+/// Zonal shifts are temporary, including customer-initiated zonal shifts and
+/// the zonal autoshift practice run zonal shifts that Route 53 ARC starts
+/// weekly, on your behalf. A zonal shift that a customer starts can be active
+/// for up to three days (72 hours). A practice run zonal shift has a 30 minute
+/// duration.
 class ZonalShiftSummary {
-  /// The Availability Zone that traffic is moved away from for a resource when
-  /// you start a zonal shift. Until the zonal shift expires or you cancel it,
-  /// traffic for the resource is instead moved to other Availability Zones in the
-  /// AWS Region.
+  /// The Availability Zone (for example, <code>use1-az1</code>) that traffic is
+  /// moved away from for a resource when you start a zonal shift. Until the zonal
+  /// shift expires or you cancel it, traffic for the resource is instead moved to
+  /// other Availability Zones in the Amazon Web Services Region.
   final String awayFrom;
 
   /// A comment that you enter about the zonal shift. Only the latest comment is
@@ -833,16 +1985,17 @@ class ZonalShiftSummary {
   /// overwrites any existing comment string.
   final String comment;
 
-  /// The expiry time (expiration time) for the zonal shift. A zonal shift is
-  /// temporary and must be set to expire when you start the zonal shift. You can
-  /// initially set a zonal shift to expire in a maximum of three days (72 hours).
-  /// However, you can update a zonal shift to set a new expiration at any time.
+  /// The expiry time (expiration time) for a customer-initiated zonal shift. A
+  /// zonal shift is temporary and must be set to expire when you start the zonal
+  /// shift. You can initially set a zonal shift to expire in a maximum of three
+  /// days (72 hours). However, you can update a zonal shift to set a new
+  /// expiration at any time.
   ///
   /// When you start a zonal shift, you specify how long you want it to be active,
   /// which Route 53 ARC converts to an expiry time (expiration time). You can
-  /// cancel a zonal shift, for example, if you're ready to restore traffic to the
-  /// Availability Zone. Or you can update the zonal shift to specify another
-  /// length of time to expire in.
+  /// cancel a zonal shift when you're ready to restore traffic to the
+  /// Availability Zone, or just wait for it to expire. Or you can update the
+  /// zonal shift to specify another length of time to expire in.
   final DateTime expiryTime;
 
   /// The identifier for the resource to include in a zonal shift. The identifier
@@ -852,7 +2005,7 @@ class ZonalShiftSummary {
   /// and Application Load Balancers with cross-zone load balancing turned off.
   final String resourceIdentifier;
 
-  /// The time (UTC) when the zonal shift is started.
+  /// The time (UTC) when the zonal shift starts.
   final DateTime startTime;
 
   /// A status for a zonal shift.
@@ -862,7 +2015,7 @@ class ZonalShiftSummary {
   ///
   /// <ul>
   /// <li>
-  /// <b>ACTIVE:</b> The zonal shift is started and active.
+  /// <b>ACTIVE:</b> The zonal shift has been started and active.
   /// </li>
   /// <li>
   /// <b>EXPIRED:</b> The zonal shift has expired (the expiry time was exceeded).
@@ -876,6 +2029,36 @@ class ZonalShiftSummary {
   /// The identifier of a zonal shift.
   final String zonalShiftId;
 
+  /// The outcome, or end state, of a practice run. The following values can be
+  /// returned:
+  ///
+  /// <ul>
+  /// <li>
+  /// <b>PENDING:</b> Outcome value when the practice run is in progress.
+  /// </li>
+  /// <li>
+  /// <b>SUCCEEDED:</b> Outcome value when the outcome alarm specified for the
+  /// practice run configuration does not go into an <code>ALARM</code> state
+  /// during the practice run, and the practice run was not interrupted before it
+  /// completed.
+  /// </li>
+  /// <li>
+  /// <b>INTERRUPTED:</b> Outcome value when the practice run did not run for the
+  /// expected 30 minutes or there was another problem with the practice run that
+  /// created an inconclusive outcome.
+  /// </li>
+  /// <li>
+  /// <b>FAILED:</b> Outcome value when the outcome alarm specified for the
+  /// practice run configuration goes into an <code>ALARM</code> state during the
+  /// practice run, and the practice run was not interrupted before it completed.
+  /// </li>
+  /// </ul>
+  /// For more information about practice run outcomes, see <a
+  /// href="https://docs.aws.amazon.com/r53recovery/latest/dg/arc-zonal-autoshift.configure.html">
+  /// Considerations when you configure zonal autoshift</a> in the Amazon Route 53
+  /// Application Recovery Controller Developer Guide.
+  final PracticeRunOutcome? practiceRunOutcome;
+
   ZonalShiftSummary({
     required this.awayFrom,
     required this.comment,
@@ -884,6 +2067,7 @@ class ZonalShiftSummary {
     required this.startTime,
     required this.status,
     required this.zonalShiftId,
+    this.practiceRunOutcome,
   });
 
   factory ZonalShiftSummary.fromJson(Map<String, dynamic> json) {
@@ -893,8 +2077,10 @@ class ZonalShiftSummary {
       expiryTime: nonNullableTimeStampFromJson(json['expiryTime'] as Object),
       resourceIdentifier: json['resourceIdentifier'] as String,
       startTime: nonNullableTimeStampFromJson(json['startTime'] as Object),
-      status: (json['status'] as String).toZonalShiftStatus(),
+      status: ZonalShiftStatus.fromString((json['status'] as String)),
       zonalShiftId: json['zonalShiftId'] as String,
+      practiceRunOutcome: (json['practiceRunOutcome'] as String?)
+          ?.let(PracticeRunOutcome.fromString),
     );
   }
 
@@ -906,14 +2092,17 @@ class ZonalShiftSummary {
     final startTime = this.startTime;
     final status = this.status;
     final zonalShiftId = this.zonalShiftId;
+    final practiceRunOutcome = this.practiceRunOutcome;
     return {
       'awayFrom': awayFrom,
       'comment': comment,
       'expiryTime': unixTimestampToJson(expiryTime),
       'resourceIdentifier': resourceIdentifier,
       'startTime': unixTimestampToJson(startTime),
-      'status': status.toValue(),
+      'status': status.value,
       'zonalShiftId': zonalShiftId,
+      if (practiceRunOutcome != null)
+        'practiceRunOutcome': practiceRunOutcome.value,
     };
   }
 }

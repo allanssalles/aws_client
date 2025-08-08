@@ -1,4 +1,5 @@
 // ignore_for_file: deprecated_member_use_from_same_package
+// ignore_for_file: unintended_html_in_doc_comment
 // ignore_for_file: unused_element
 // ignore_for_file: unused_field
 // ignore_for_file: unused_import
@@ -188,11 +189,11 @@ class PutAuditEventsResponse {
   factory PutAuditEventsResponse.fromJson(Map<String, dynamic> json) {
     return PutAuditEventsResponse(
       failed: (json['failed'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => ResultErrorEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
       successful: (json['successful'] as List)
-          .whereNotNull()
+          .nonNulls
           .map((e) => AuditEventResultEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
     );
